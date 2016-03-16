@@ -54,7 +54,7 @@ class UserDatafile extends Model
 		    $character = Auth::user()->getCharacterFromDataTag($charTag, false);
 		    
 		    if ($character) {
-				$scanTime = (@$charData['scanTimes']) ? max($charData['scanTimes']['inventory'], $charData['scanTimes']['bank'], $charData['scanTimes']['bags']) : 0;
+				$scanTime = (@$charData['scanTimes']) ? max(@$charData['scanTimes']['inventory'], @$charData['scanTimes']['bank'], @$charData['scanTimes']['bags']) : 0;
 				
 				if ($scanTime > $character->last_scanned) {
 					if (@$charData['equipped']) {
