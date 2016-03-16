@@ -14,7 +14,7 @@ class AddItemDisplayIdFieldToUserItemsTable extends Migration
     {
         Schema::table('user_items', function (Blueprint $table) {
             $table->integer('item_display_id')->nullable()->unsigned()->after('item_id');
-			$table->foreign('item_display_id')->references('id')->on('item_contexts')->onDelete('cascade');
+			$table->foreign('item_display_id')->references('id')->on('item_displays')->onDelete('cascade');
         });
     }
 
