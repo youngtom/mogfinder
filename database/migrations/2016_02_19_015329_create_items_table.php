@@ -19,7 +19,7 @@ class CreateItemsTable extends Migration
 			$table->foreign('item_context_id')->references('id')->on('item_contexts')->onDelete('cascade');
 			$table->string('bonus')->nullable();
             $table->integer('item_display_id')->nullable()->unsigned();
-			$table->foreign('item_display_id')->references('id')->on('item_contexts')->onDelete('cascade');
+			$table->foreign('item_display_id')->references('id')->on('item_displays')->onDelete('cascade');
             $table->string('name');
             $table->integer('item_bind')->nullable();
             $table->integer('buy_price');
