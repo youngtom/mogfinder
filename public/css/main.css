@@ -1,0 +1,112 @@
+.navbar-form input, .form-inline input {
+	width:auto;
+}
+
+.navbar {
+    margin-bottom: 0;
+}
+
+.subnav {
+	margin: 0;
+	top: 0px;
+	z-index: 1020;
+	background: #333;
+}
+
+.subnav .container { width: 100%; }
+
+.item-scroll-with-nav .subnav.affix, .subnav.affix {
+	position: fixed;
+	top: 51px;
+	z-index: 10;
+	width: inherit;
+	-webkit-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.75);
+	box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.75);
+	border-top-left-radius: 0px;
+	border-top-right-radius: 0px;
+}
+
+.item-scroll-with-nav {
+	padding-top: 70px;
+	position: relative;
+}
+
+.item-scroll-with-nav .subnav {
+	position: absolute;
+	top: 0px;
+}
+
+.game-icon-sm {
+	display: inline-block;
+	background-size: 100% 100%;
+	width: 20px;
+	height: 20px;
+	vertical-align: middle;
+}
+
+.item-link.q0 { color: #9d9d9d; }
+.item-link.q1 { color: #fff; }
+.item-link.q2 { color: #1eff00; }
+.item-link.q3 { color: #0070dd; }
+.item-link.q4 { color: #a335ee; }
+.item-link.q5 { color: #ff8000; }
+.item-link.q6 { color: #e5cc80; }
+.item-link.q7 { color: #e5cc80; }
+.item-link.q8 { color: #0cf; }
+
+a.death-knight { color: #C41F3B !important; }
+a.druid { color: #FF7D0A !important; }
+a.hunter { color: #ABD473 !important; }
+a.mage { color: #69CCF0 !important; }
+a.monk { color: #00FF96 !important; }
+a.paladin { color: #F58CBA !important; }
+a.priest { color: #fff !important; }
+a.rogue { color: #FFF569 !important; }
+a.shaman { color: #0070DE !important; }
+a.warlock { color: #9482C9 !important; }
+a.warrior { color: #C79C6E !important; }
+
+.btn[data-class="death-knight"] { background-color: rgba(196, 30, 59, 100); }
+.btn[data-class="druid"] { background-color: rgba(255, 125, 10, 100); }
+.btn[data-class="hunter"] { background-color: rgba(171, 212, 115, 100); color: #333; }
+.btn[data-class="mage"] { background-color: rgba(105, 204, 240, 100); color: #333; }
+.btn[data-class="monk"] { background-color: rgba(0, 255, 150, 100); color: #333; }
+.btn[data-class="paladin"] { background-color: rgba(245, 140, 186, 100); }
+.btn[data-class="priest"] { background-color: rgba(255, 255, 255 , 100); color: #333; }
+.btn[data-class="rogue"] { background-color: rgba(255, 245, 105, 100); color: #333; }
+.btn[data-class="shaman"] { background-color: rgba(0, 112, 222, 100); }
+.btn[data-class="warlock"] { background-color: rgba(148, 130, 201, 100); }
+.btn[data-class="warrior"] { background-color: rgba(199, 156, 110, 100); }
+
+.mogslot-summary h3 { margin-top: 0px; }
+
+.mogslot-progress-wrapper { 
+	margin-bottom: 10px;
+	display: block;
+}
+.mogslot-progress-wrapper .progress {
+	margin-bottom: 0px;
+	width: calc(100% - 25px);
+	display: inline-block;
+	vertical-align: middle;
+	position: relative;
+}
+
+.mogslot-progress-wrapper .progress .progress-label {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	text-align: center;
+	line-height: 20px;
+	text-shadow: 1px 1px 1px rgba(0, 0, 0, .75);
+	color: white;
+	font-size: 75%;
+	transition: all 0.2s ease;
+}
+
+.mogslot-progress-wrapper:hover .progress .progress-label.summary { opacity: 0; }
+.mogslot-progress-wrapper .progress .progress-label.mogslot-info { opacity: 0; }
+.mogslot-progress-wrapper:hover .progress .progress-label.mogslot-info { opacity: 1; }

@@ -1,0 +1,199 @@
+$(window).on('load', function () {
+	$('.collected-toggle-btn').on('click', function () {
+		var collected = parseInt($(this).attr('data-collected'));
+		
+		if ($(this).hasClass('btn-primary')) {
+			$(this).removeClass('btn-primary');
+			$(this).addClass('btn-default');
+			
+			if (collected) {
+				$('.item-display-group').addClass('hide-collected');
+			} else {
+				$('.item-display-group').addClass('hide-uncollected');
+			}
+		} else {
+			$(this).addClass('btn-primary');
+			$(this).removeClass('btn-default');
+			
+			if (collected) {
+				$('.item-display-group').removeClass('hide-collected');
+			} else {
+				$('.item-display-group').removeClass('hide-uncollected');
+			}
+		}
+		
+		resetScroll();
+	});
+	
+	$('.quest-toggle-btn').on('click', function () {
+		if ($(this).hasClass('btn-primary')) {
+			$(this).removeClass('btn-primary');
+			$(this).addClass('btn-default');
+			$('.item-row[data-quest-item="1"]').addClass('quest-filtered');
+			
+			$('.item-display-panel').each(function () {
+				var $validRows = $('.item-row:not(.quest-filtered)', $(this));
+				
+				if ($validRows.length <= 1) {
+					$(this).addClass('quest-filtered');
+				}
+			});
+		} else {
+			$(this).addClass('btn-primary');
+			$(this).removeClass('btn-default');
+			$('.item-row').removeClass('quest-filtered');
+			$('.item-display-panel').removeClass('quest-filtered');
+		}
+		
+		resetScroll();
+	});
+	
+	$('.selectable-filter .dropdown-menu li a').on('click', function () {
+		var $dropDown = $(this).closest('.selectable-filter');
+		
+		$('.dropdown-menu li:not(.all-select)', $dropDown).show();
+		
+		if ($(this).hasClass('show-all')) {
+			$dropDown.addClass('all-selected');
+			$('.selected-value', $dropDown).html('All');
+			$('.btn.dropdown-toggle', $dropDown).attr('data-class', '');
+		} else {
+			$dropDown.removeClass('all-selected');
+			$('.selected-value', $dropDown).html($(this).html());
+			$(this).parent().hide();
+			$('.btn.dropdown-toggle', $dropDown).attr('data-class', $(this).attr('data-class-code'));
+		}
+	});
+	
+	$('.class-filter .dropdown-menu li a').on('click', function () {
+		var classID = parseInt($(this).attr('data-class-id'));
+		filterClassItems(classID);
+		
+		if (classID) {
+			$('.panel-group').addClass('class-filtered');
+			$('.btn.dropdown-toggle', $(this).parents('.class-filter')).removeClass('btn-primary').addClass('btn-default');
+		} else {
+			$('.panel-group').removeClass('class-filtered');
+			$('.btn.dropdown-toggle', $(this).parents('.class-filter')).addClass('btn-primary').removeClass('btn-default');
+		}
+		
+		return false;
+	});
+	
+	$('.source-filter .dropdown-menu li a').on('click', function () {
+		var sourceID = $(this).attr('data-source-id');
+		filterSourceItems(sourceID);
+		
+		if (sourceID != '0') {
+			$('.panel-group').addClass('source-filtered');
+			$('.source-filter .dropdown-toggle').addClass('btn-success').removeClass('btn-default');
+		} else {
+			$('.panel-group').removeClass('source-filtered');
+			$('.source-filter .dropdown-toggle').addClass('btn-default').removeClass('btn-success');
+		}
+		
+		return false;
+	});
+	
+	$('.character-filter .dropdown-menu li a').on('click', function () {
+		var charID = parseInt($(this).attr('data-character-id'));
+		filterCharacterItems(charID);
+		
+		if (charID) {
+			$('.panel-group').addClass('chaaracter-filtered');
+		} else {
+			$('.panel-group').removeClass('character-filtered');
+		}
+		
+		$('.character-filter .dropdown-toggle').dropdown("toggle");
+		
+		return false;
+	});
+});
+
+function filterClassItems(classID) {
+	$('.item-row').removeClass('invalid-class');
+	
+	if (classID) {
+		var classMask = Math.pow(2, classID);
+		
+		$('.item-row[data-classmask!="0"]').each(function () {
+			var itemMask = parseInt($(this).attr('data-classmask'));
+			
+			if ((classMask & itemMask) == 0) {
+				$(this).addClass('invalid-class');
+			}
+		});
+	}
+		
+	updateItemDisplayPanels();
+}
+
+function filterCharacterItems(charID) {
+	$('.item-display-panel').removeClass('filtered');
+	
+	if (charID) {
+		$('.item-display-panel').each(function () {
+			if (!$('.item-row[data-character-id="' + charID + '"]', $(this)).length) {
+				$(this).addClass('filtered');
+			}
+		});
+	}
+}
+
+function filterSourceItems(sourceID) {
+	$('.item-row').removeClass('invalid-source');
+	
+	if (sourceID != '0') {
+		$('.item-row[data-sources!="0"]').each(function () {
+			if (($(this).attr('data-sources') != sourceID) && (parseInt($.inArray(sourceID, $(this).attr('data-sources').split('|'))) < 0)) {
+				$(this).addClass('invalid-source');
+			}
+		});
+	}
+		
+	updateItemDisplayPanels();
+}
+
+function updateItemDisplayPanels() {
+	$('.item-display-panel').each(function () {
+		var $validRows = $('.item-row:not(.invalid-class,.invalid-race,.invalid-character,.invalid-source)', $(this));
+		
+		if ($validRows.length) {
+			$(this).removeClass('filtered');
+			
+			$('.display-item-link', $(this)).html($('.itemname', $validRows.first()).html());
+			
+			if ($validRows.length > 1) {
+				var addlStr = '(and ' + String($validRows.length - 1) + ' other';
+				addlStr = ($validRows.length > 2) ? addlStr + 's)' : addlStr + ')';
+				$('.num-addl-items', $(this)).show().html(addlStr);
+			} else {
+				$('.num-addl-items', $(this)).hide();
+			}
+		} else {
+			$(this).addClass('filtered');
+		}
+		
+		if ($('.item-row[data-item-collected="1"]:not(.invalid-class,.invalid-race,.invalid-character,.invalid-source)', $(this)).length) {
+			$(this).attr('data-display-collected', 1);
+		} else {
+			$(this).attr('data-display-collected', 0);
+		}
+	});
+	
+	$('.collected-count').html($('.item-display-panel[data-display-collected="1"]:not(.filtered)').length);
+	$('.uncollected-count').html($('.item-display-panel[data-display-collected="0"]:not(.filtered)').length);
+	
+	resetScroll();
+}
+
+function resetScroll() {
+	/*
+	var $activePanel = $('.item-display-panel:not(.filtered) .panel-heading:not(.collapsed)');
+	var offset = ($activePanel.length) ? $activePanel.scrollTop() : 0;
+	$(window).scrollTop(offset);
+	*/
+	$('.panel-collapse').collapse('hide');
+	$(window).scrollTop(0);
+}

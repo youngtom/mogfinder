@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Console;
+
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+
+class Kernel extends ConsoleKernel
+{
+    /**
+     * The Artisan commands provided by your application.
+     *
+     * @var array
+     */
+    protected $commands = [
+        // Commands\Inspire::class
+        Commands\ItemsImport::class,
+        Commands\GameItemsImport::class,
+        Commands\UpdateBitmasks::class,
+        Commands\ImportUserData::class,
+        Commands\ItemSourceConversion::class,
+        Commands\ItemDisplayUpdate::class,
+        Commands\ImportWowdbSources::class,
+        Commands\ListDuplicateItems::class,
+        Commands\RemoveDuplicateItemDisplays::class,
+        Commands\UpdateTransmoggableItemDisplays::class,
+        Commands\UpdateItemDisplayRenders::class,
+        Commands\CreateUser::class,
+        Commands\UpdateItemFactionInfo::class,
+        Commands\ImportIconImages::class,
+        Commands\UpdateItemData::class,
+        Commands\SetupClassItemSubtypeStats::class,
+        Commands\ImportDynamicQuests::class,
+        Commands\ResetUserData::class
+    ];
+
+    /**
+     * Define the application's command schedule.
+     *
+     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @return void
+     */
+    protected function schedule(Schedule $schedule)
+    {
+        // $schedule->command('inspire')
+        //          ->hourly();
+    }
+}

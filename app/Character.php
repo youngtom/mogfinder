@@ -1,0 +1,237 @@
+<?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+use App\Character;
+use App\Realm;
+use App\Item;
+use Config;
+use App\UserItem;
+use DB;
+
+class Character extends Model
+{
+	private static $apiClient = null;
+	public $additionalData = [];
+	
+	public static function boot() {
+		parent::boot();
+		
+		static::saving(function ($character) {
+			if (!$character->url_token) {
+				$character->url_token = $character->getToken();
+			}
+			return true;
+		});
+	}
+	
+	public function charClass() {
+        return $this->belongsTo('App\CharClass', 'class_id');
+	}
+	
+	public function race() {
+        return $this->belongsTo('App\Race');
+	}
+	
+	public function realm() {
+        return $this->belongsTo('App\Realm');
+	}
+	
+	public function faction() {
+        return $this->belongsTo('App\Faction');
+	}
+	
+	public function user() {
+        return $this->belongsTo('App\User');
+	}
+	
+    public function items() {
+	    return $this->hasMany('App\UserItem');
+    }
+    
+    public function getToken() {
+	    return str_slug($this->name . ' ' . $this->realm->name . ' ' . $this->realm->region);
+    }
+	
+	public function canUseItem(Item $item) {
+		if ($item->required_level && $this->level < $item->required_level) {
+			return false;
+		}
+		
+		if (!($this->charClass && $item->equippableByClass($this->charClass)) || !($this->race && $item->equippableByRace($this->race))) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public function eligibleForQuestReward(Item $item, $dynamicRewards = false) {
+		if ($dynamicRewards && $item->primary_stats) {
+			return $this->canUseItem($item) && $this->charClass->eligibleForQuestReward($item);
+		} else {
+			return $this->canUseItem($item);
+		}
+	}
+	
+    public function importBnetData($returnFields = []) {
+	 	if (self::$apiClient === null) {
+			self::$apiClient = new \App\BnetWowApi(Config::get('settings.bnet_api_key'), Config::get('settings.bnet_api_locale'));  
+	    }
+	    
+	    $data = self::$apiClient->getCharacterData($this->name, $this->realm->name, $returnFields);
+	    
+	    if ($data) {
+		    $this->faction_id = $data['faction'] + 1;
+			$this->class_id = $data['class'];
+			$this->race_id = $data['race'];
+			$this->level = $data['level'];
+			$this->save();
+			
+			foreach ($returnFields as $field) {
+				$this->additionalData[$field] = $data[$field];
+			}
+			
+			return true;
+	    } else {
+		    return false;
+	    }
+    }
+    
+    public function importItemData($charData, UserDatafile $dataFile = null) {
+	    $charItemIDs = [];
+        
+        $questLocation = ItemLocation::where('label', '=', 'quest')->first();
+			    
+	    if (@$charData['equipped']) {
+		    $equippedLocation = ItemLocation::where('label', '=', 'equipped')->first();
+		    
+		    foreach ($charData['equipped'] as $equippedItemStr) {
+			    list($bound, $xmoggable, $itemLink) = explode('--', $equippedItemStr);
+			    
+			    $userItem = UserItem::where('character_id', '=', $this->id)->where('item_link', $itemLink)->first();
+			    
+			    if ($userItem) {
+				    $userItem->item_location_id = $equippedLocation->id;
+				    $userItem->bound = 1;
+				    $userItem->save();
+			    } else {
+				    $item = Item::findItemFromLink($itemLink);
+			    
+				    if ($item && $item->isTransmoggable()) {
+				        $userItem = $this->addUserItem($item, $itemLink, $equippedLocation);
+				    }
+			    }
+			    
+			    if ($userItem) {
+				    $charItemIDs[] = $userItem->id;
+			    }
+			    
+			    if ($dataFile) {
+				    $dataFile->incrementResponseData('current', 1);
+				    $dataFile->save();
+			    }
+		    }
+		}
+		
+		if (@$charData['items']) {
+		    foreach ($charData['items'] as $locationImportTag => $itemArr) {
+			    $itemLocation = ItemLocation::where('import_tag', '=', $locationImportTag)->first();
+			    
+			    if ($itemLocation) {			    
+				    foreach ($itemArr as $itemStr) {
+					    list($bound, $xmoggable, $itemLink) = explode('--', $itemStr);
+					    
+					    $userItem = UserItem::where('character_id', '=', $this->id)->where('item_link', $itemLink)->first();
+				    
+					    if ($userItem) {
+						    $userItem->item_location_id = $equippedLocation->id;
+						    $userItem->bound = 1;
+						    $userItem->save();
+					    } else {
+						    $item = Item::findItemFromLink($itemLink);
+						    
+						    if ($item && $item->isTransmoggable()) {
+						        if ($this->canUseItem($item)) {
+							    	$userItem = $this->addUserItem($item, $itemLink, $itemLocation, $bound);
+						        } elseif ($bound != 1) {
+							        $alts = $this->user->getOtherCharacters($this, ($bound === 0));
+							        
+							        $found = false;
+							        $alts->each(function ($alt) use ($item, &$found) { 
+								        if ($alt->canUseItem($item)) {
+											$found = $alt;
+											return false;
+										}
+							        });
+							        
+							        if ($found) {
+								        $userItem = $this->addUserItem($item, $itemLink, $itemLocation, $bound);
+							        }
+						        }
+						    }
+						}
+											    
+					    if ($userItem) {
+						    $charItemIDs[] = $userItem->id;
+					    }
+					    
+					    if ($dataFile) {
+						    $dataFile->incrementResponseData('current', 1);
+						    $dataFile->save();
+					    }
+				    }
+				} else {
+					if ($dataFile) {
+					    $dataFile->incrementResponseData('current', count ($itemArr));
+					    $dataFile->save();
+				    }
+				}
+		    }
+		}
+		
+		DB::table('user_items')->where('item_location_id', '<>', $questLocation->id)->where('character_id', '=', $this->id)->whereNotIn('id', $charItemIDs)->delete();
+		$this->save();
+    }
+    
+    public function importQuestItemData($quests, UserDatafile $dataFile = null) {
+	    $questSourceType = ItemSourceType::where('label', '=', 'REWARD_FOR_QUEST')->first();
+	    $questLocation = ItemLocation::where('label', '=', 'quest')->first();
+	    
+	    foreach ($quests as $questID) {
+		    $itemSources = ItemSource::where('bnet_source_id', '=', $questID)->where('item_source_type_id', '=', $questSourceType->id)->get();
+		    
+		    $itemSources->each(function ($itemSource) use ($questLocation) {
+			   $userItem = $this->items()->where('item_id', '=', $itemSource->item_id)->where('item_location_id', '=', $questLocation->id)->first();
+			   
+			   if (!$userItem && $itemSource->item && $itemSource->item->isTransmoggable()) {
+			   		if ($this->eligibleForQuestReward($itemSource->item, $itemSource->dynamic_quest_rewards)) {
+						$userItem = $this->addUserItem($itemSource->item, null, $questLocation, null);
+					}
+			   	}
+		    });
+		    
+		    if ($dataFile) {
+			    $dataFile->incrementResponseData('current', 1);
+			    $dataFile->save();
+		    }
+	    }
+	    
+	    $this->quests_imported = implode(',', array_unique(array_merge(explode(',', $this->quests_imported), $quests)));
+	    $this->save();
+    }
+    
+    public function addUserItem($item, $itemLink, ItemLocation $location, $bound = 1) {
+	    $userItem = new UserItem;
+        $userItem->user_id = $this->user_id;
+        $userItem->item_id = $item->id;
+        $userItem->item_display_id = $item->item_display_id;
+        $userItem->item_location_id = $location->id;
+        $userItem->character_id = $this->id;
+        $userItem->item_link = $itemLink;
+        $userItem->bound = $bound;
+        $userItem->save();
+        
+        return $userItem;
+    }
+}

@@ -1,0 +1,13 @@
+.uploader .status { display: none; }
+.uploader .status.default { display: inherit; }
+
+.uploader .status.error { color: red; }
+
+#upload-progress { 
+	display: none;
+	margin: 7px 0px;
+}
+
+.uploader .progress-bar {
+	transition: 1s;
+}
