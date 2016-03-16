@@ -47,7 +47,7 @@ class User extends Authenticatable
 		    $character = $this->getCharacterFromDataTag($charTag, true, ['quests']);
 		    
 		    if ($character) {
-				$scanTime = (@$charData['scanTimes']) ? max($charData['scanTimes']['inventory'], $charData['scanTimes']['bank'], $charData['scanTimes']['bags']) : 0;
+				$scanTime = (@$charData['scanTimes']) ? max(@$charData['scanTimes']['inventory'], @$charData['scanTimes']['bank'], @$charData['scanTimes']['bags']) : 0;
 				
 				if ($scanTime > $character->last_scanned) {
 					// Queue item import
