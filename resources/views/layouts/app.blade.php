@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Mogcheck</title>
+    <title>MogFinder</title>
 
     <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">
     <link href="{{ asset('css/sb-admin.css') }}" rel="stylesheet">
@@ -38,7 +38,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{{ url('/') }}">Mogcheck</a>
+                <a class="navbar-brand" href="{{ url('/') }}">MogFinder</a>
             </div>
             
             <ul class="nav navbar-right top-nav">
