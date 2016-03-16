@@ -34,8 +34,6 @@ class CreateItemsTable extends Migration
 			$table->integer('item_level')->nullable();
 			$table->integer('quality');
 			$table->integer('required_level')->nullable();
-            $table->integer('item_source_id')->nullable()->unsigned();
-			$table->foreign('item_source_id')->references('id')->on('item_sources')->onDelete('cascade');
 			$table->boolean('auctionable');
 			$table->string('allowable_classes')->nullable();
 			$table->string('allowable_races')->nullable();
