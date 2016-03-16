@@ -14,7 +14,7 @@ class CreateInventoryTypesTable extends Migration
     {
         Schema::create('inventory_types', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name')->after('id'); 
+            $table->string('name');
             $table->timestamps();
         });
     }
