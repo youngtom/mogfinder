@@ -194,31 +194,47 @@ class Character extends Model
 		$this->save();
     }
     
-    public function importQuestItemData($quests, UserDatafile $dataFile = null) {
-	    $questSourceType = ItemSourceType::where('label', '=', 'REWARD_FOR_QUEST')->first();
-	    $questLocation = ItemLocation::where('label', '=', 'quest')->first();
-	    
-	    foreach ($quests as $questID) {
-		    $itemSources = ItemSource::where('bnet_source_id', '=', $questID)->where('item_source_type_id', '=', $questSourceType->id)->get();
-		    
-		    $itemSources->each(function ($itemSource) use ($questLocation) {
-			   $userItem = $this->items()->where('item_id', '=', $itemSource->item_id)->where('item_location_id', '=', $questLocation->id)->first();
-			   
-			   if (!$userItem && $itemSource->item && $itemSource->item->isTransmoggable()) {
-			   		if ($this->eligibleForQuestReward($itemSource->item, $itemSource->dynamic_quest_rewards)) {
-						$userItem = $this->addUserItem($itemSource->item, null, $questLocation, null);
-					}
-			   	}
-		    });
-		    
-		    if ($dataFile) {
-			    $dataFile->incrementResponseData('current', 1);
-			    $dataFile->save();
-		    }
+    public function importQuestItemData(UserDatafile $dataFile = null) {
+	    if (!isset($this->additionalData['quests'])) {
+		    $this->importBnetData(['quests']);
 	    }
 	    
-	    $this->quests_imported = implode(',', array_unique(array_merge(explode(',', $this->quests_imported), $quests)));
-	    $this->save();
+	    if (@$this->additionalData['quests'] && is_array($this->additionalData['quests'])) {
+			$questImportToken = md5(serialize($this->additionalData['quests']));
+		    
+		    if ($questImportToken != $this->quest_import_token) {
+			    $quests = array_diff($this->additionalData['quests'], explode(',', $this->quests_imported));
+			    
+			    if (count($quests)) {
+				    $questSourceType = ItemSourceType::where('label', '=', 'REWARD_FOR_QUEST')->first();
+				    $questLocation = ItemLocation::where('label', '=', 'quest')->first();
+				    
+				    foreach ($quests as $questID) {
+					    $itemSources = ItemSource::where('bnet_source_id', '=', $questID)->where('item_source_type_id', '=', $questSourceType->id)->get();
+					    
+					    $itemSources->each(function ($itemSource) use ($questLocation) {
+						   $userItem = $this->items()->where('item_id', '=', $itemSource->item_id)->where('item_location_id', '=', $questLocation->id)->first();
+						   
+						   if (!$userItem && $itemSource->item && $itemSource->item->isTransmoggable()) {
+						   		if ($this->eligibleForQuestReward($itemSource->item, $itemSource->dynamic_quest_rewards)) {
+									$userItem = $this->addUserItem($itemSource->item, null, $questLocation, null);
+								}
+						   	}
+					    });
+					    
+					    if ($dataFile) {
+						    $dataFile->incrementResponseData('current', 1);
+						    $dataFile->save();
+					    }
+				    }
+				    
+				    $this->quests_imported = implode(',', array_unique(array_merge(explode(',', $this->quests_imported), $quests)));
+			    }
+			
+				$this->quest_import_token = $questImportToken;
+				$this->save();
+			}
+		}
     }
     
     public function addUserItem($item, $itemLink, ItemLocation $location, $bound = 1) {
