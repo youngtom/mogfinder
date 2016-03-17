@@ -21,7 +21,7 @@
 			        	<div class="progress">
 				        	<div class="progress-bar" role="progressbar" aria-valuenow="<?=$userCount?>" aria-valuemin="0" aria-valuemax="<?=$total?>" style="width: <?=$percent?>%;"></div>
 				        	<div class="progress-label summary"><?=$userCount?> / <?=$total?></div>
-				        	<div class="progress-label mogslot-info"><?=$mogslot->label?></div>
+				        	<div class="progress-label mogslot-info"><?=$mogslot->simple_label?></div>
 			        	</div>
 			        </a>
 			        <?php 
