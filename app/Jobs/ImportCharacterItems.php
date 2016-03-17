@@ -13,20 +13,20 @@ class ImportCharacterItems extends Job implements ShouldQueue
 {
     use InteractsWithQueue, SerializesModels;
     
-    protected $character;
+    protected $character_id;
     protected $charData;
-    protected $userDatafile;
+    protected $user_datafile_id;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Character $character, $charData, UserDatafile $userDatafile)
+    public function __construct($characterID, $charData, $userDatafileID)
     {
-        $this->character = $character;
+        $this->character_id = $characterID;
         $this->charData = $charData;
-        $this->userDatafile = $userDatafile;
+        $this->user_datafile_id = $userDatafileID;
     }
 
     /**
@@ -36,6 +36,9 @@ class ImportCharacterItems extends Job implements ShouldQueue
      */
     public function handle()
     {
-        $this->character->importItemData($this->charData, $this->userDatafile);
+	    $character = Character::findOrFail($this->character_id);
+	    $dataFile = UserDatafile::findOrFail($this->user_datafile_id);
+	    
+        $character->importItemData($this->charData, $dataFile);
     }
 }

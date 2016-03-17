@@ -78,7 +78,7 @@ class UserController extends Controller
 					$userFile->setResponseData('current', 0);
 					$userFile->save();
 					
-					$job = (new ImportUserData($user, $userFile))->onQueue('high');
+					$job = (new ImportUserData($user->id, $userFile->id))->onQueue('high');
 				    $this->dispatch($job);
 					
 					return Response::json(['success' => true, 'token' => $userFile->token, 'total' => $itemCount, 'reportURL' => url('user/upload-data/report/' . $userFile->token)]);

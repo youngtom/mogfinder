@@ -51,7 +51,7 @@ class User extends Authenticatable
 				
 				if ($scanTime > $character->last_scanned) {
 					// Queue item import
-					$job = (new ImportCharacterItems($character, $charData, $dataFile))->onQueue('med');
+					$job = (new ImportCharacterItems($character->id, $charData, $dataFile->id))->onQueue('med');
 					$this->dispatch($job);
 					$character->last_scanned = $scanTime;
 				}
@@ -63,7 +63,7 @@ class User extends Authenticatable
 					    $questDiffArr = array_diff($character->additionalData['quests'], explode(',', $character->quests_imported));
 					    
 					    if (count($questDiffArr)) {
-						    $job = (new ImportCharacterQuestItems($character, $questDiffArr, $dataFile))->onQueue('low');
+						    $job = (new ImportCharacterQuestItems($character->id, $questDiffArr, $dataFile->id))->onQueue('low');
 						    $this->dispatch($job);
 						    
 						    // Queue quest import

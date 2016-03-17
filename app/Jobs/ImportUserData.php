@@ -13,18 +13,18 @@ class ImportUserData extends Job implements ShouldQueue
 {
     use InteractsWithQueue, SerializesModels;
     
-    protected $user;
-    protected $userDatafile;
+    protected $user_id;
+    protected $user_datafile_id;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(User $user, UserDatafile $userDatafile)
+    public function __construct($userID, $userDatafileID)
     {
-        $this->user = $user;
-        $this->userDatafile = $userDatafile;
+        $this->user = $userID;
+        $this->user_datafile_id = $userDatafileID;
     }
 
     /**
@@ -34,6 +34,9 @@ class ImportUserData extends Job implements ShouldQueue
      */
     public function handle()
     {
-        $this->user->importUserData($this->userDatafile);
+	    $user = User::findOrFail($this->user_id);
+	    $dataFile = UserDatafile::findOrFail($this->user_datafile_id);
+	    
+        $user->importUserData($dataFile);
     }
 }
