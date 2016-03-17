@@ -60,10 +60,6 @@ class User extends Authenticatable
 					$character->latest_chardata = json_encode($charData);
 					$character->save();
 				}
-				
-				// Queue quest import
-				$job = (new ImportCharacterQuestItems($character->id))->onQueue('low');
-			    $this->dispatch($job);
 		    }
 	    }
 	    
