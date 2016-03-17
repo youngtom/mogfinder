@@ -20,7 +20,7 @@
 			{!! Form::open(['url' => 'user/upload-data']) !!}
 				<button class="btn btn-primary fileinput-button" data-default-text="Upload .lua File">
 			        <i class="fa fa-btn fa-upload"></i>
-			        <span>&nbsp;Upload ItemCollector.lua</span>
+			        <span>&nbsp;Upload .lua file</span>
 			        <input id="luaupload" type="file" name="file" />
 			    </button>
 		    {!! Form::close() !!}
