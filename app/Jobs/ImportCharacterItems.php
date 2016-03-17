@@ -14,7 +14,6 @@ class ImportCharacterItems extends Job implements ShouldQueue
     use InteractsWithQueue, SerializesModels;
     
     protected $character_id;
-    protected $charData;
     protected $user_datafile_id;
 
     /**
@@ -25,7 +24,6 @@ class ImportCharacterItems extends Job implements ShouldQueue
     public function __construct($characterID, $userDatafileID)
     {
         $this->character_id = $characterID;
-        $this->charData = $charData;
         $this->user_datafile_id = $userDatafileID;
     }
 
