@@ -27,7 +27,7 @@ $(function () {
 							updateProgressbar($('#upload-progress'), polldata.current, polldata.total);
 							
 							if (polldata.current < polldata.total) {
-								setTimeout(reportPoll, 5000);
+								setTimeout(reportPoll, 2500);
 							}
 						});
 					};
