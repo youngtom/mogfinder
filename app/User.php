@@ -76,9 +76,6 @@ class User extends Authenticatable
 						    $dataFile->save();
 					    }
 					}
-					
-					$character->quest_import_token = $questImportToken;
-					$character->save();
 				}
 		    }
 	    }
