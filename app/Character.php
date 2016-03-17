@@ -98,7 +98,15 @@ class Character extends Model
 	    }
     }
     
-    public function importItemData($charData, UserDatafile $dataFile = null) {
+    public function importItemData($dataFileID = null) {
+	    IF (!$this->latest_chardata) {
+		    return false;
+	    }
+	    
+	    $charData = json_decode($this->latest_chardata, true);
+	    
+	    $dataFile = ($dataFileID) ? UserDatafile::find($dataFileID) : false;
+	    
 	    $charItemIDs = [];
         
         $questLocation = ItemLocation::where('label', '=', 'quest')->first();
@@ -194,7 +202,9 @@ class Character extends Model
 		$this->save();
     }
     
-    public function importQuestItemData(UserDatafile $dataFile = null) {
+    public function importQuestItemData($dataFileID = null) {
+	    $dataFile = ($dataFileID) ? UserDatafile::find($dataFileID) : false;
+	    
 	    if (!isset($this->additionalData['quests'])) {
 		    $this->importBnetData(['quests']);
 	    }

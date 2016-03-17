@@ -35,8 +35,7 @@ class ImportCharacterQuestItems extends Job implements ShouldQueue
     public function handle()
     {
 	    $character = Character::findOrFail($this->character_id);
-	    $dataFile = UserDatafile::findOrFail($this->user_datafile_id);
 	    
-        $character->importQuestItemData($dataFile);
+        $character->importQuestItemData($this->user_datafile_id);
     }
 }

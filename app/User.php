@@ -42,7 +42,9 @@ class User extends Authenticatable
 	    return $this->hasMany('App\Character');
     }
     
-    public function importUserData($dataFile) {
+    public function importUserData($dataFileID) {
+	    $dataFile = UserDatafile::findOrFail($dataFileID);
+	    
 	    foreach ($dataFile->import_data['chars'] as $charTag => $charData) {
 		    $character = $this->getCharacterFromDataTag($charTag, true, ['quests']);
 		    
@@ -51,9 +53,12 @@ class User extends Authenticatable
 				
 				if ($scanTime > $character->last_scanned) {
 					// Queue item import
-					$job = (new ImportCharacterItems($character->id, $charData, $dataFile->id))->onQueue('med');
+					$job = (new ImportCharacterItems($character->id, $dataFile->id))->onQueue('med');
 					$this->dispatch($job);
+					
 					$character->last_scanned = $scanTime;
+					$character->latest_chardata = json_encode($charData);
+					$character->save();
 				}
 				
 				if (@$character->additionalData['quests'] && is_array($character->additionalData['quests'])) {
@@ -63,7 +68,7 @@ class User extends Authenticatable
 					    $questDiffArr = array_diff($character->additionalData['quests'], explode(',', $character->quests_imported));
 					    
 					    if (count($questDiffArr)) {
-						    $job = (new ImportCharacterQuestItems($character->id, $questDiffArr, $dataFile->id))->onQueue('low');
+						    $job = (new ImportCharacterQuestItems($character->id, $dataFile->id))->onQueue('low');
 						    $this->dispatch($job);
 						    
 						    // Queue quest import
@@ -73,9 +78,8 @@ class User extends Authenticatable
 					}
 					
 					$character->quest_import_token = $questImportToken;
+					$character->save();
 				}
-				
-				$character->save();
 		    }
 	    }
 	    

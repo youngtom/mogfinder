@@ -35,8 +35,7 @@ class ImportUserData extends Job implements ShouldQueue
     public function handle()
     {
 	    $user = User::findOrFail($this->user_id);
-	    $dataFile = UserDatafile::findOrFail($this->user_datafile_id);
 	    
-        $user->importUserData($dataFile);
+        $user->importUserData($this->user_datafile_id);
     }
 }

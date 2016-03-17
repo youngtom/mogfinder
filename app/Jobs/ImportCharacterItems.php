@@ -22,7 +22,7 @@ class ImportCharacterItems extends Job implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($characterID, $charData, $userDatafileID)
+    public function __construct($characterID, $userDatafileID)
     {
         $this->character_id = $characterID;
         $this->charData = $charData;
@@ -37,8 +37,7 @@ class ImportCharacterItems extends Job implements ShouldQueue
     public function handle()
     {
 	    $character = Character::findOrFail($this->character_id);
-	    $dataFile = UserDatafile::findOrFail($this->user_datafile_id);
 	    
-        $character->importItemData($this->charData, $dataFile);
+        $character->importItemData($this->user_datafile_id);
     }
 }
