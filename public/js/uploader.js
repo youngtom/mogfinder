@@ -74,6 +74,7 @@ function updateProgressbar($progress, current, total) {
 		if (current && total) {
 			var percent = (current / total) * 100;
 			$bar.width(percent + '%');
+			$('.progress-label', $bar).html(String(Math.round(percent)) + '%')
 		}
 	}
 }
