@@ -9,15 +9,16 @@ $(function () {
 	        var $button = $(this).parent();
 	        $button.addClass('disabled');
 	        $('.fa-btn', $button).removeClass('fa-upload').addClass('fa-circle-o-notch').addClass('fa-spin');
-	        $('span', $button).html('Uploading...');
+	        $('span', $button).html('&nbsp;Uploading...');
         },
         done: function (e, data) {
 	        var $button = $(this).parent();
 	        
             if (data.result.success) {
-	            $button.removeClass('btn-primary').addClass('btn-success');
-	            $('span', $button).html('Processing');
+	            $button.removeClass('btn-primary').addClass('btn-warning');
+	            $('span', $button).html('&nbsp;Processing');
 	            $('.status').hide();
+	            $('#luaupload').hide();
 	            
 	            updateProgressbar($('#upload-progress'), 0, parseInt(data.result.total));
 	            
@@ -28,6 +29,10 @@ $(function () {
 							
 							if (polldata.current < polldata.total) {
 								setTimeout(reportPoll, 2500);
+							} else {
+								$button.removeClass('btn-warning').addClass('btn-success');
+						        $('span', $button).html('&nbsp;Complete');
+						        $('.fa-btn', $button).addClass('fa-check').removeClass('fa-circle-o-notch').removeClass('fa-spin');
 							}
 						});
 					};

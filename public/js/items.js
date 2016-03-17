@@ -77,6 +77,8 @@ $(window).on('load', function () {
 			$('.btn.dropdown-toggle', $(this).parents('.class-filter')).addClass('btn-primary').removeClass('btn-default');
 		}
 		
+		$('.class-filter .dropdown-toggle').dropdown("toggle");
+		
 		return false;
 	});
 	
@@ -91,6 +93,8 @@ $(window).on('load', function () {
 			$('.panel-group').removeClass('source-filtered');
 			$('.source-filter .dropdown-toggle').addClass('btn-default').removeClass('btn-success');
 		}
+		
+		$('.source-filter .dropdown-toggle').dropdown("toggle");
 		
 		return false;
 	});

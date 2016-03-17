@@ -11,3 +11,17 @@
 .uploader .progress-bar {
 	transition: 2s;
 }
+
+#upload-progress .progress-label {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	text-align: center;
+	line-height: 20px;
+	text-shadow: 1px 1px 1px rgba(0, 0, 0, .75);
+	color: white;
+	font-size: 75%;
+	transition: all 0.2s ease;
+}

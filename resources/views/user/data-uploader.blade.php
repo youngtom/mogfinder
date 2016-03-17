@@ -20,7 +20,7 @@
 			{!! Form::open(['url' => 'user/upload-data']) !!}
 				<button class="btn btn-primary fileinput-button" data-default-text="Upload .lua File">
 			        <i class="fa fa-btn fa-upload"></i>
-			        <span>Upload .lua File</span>
+			        <span>&nbsp;Upload ItemCollector.lua</span>
 			        <input id="luaupload" type="file" name="file" />
 			    </button>
 		    {!! Form::close() !!}
@@ -29,7 +29,9 @@
 			<p class="form-control-static status default">File is located at <strong>\World of Warcraft\WTF\Account\{ACCOUNT NAME}\SavedVariables\ItemCollector.lua</strong></p>
 			<p class="form-control-static status error">An error occurred.</strong></p>
 			<div id="upload-progress" class="progress">
-				<div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+				<div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+					<div class="progress-label"></div>
+				</div>
 			</div>
 		</div>
 	</div>
