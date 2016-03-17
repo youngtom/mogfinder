@@ -23,7 +23,7 @@ class ImportUserData extends Job implements ShouldQueue
      */
     public function __construct($userID, $userDatafileID)
     {
-        $this->user = $userID;
+        $this->user_id = $userID;
         $this->user_datafile_id = $userDatafileID;
     }
 
