@@ -61,22 +61,9 @@ class User extends Authenticatable
 					$character->save();
 				}
 				
-				if (@$character->additionalData['quests'] && is_array($character->additionalData['quests'])) {
-					$questImportToken = md5(serialize($character->additionalData['quests']));
-				    
-				    if ($questImportToken != $character->quest_import_token) {
-					    $questDiffArr = array_diff($character->additionalData['quests'], explode(',', $character->quests_imported));
-					    
-					    if (count($questDiffArr)) {
-						    $job = (new ImportCharacterQuestItems($character->id, $dataFile->id))->onQueue('low');
-						    $this->dispatch($job);
-						    
-						    // Queue quest import
-						    $dataFile->incrementResponseData('total', count($questDiffArr));
-						    $dataFile->save();
-					    }
-					}
-				}
+				// Queue quest import
+				$job = (new ImportCharacterQuestItems($character->id))->onQueue('low');
+			    $this->dispatch($job);
 		    }
 	    }
 	    

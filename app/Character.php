@@ -203,9 +203,7 @@ class Character extends Model
 		$this->save();
     }
     
-    public function importQuestItemData($dataFileID = null) {
-	    $dataFile = ($dataFileID) ? UserDatafile::find($dataFileID) : false;
-	    
+    public function importQuestItemData() {
 	    if (!isset($this->additionalData['quests'])) {
 		    $this->importBnetData(['quests']);
 	    }
@@ -232,11 +230,6 @@ class Character extends Model
 								}
 						   	}
 					    });
-					    
-					    if ($dataFile) {
-						    $dataFile->incrementResponseData('current', 1);
-						    $dataFile->save();
-					    }
 				    }
 				    
 				    $this->quests_imported = implode(',', array_unique(array_merge(explode(',', $this->quests_imported), $quests)));
