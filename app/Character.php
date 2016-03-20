@@ -9,6 +9,7 @@ use App\Item;
 use Config;
 use App\UserItem;
 use DB;
+use App\Jobs\ImportCharacterQuestItems;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class Character extends Model
