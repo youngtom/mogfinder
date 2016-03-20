@@ -83,7 +83,7 @@ class Character extends Model
 			self::$apiClient = new \App\BnetWowApi(Config::get('settings.bnet_api_key'), Config::get('settings.bnet_api_locale'));  
 	    }
 	    
-	    $data = self::$apiClient->getCharacterData($this->name, $this->realm->name, $returnFields);
+	    $data = self::$apiClient->getCharacterData($this->name, $this->realm->name, $this->realm->region, $returnFields);
 	    
 	    if ($data) {
 		    $this->faction_id = $data['faction'] + 1;

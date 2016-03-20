@@ -27,21 +27,21 @@ class BnetWowApi
 		if ($bonus) {
 			$params['bl'] = $bonus;
 		}
-		return $this->_getEndpointData($endpoint, $params);
+		return $this->_getEndpointData($endpoint, 'us', $params);
 	}
 	
-	public function getCharacterData($name, $realm, $fields = []) {
+	public function getCharacterData($name, $realm, $region, $fields = []) {
 		$endpoint = '/character/' . $realm . '/' . $name;
 		$params = array();
 		
 		if ($fields) {
 			$params['fields'] = implode(',', $fields);
 		}
-		return $this->_getEndpointData($endpoint, $params, 60*10);
+		return $this->_getEndpointData($endpoint, 'us', $params, 60*10);
 	}
 	
-    private function _getEndpointData($endpoint, $params = array(), $expirationOverride = false) {
-	    $searchURL = Config::get('settings.bnet_api_base_url') . $endpoint;
+    private function _getEndpointData($endpoint, $region = 'us', $params = array(), $expirationOverride = false) {
+	    $searchURL = str_replace('{$region}', strtolower($region), Config::get('settings.bnet_api_base_url')) . $endpoint;
 	    $searchURL .= (count($params)) ? '?' . http_build_query($params) : '';
 	    $params = array_merge($this->defaultParameters, $params);
 	    $endpoint = '/' . trim($endpoint, '/');
@@ -77,9 +77,8 @@ class BnetWowApi
 		
 		try {
 			$res = self::$client->request('GET', $url, ['http_errors' => false]);
-		} catch (ClientException $e) {
-			$data = json_decode($e->getResponse()->getBody(), true);
-			throw new Exception($data['detail'], $e->getCode());
+		} catch (\Exception $e) {
+			return false;
 		}
 		
 		if ($res) {
