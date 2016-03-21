@@ -85,7 +85,7 @@
     </div>
     
     <footer class="footer">
-	    <p class="text-muted pull-right">&copy;<?=date('Y')?> tritus. All images &reg; or &trade; <a href="http://www.blizzard.com" target="_blank">Blizzard Entertainment</a>.</p>
+	    <p class="text-muted pull-right">&copy;<?=date('Y')?> tritus. All images &reg; <a href="http://www.blizzard.com" target="_blank">Blizzard Entertainment</a>.</p>
     </footer>
 
     <script src="{{ asset('js/jquery.js') }}"></script>

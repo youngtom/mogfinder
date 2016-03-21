@@ -109,6 +109,6 @@ a.warrior { color: #C79C6E !important; }
 	transition: all 0.2s ease;
 }
 
-.mogslot-progress-wrapper:hover .progress .progress-label.mogslot-info { opacity: 0; }
-.mogslot-progress-wrapper .progress .progress-label.summary { opacity: 0; }
-.mogslot-progress-wrapper:hover .progress .progress-label.summary { opacity: 1; }
+.mogslot-progress-wrapper:hover .progress .progress-label.summary { opacity: 0; }
+.mogslot-progress-wrapper .progress .progress-label.mogslot-info { opacity: 0; }
+.mogslot-progress-wrapper:hover .progress .progress-label.mogslot-info { opacity: 1; }
