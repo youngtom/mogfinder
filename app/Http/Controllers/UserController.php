@@ -22,6 +22,10 @@ class UserController extends Controller
         $this->middleware('auth');
     }
     
+    public function getDashboard() {
+	    return view('user.dashboard');
+    }
+    
 	public function dataUpload() {
 	    return view('user.data-uploader');
 	}

@@ -15,6 +15,8 @@
 
 .subnav .container { width: 100%; }
 
+.panel > .panel-body > .page-header:first-child { margin-top: 0px; }
+
 .item-scroll-with-nav .subnav.affix, .subnav.affix {
 	position: fixed;
 	top: 51px;

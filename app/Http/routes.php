@@ -37,19 +37,21 @@ use App\FileUpload;
 |
 */
 
+Route::get('/', 'HomeController@index');
+
+/*
 Route::get('/test', function () {
-	$characters = \App\Character::all();
+	$character = \App\Character::find(162);
 	
-	foreach ($characters as $character) {
-		$character->save();
-	} 
+	$character->importBnetData();
 });
+*/
 
 Route::group(['middleware' => 'web'], function () {
     Route::auth();
-
-	Route::get('/', 'HomeController@index');
-    Route::get('/home', 'HomeController@index');
+    
+    //Route::get('/', 'HomeController@index');
+	Route::get('/home', 'HomeController@index');
     
     //Admin helpers routes
     Route::get('/items/set-mogslot-icons/{mogslotID?}/{iconID?}', 'ItemsController@setMogslotIcons');
@@ -61,18 +63,10 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('/items/{group}/{category}/{mogslotURL}', 'ItemsController@showSlot')->where('group', '(armor|weapons)');
     
     //user routes
+    Route::get('/dashboard', 'UserController@getDashboard');
     Route::get('/user/upload-data', 'UserController@dataUpload');
     Route::post('/user/upload-data', 'UserController@dataUploadHandler');
     Route::get('/user/upload-data/report/{token}', 'UserController@dataResponse');
-    
-    // Authentication routes...
-	Route::get('auth/login', 'Auth\AuthController@getLogin');
-	Route::post('auth/login', 'Auth\AuthController@postLogin');
-	Route::get('auth/logout', 'Auth\AuthController@getLogout');
-	
-	// Registration routes...
-	Route::get('auth/register', 'Auth\AuthController@getRegister');
-	Route::post('auth/register', 'Auth\AuthController@postRegister');
 	
 	/* uploaded file routes */
 	

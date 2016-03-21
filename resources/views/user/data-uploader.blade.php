@@ -14,23 +14,25 @@
 
 @section('content')
 <div class="container-fluid">
-	<div class="page-header"><h1>Data Upload</h1></div>
-	<div class="uploader row">
-		<div class="col-md-2">
-			{!! Form::open(['url' => 'user/upload-data']) !!}
-				<button class="btn btn-primary fileinput-button" data-default-text="Upload .lua File">
-			        <i class="fa fa-btn fa-upload"></i>
-			        <span>&nbsp;Upload .lua file</span>
-			        <input id="luaupload" type="file" name="file" />
-			    </button>
-		    {!! Form::close() !!}
-	    </div>
-	    <div class="col-md-10">
-			<p class="form-control-static status default">File is located at <strong>\World of Warcraft\WTF\Account\{ACCOUNT NAME}\SavedVariables\ItemCollector.lua</strong></p>
-			<p class="form-control-static status error">An error occurred.</strong></p>
-			<div id="upload-progress" class="progress">
-				<div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
-					<div class="progress-label"></div>
+	<div class="col-md-10 col-md-offset-1">
+		<div class="page-header"><h1>Data Upload</h1></div>
+		<div class="uploader row">
+			<div class="col-md-2">
+				{!! Form::open(['url' => 'user/upload-data']) !!}
+					<button class="btn btn-primary fileinput-button" data-default-text="Upload .lua File">
+				        <i class="fa fa-btn fa-upload"></i>
+				        <span>&nbsp;Upload .lua file</span>
+				        <input id="luaupload" type="file" name="file" />
+				    </button>
+			    {!! Form::close() !!}
+		    </div>
+		    <div class="col-md-10">
+				<p class="form-control-static status default">File is located at <strong>\World of Warcraft\WTF\Account\{ACCOUNT NAME}\SavedVariables\ItemCollector.lua</strong></p>
+				<p class="form-control-static status error">An error occurred.</strong></p>
+				<div id="upload-progress" class="progress">
+					<div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+						<div class="progress-label"></div>
+					</div>
 				</div>
 			</div>
 		</div>
