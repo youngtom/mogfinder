@@ -112,10 +112,9 @@
 		                
 		                <span class="pull-right">
 		                	<?php if ($restrictedClassMask && count($restrictedClasses)) { ?>
-		                	<i class="fa fa-btn fa-star-half-o partiallly-collected-star" title="Unlocked on:<br><?=implode('<br>', $restrictedClasses)?>" data-toggle="tooltip" data-placement="left"></i>
+		                	<i class="fa fa-btn fa-star-o partiallly-collected-star" title="Unlocked on:<br><?=implode('<br>', $restrictedClasses)?>" data-toggle="tooltip" data-placement="left"></i>
 		                	<?php } ?>
 		                	<i class="fa fa-btn fa-star collected-star" title="Collected" data-toggle="tooltip" data-placement="left"></i>
-		                	<i class="fa fa-btn fa-star-o uncollected-star" title="Not Collected" data-toggle="tooltip" data-placement="left"></i>
 		                </span>
 		            </div>		            
 		            <div id="display-<?=$display->id?>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="display-heading-<?=$display->id?>">
