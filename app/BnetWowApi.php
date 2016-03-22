@@ -37,7 +37,7 @@ class BnetWowApi
 		if ($fields) {
 			$params['fields'] = implode(',', $fields);
 		}
-		return $this->_getEndpointData($endpoint, 'us', $params, 60*10);
+		return $this->_getEndpointData($endpoint, $region, $params, 60*10);
 	}
 	
     private function _getEndpointData($endpoint, $region = 'us', $params = array(), $expirationOverride = false) {
@@ -45,7 +45,7 @@ class BnetWowApi
 	    $searchURL .= (count($params)) ? '?' . http_build_query($params) : '';
 	    $params = array_merge($this->defaultParameters, $params);
 	    $endpoint = '/' . trim($endpoint, '/');
-	    $url = Config::get('settings.bnet_api_base_url') . $endpoint . '?' . http_build_query($params);
+	    $url = str_replace('{$region}', strtolower($region), Config::get('settings.bnet_api_base_url')) . $endpoint . '?' . http_build_query($params);
 	    
 		if ($cache = BnetApiCache::where('request_uri', '=', $searchURL)->where('expiration', '>', time())->orderBy('expiration', 'DESC')->first()) {
 			return json_decode($cache->data, true);
