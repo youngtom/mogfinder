@@ -169,7 +169,7 @@ class ImportUserData extends Command
 			    }
 		    }
 		    
-		    $scanTime = (@$charData['scanTimes']) ? max($charData['scanTimes']['inventory'], $charData['scanTimes']['bank'], $charData['scanTimes']['bags']) : 0;
+		    $scanTime = (@$charData['scanTime']) ? $charData['scanTime'] : 0;
 		    
 		    if ($scanTime > $character->last_scanned) {
 			    //UserItem::where('user_id', '=', $user->id)->where('item_location_id', '<>', $questLocation->id)->where('character_id', '=', $character->id)->delete();

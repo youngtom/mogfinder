@@ -86,10 +86,11 @@ class Character extends Model
 	    $data = self::$apiClient->getCharacterData($this->name, $this->realm->name, $this->realm->region, $returnFields);
 	    
 	    if ($data) {
-		    $this->faction_id = $data['faction'] + 1;
-			$this->class_id = $data['class'];
-			$this->race_id = $data['race'];
-			$this->level = $data['level'];
+		    $factionID = $data['faction'] + 1;
+		    $this->faction_id = ($factionID) ?: $this->faction_id;
+			$this->class_id = ($data['class']) ?: $this->class_id;
+			$this->race_id = ($data['race']) ?: $this->race_id;
+			$this->level = ($data['level']) ?: $this->level;
 			$this->save();
 			
 			foreach ($returnFields as $field) {

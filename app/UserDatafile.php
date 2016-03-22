@@ -51,10 +51,10 @@ class UserDatafile extends Model
 		}
 		
 		foreach ($this->import_data['chars'] as $charTag => $charData) {
-		    $character = Auth::user()->getCharacterFromDataTag($charTag, false);
+		    $character = Auth::user()->getCharacterFromDataArray($charData['charInfo'], false);
 		    
 		    if ($character) {
-				$scanTime = (@$charData['scanTimes']) ? max(@$charData['scanTimes']['inventory'], @$charData['scanTimes']['bank'], @$charData['scanTimes']['bags']) : 0;
+				$scanTime = (@$charData['scanTime']) ? $charData['scanTime'] : 0;
 				
 				if ($scanTime > $character->last_scanned) {
 					if (@$charData['equipped']) {

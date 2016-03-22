@@ -6,6 +6,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\UserItem;
 use App\UserDatafile;
 use App\Character;
+use App\CharClass;
+use App\Race;
 use App\Realm;
 use DB;
 use App\Jobs\ImportCharacterItems;
@@ -46,10 +48,10 @@ class User extends Authenticatable
 	    $dataFile = UserDatafile::findOrFail($dataFileID);
 	    
 	    foreach ($dataFile->import_data['chars'] as $charTag => $charData) {
-		    $character = $this->getCharacterFromDataTag($charTag, true, ['quests']);
+		    $character = $this->getCharacterFromDataArray($charData['charInfo'], false);
 		    
 		    if ($character) {
-				$scanTime = (@$charData['scanTimes']) ? max(@$charData['scanTimes']['inventory'], @$charData['scanTimes']['bank'], @$charData['scanTimes']['bags']) : 0;
+				$scanTime = (@$charData['scanTime']) ? $charData['scanTime'] : 0;
 				
 				if ($scanTime > $character->last_scanned) {
 					// Queue item import
@@ -97,12 +99,11 @@ class User extends Authenticatable
         }
     }
     
-    public function getCharacterFromDataTag($tag, $importFromBnet = true, $returnFields = []) {
-	    $charTagArr = explode(' - ', $tag);
-        $region = $charTagArr[0];
-        $realmName = $charTagArr[1];
-        $name = $charTagArr[2];
-        $factionName = $charTagArr[3];
+    public function getCharacterFromDataArray($infoArr, $importFromBnet = true, $returnFields = []) {
+        $region = $infoArr['region'];
+        $realmName = $infoArr['realm'];
+        $name = $infoArr['name'];
+        $factionName = $infoArr['faction'];
         
         $realm = Realm::where('name', '=', $realmName)->where('region', '=', $region)->first();
 	    
@@ -116,11 +117,16 @@ class User extends Authenticatable
 	    $character = Character::where('user_id', '=', $this->id)->where('realm_id', '=', $realm->id)->where('name', '=', $name)->first();
 	    
 	    if (!$character) {
+		    $class = (@$infoArr['class']) ? CharClass::where('unlocalized_name', '=', $infoArr['class'])->first() false;
+		    $race = (@$infoArr['race']) ? Race::where('name', '=', $infoArr['race'])->first() false;
+		    
 			$character = new Character;
 			$character->name = $name;
 			$character->user_id = $this->id;
 			$character->realm_id = $realm->id;
-			$character->level = 0;
+			$character->level = $infoArr['level'];
+			$character->class_id = ($class) ? $class->id : null;
+			$character->race_id = ($race) ? $race->id : null;
 			$character->faction_id = ($character->faction_id) ?: @Faction::where('name', '=', $factionName)->first()->id;
 			$character->save();
 	    }
