@@ -104,9 +104,11 @@ class Character extends Model
     }
     
     public function importItemData($dataFileID = null) {
-	    IF (!$this->latest_chardata) {
+	    if (!$this->latest_chardata) {
 		    return false;
 	    }
+	    
+	    \Log::info('Importing item data for character: ' . $this->id);
 	    
 	    $charData = json_decode($this->latest_chardata, true);
 	    
@@ -217,6 +219,8 @@ class Character extends Model
 		    $this->importBnetData(['quests']);
 	    }
 	    
+	    \Log::info('Importing quest data for character: ' . $this->id);
+	    
 	    if (@$this->additionalData['quests'] && is_array($this->additionalData['quests'])) {
 			$questImportToken = md5(serialize($this->additionalData['quests']));
 		    
@@ -247,6 +251,8 @@ class Character extends Model
 				$this->quest_import_token = $questImportToken;
 				$this->save();
 			}
+		} else {
+			\Log::error('Failed loading bnet quest data for character: ' . $this->id);
 		}
     }
     

@@ -47,6 +47,8 @@ class User extends Authenticatable
     public function importUserData($dataFileID) {
 	    $dataFile = UserDatafile::findOrFail($dataFileID);
 	    
+	    \Log::info('Importing user data for user: ' . $this->id);
+	    
 	    foreach ($dataFile->import_data['chars'] as $charTag => $charData) {
 		    $character = $this->getCharacterFromDataArray($charData['charInfo'], false);
 		    
