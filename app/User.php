@@ -118,7 +118,17 @@ class User extends Authenticatable
 	    
 	    if (!$character) {
 		    $class = (@$infoArr['class']) ? CharClass::where('unlocalized_name', '=', $infoArr['class'])->first() : false;
-		    $race = (@$infoArr['race']) ? Race::where('name', '=', $infoArr['race'])->first() : false;
+		    $faction = Faction::where('name', '=', $factionName)->first();
+		    
+		    if (@$infoArr['race'] == 'Scourge') {
+			    $raceStr = 'Undead';
+		    } elseif (@$infoArr['race'] == 'Pandaren') {
+			    $raceStr = $infoArr['race'] . ' (' . $faction->name . ')';
+		    } else {
+			    $raceStr = $infoArr['race'];
+		    }
+		    
+		    $race = (@$infoArr['race']) ? Race::where('name', '=', $raceStr)->first() : false;
 		    
 			$character = new Character;
 			$character->name = $name;
@@ -127,7 +137,7 @@ class User extends Authenticatable
 			$character->level = $infoArr['level'];
 			$character->class_id = ($class) ? $class->id : null;
 			$character->race_id = ($race) ? $race->id : null;
-			$character->faction_id = ($character->faction_id) ?: @Faction::where('name', '=', $factionName)->first()->id;
+			$character->faction_id = ($faction) ? $faction->id : $character->faction_id;
 			$character->save();
 	    }
 	    
