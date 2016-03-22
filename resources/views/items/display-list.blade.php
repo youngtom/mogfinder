@@ -153,11 +153,17 @@
 											<td class="itemname"><a href="http://www.wowhead.com/item=<?=$item->bnet_id?>" target="_blank" rel="<?=$item->getWowheadMarkup()?>" class="item-link q<?=$item->quality?>">[<?=$item->name?>]</a></td>
 											<td class="source"><?=$sources?></td>
 											<td class="center collected">
-											<?php if (in_array($item->id, $userItemIDs)) { ?>
-							                	<i class="fa fa-btn fa-star" title="collected"></i>
-							                <?php } else { ?>
-							                	<i class="fa fa-btn fa-star-o" title="not collected"></i>
-							                <?php } ?>
+											<?php 
+												if (in_array($item->id, $userItemIDs)) {
+													if ($item->allowable_classes) {
+														echo '<i class="fa fa-btn fa-star-o"></i>';
+													} else {
+														echo '<i class="fa fa-btn fa-star"></i>';
+													}
+												} else {
+													echo '&nbsp;';
+												}	
+											?>
 											</td>
 										</tr>
 									<?php 
