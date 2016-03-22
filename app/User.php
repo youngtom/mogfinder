@@ -117,8 +117,8 @@ class User extends Authenticatable
 	    $character = Character::where('user_id', '=', $this->id)->where('realm_id', '=', $realm->id)->where('name', '=', $name)->first();
 	    
 	    if (!$character) {
-		    $class = (@$infoArr['class']) ? CharClass::where('unlocalized_name', '=', $infoArr['class'])->first() false;
-		    $race = (@$infoArr['race']) ? Race::where('name', '=', $infoArr['race'])->first() false;
+		    $class = (@$infoArr['class']) ? CharClass::where('unlocalized_name', '=', $infoArr['class'])->first() : false;
+		    $race = (@$infoArr['race']) ? Race::where('name', '=', $infoArr['race'])->first() : false;
 		    
 			$character = new Character;
 			$character->name = $name;
