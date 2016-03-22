@@ -37,8 +37,6 @@ use App\FileUpload;
 |
 */
 
-Route::get('/', 'HomeController@index');
-
 /*
 Route::get('/test', function () {
 	$character = \App\Character::find(162);
@@ -50,7 +48,7 @@ Route::get('/test', function () {
 Route::group(['middleware' => 'web'], function () {
     Route::auth();
     
-    //Route::get('/', 'HomeController@index');
+    Route::get('/', 'HomeController@index');
 	Route::get('/home', 'HomeController@index');
     
     //Admin helpers routes
