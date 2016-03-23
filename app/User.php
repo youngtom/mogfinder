@@ -50,23 +50,27 @@ class User extends Authenticatable
 	    \Log::info('Importing user data for user: ' . $this->id);
 	    
 	    foreach ($dataFile->import_data['chars'] as $charTag => $charData) {
-		    if (@$charData['charInfo'] && count($charData['charInfo'])) {
+		    $character = ($charTag) ? Character::where('wow_guid', '=', $charTag)->where('user_id', '=', $this->id)->first() : false;
+		    
+		    if (!$character) {
 			    $character = $this->getCharacterFromDataArray($charData['charInfo'], false);
-			    
-			    if ($character) {
-					$scanTime = (@$charData['scanTime']) ? $charData['scanTime'] : 0;
-					
-					if ($scanTime > $character->last_scanned) {
-						// Queue item import
-						$job = (new ImportCharacterItems($character->id, $dataFile->id))->onQueue('med');
-						$this->dispatch($job);
-						
-						$character->last_scanned = $scanTime;
-						$character->latest_chardata = json_encode($charData);
-						$character->save();
-					}
-			    }
 			}
+		    
+		    if ($character) {
+				$scanTime = (@$charData['scanTime']) ? $charData['scanTime'] : 0;
+				
+				if ($scanTime > $character->last_scanned) {
+					// Queue item import
+					$job = (new ImportCharacterItems($character->id, $dataFile->id))->onQueue('med');
+					$this->dispatch($job);
+					
+					$character->last_scanned = $scanTime;
+					$character->latest_chardata = json_encode($charData);
+				}
+				
+				$character->wow_guid = $charTag;
+				$character->save();
+		    }
 	    }
 	    
 	    if (@$dataFile->import_data['heirlooms'] && is_array($dataFile->import_data['heirlooms']) && count($dataFile->import_data['heirlooms'])) {
@@ -104,6 +108,10 @@ class User extends Authenticatable
     }
     
     public function getCharacterFromDataArray($infoArr, $importFromBnet = true, $returnFields = []) {
+	    if (!$infoArr) {
+		    return false;
+	    }
+	    
         $region = $infoArr['region'];
         $realmName = $infoArr['realm'];
         $name = $infoArr['name'];
