@@ -5,10 +5,15 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\FileUpload;
 use Config;
+use Sofa\Eloquence\Eloquence;
 
 class ItemDisplay extends Model
 {
+	use Eloquence;
 	use \App\Http\Traits\FileHandler;
+	
+	protected $primaryItemOverride = null;
+	protected $searchableColumns = ['items.name'];
 	
 	public function items() {
 		return $this->hasMany('App\Item');
@@ -26,12 +31,21 @@ class ItemDisplay extends Model
 		return $this->belongsTo('App\Mogslot');
 	}
 	
-	public function getPrimaryItem() {
-		if ($this->primaryItem) {
+	public function getPrimaryItem($search = null) {
+		if ($this->primaryItemOverride) {
+			return $this->primaryItemOverride;
+		} elseif ($this->primaryItem) {
 			return $this->primaryItem;
 		} else {
-			return $this->items()->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->first();
+			if ($search) {
+				$item = $this->items()->where('transmoggable', '=', 1)->search($search)->orderBy('bnet_id', 'ASC')->first();
+			}
+			return ($search && $item) ? $item : $this->items()->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->first();
 		}
+	}
+	
+	public function setTempPrimaryItem(Item $item) {
+		$this->primaryItemOverride = $item;
 	}
 	
 	public function downloadRenderFile() {

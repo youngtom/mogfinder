@@ -59,6 +59,12 @@
                 @endif
             </ul>
             
+            <form class="navbar-form navbar-right" action="{{ url('/search') }}">
+                <div class="form-group">
+	                <input type="text" class="form-control" name="q" placeholder="Item Search" />
+                </div>
+            </form>
+            
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
                     <li class="{{ set_active('home') }}">

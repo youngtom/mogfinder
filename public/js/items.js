@@ -130,7 +130,7 @@ function filterClassItems(classID) {
 		});
 	}
 		
-	updateItemDisplayPanels();
+	updateItemDisplayPanels(true);
 }
 
 function filterCharacterItems(charID) {
@@ -156,21 +156,28 @@ function filterSourceItems(sourceID) {
 		});
 	}
 		
-	updateItemDisplayPanels();
+	updateItemDisplayPanels(false);
 }
 
-function updateItemDisplayPanels() {
+function updateItemDisplayPanels(updateCollected) {
 	$('.item-display-panel').each(function () {
 		var $validRows = $('.item-row:not(.invalid-class,.invalid-race,.invalid-character,.invalid-source)', $(this));
+		var $priorityRows = $('.item-row.priority', $(this));
 		
 		if ($validRows.length) {
 			$(this).removeClass('filtered');
 			
-			$('.display-item-link', $(this)).html($('.itemname', $validRows.first()).html());
+			if ($priorityRows.length) {
+				$('.display-item-link', $(this)).html($('.itemname', $priorityRows.first()).html());
+			} else {
+				$('.display-item-link', $(this)).html($('.itemname', $validRows.first()).html());
+			}
 			
-			if ($validRows.length > 1) {
-				var addlStr = '(and ' + String($validRows.length - 1) + ' other';
-				addlStr = ($validRows.length > 2) ? addlStr + 's)' : addlStr + ')';
+			var numItmes = $priorityRows.length + $validRows.length;
+			
+			if (numItmes > 1) {
+				var addlStr = '(and ' + String(numItmes - 1) + ' other';
+				addlStr = (numItmes > 2) ? addlStr + 's)' : addlStr + ')';
 				$('.num-addl-items', $(this)).show().html(addlStr);
 			} else {
 				$('.num-addl-items', $(this)).hide();
@@ -179,10 +186,12 @@ function updateItemDisplayPanels() {
 			$(this).addClass('filtered');
 		}
 		
-		if ($('.item-row[data-item-collected="1"]:not(.invalid-class,.invalid-race,.invalid-character,.invalid-source)', $(this)).length) {
-			$(this).attr('data-display-collected', 1);
-		} else {
-			$(this).attr('data-display-collected', 0);
+		if (updateCollected)		
+			if ($('.item-row[data-item-collected="1"]:not(.invalid-class,.invalid-race,.invalid-character,.invalid-source)', $(this)).length) {
+				$(this).attr('data-display-collected', 1);
+			} else {
+				$(this).attr('data-display-collected', 0);
+			}
 		}
 	});
 	

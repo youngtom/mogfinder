@@ -5,12 +5,15 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Config;
 use App\Race;
+use Sofa\Eloquence\Eloquence;
 
 class Item extends Model
 {
+	use Eloquence;
 	use \App\Http\Traits\FileHandler;
 	
 	private static $apiClient = null;
+	protected $searchableColumns = ['name', 'bnet_id'];
 	
 	public function inventoryType() {
         return $this->belongsTo('App\InventoryType');

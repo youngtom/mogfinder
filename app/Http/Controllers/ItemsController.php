@@ -119,6 +119,64 @@ class ItemsController extends Controller
 		*/
 	    
 	    $displays = ItemDisplay::where('transmoggable', '=', 1)->whereIn('mogslot_id', $mogslotIDs)->orderBy('bnet_display_id', 'ASC')->get();
+	    
+	    return $this->showItemDisplays($displays, $mogslot);
+    }
+    
+    public function search($query) {
+	    $query = str_replace('+', ' ', $query);
+	    
+	    $createdItemSourceType = ItemSourceType::where('label', '=', 'CONTAINED_IN_ITEM')->first();
+		$createdFromItemBnetIDs = ItemSource::where('item_source_type_id', '=', $createdItemSourceType->id)->groupBy('bnet_source_id')->get()->lists('bnet_source_id')->toArray();
+		$createdItemBnetIDs = [];
+	    
+	    //search items (by name)
+	    $items = Item::where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->search('"' . $query . '"')->get();
+	    
+	    if (!$items->count()) {
+		    $createdItemBnetIDs = Item::whereIn('bnet_id', $createdFromItemBnetIDs)->search("'" . $query . "'")->get()->lists('bnet_id')->toArray();
+		    
+		    if (!count($createdItemBnetIDs)) {
+			    $items = Item::where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->search($query)->get();
+			} else {
+				$searchSource = true;
+			}
+	    }
+	    
+	    $searchSource = ($items->count() > 1);
+	    
+	    if ($searchSource || count($createdItemBnetIDs)) {
+		    //search items that are created by another item (by the source item name)
+		    if (!count($createdItemBnetIDs)) {
+			    $createdItemBnetIDs = Item::whereIn('bnet_id', $createdFromItemBnetIDs)->search($query)->get()->lists('bnet_id')->toArray();
+		    }
+		    
+		    $createdItems = Item::where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->whereHas('itemSources', function ($query) use ($createdItemBnetIDs, $createdItemSourceType) {
+			    $query->whereIn('bnet_source_id', $createdItemBnetIDs)->where('item_source_type_id', '=', $createdItemSourceType->id);
+		    })->get();
+		    
+		    $items = $items->merge($createdItems);
+		}
+		
+	    $itemIDs = $items->lists('id')->toArray();
+	    $displayIDs = array_unique($items->lists('item_display_id')->toArray());
+	    $itemsByDisplay = $items->groupBy('item_display_id');
+	    
+	    $displays = ItemDisplay::whereIn('id', $displayIDs)->where('transmoggable', '=', 1)->get();
+	    
+	    // restore search relevance
+	    $displays = $displays->sortBy(function ($display) use ($displayIDs) {
+		    return array_search($display->id, $displayIDs);
+	    });
+	    
+	    $displays->each(function ($display) use ($itemsByDisplay) {
+		    $display->setTempPrimaryItem($itemsByDisplay[$display->id][0]);
+	    });
+	    
+	    return $this->showItemDisplays($displays, false, $itemIDs);
+    }
+    
+    protected function showItemDisplays($displays, $mogslot = false, $priorityItemIDs = []) {
 	    $user = Auth::user();
 	    
 	    $dispIds = $displays->lists('id');
@@ -134,7 +192,7 @@ class ItemsController extends Controller
 		if (Item::where('allowable_classes', '>', 0)->whereIn('id', $itemIDs)->get()->count()) {
 		    $classes = CharClass::orderBy('name', 'ASC')->get();
 		    
-		    if ($mogslot->allowed_class_bitmask) {
+		    if ($mogslot && $mogslot->allowed_class_bitmask) {
 			    $classes = $classes->filter(function ($class) use ($mogslot) {
 				   $classMask = pow(2, $class->id);
 				   return (($classMask & $mogslot->allowed_class_bitmask) !== 0); 
@@ -144,6 +202,6 @@ class ItemsController extends Controller
 			$classes = false;
 		}
 	    
-	    return view('items.display-list')->with('mogslot', $mogslot)->with('itemDisplays', $displays)->with('user', $user)->with('userDisplayIDs', $userDisplayIDs)->with('userItemIDs', $userItemIDs)->with('classes', $classes)->with('itemSourceTypes', $itemSourceTypes);
+	    return view('items.display-list')->with('mogslot', $mogslot)->with('itemDisplays', $displays)->with('user', $user)->with('userDisplayIDs', $userDisplayIDs)->with('userItemIDs', $userItemIDs)->with('classes', $classes)->with('itemSourceTypes', $itemSourceTypes)->with('priorityItemIDs', $priorityItemIDs);
     }
 }

@@ -60,6 +60,20 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('/items/duplicates/{selectedCharacterURL}', 'ItemsController@duplicates');
     Route::get('/items/{group}/{category}/{mogslotURL}', 'ItemsController@showSlot')->where('group', '(armor|weapons)');
     
+    //Search routes
+    Route::get('/search', function () {
+	    $query = \Request::input('q');
+	    
+	    if ($query) {
+		    $query = preg_replace('/\s+/', '+', $query);
+		    return redirect()->route('search', [$query]);
+	    } else {
+		    return view('items.search');
+	    }
+    });
+    
+    Route::get('/search/{query}', ['as' => 'search', 'uses' => 'ItemsController@search']);
+    
     //user routes
     Route::get('/dashboard', 'UserController@getDashboard');
     Route::get('/user/upload-data', 'UserController@dataUpload');
