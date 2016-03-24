@@ -160,7 +160,7 @@ class Character extends Model
 					    $userItem = UserItem::where('character_id', '=', $this->id)->where('item_link', $itemLink)->first();
 				    
 					    if ($userItem) {
-						    $userItem->item_location_id = $equippedLocation->id;
+						    $userItem->item_location_id = $itemLocation->id;
 						    $userItem->bound = 1;
 						    $userItem->save();
 					    } else {
