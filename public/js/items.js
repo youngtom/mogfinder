@@ -186,7 +186,7 @@ function updateItemDisplayPanels(updateCollected) {
 			$(this).addClass('filtered');
 		}
 		
-		if (updateCollected)		
+		if (updateCollected) {
 			if ($('.item-row[data-item-collected="1"]:not(.invalid-class,.invalid-race,.invalid-character,.invalid-source)', $(this)).length) {
 				$(this).attr('data-display-collected', 1);
 			} else {
