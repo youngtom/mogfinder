@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Config;
 use App\Race;
+use App\Faction;
 use Sofa\Eloquence\Eloquence;
 
 class Item extends Model
@@ -255,6 +256,21 @@ class Item extends Model
 		});
 		
 		return $restrictedClasses;
+	}
+	
+	public function getRestrictedFactions() {
+		if (!$this->allowable_races) {
+			return false;
+		}
+		
+		$mask = $this->allowable_races;
+		$factions = Faction::where('race_bitmask', '>', 0)->orderBy('name', 'ASC')->get();
+		
+		$restrictedFactions = $factions->filter(function ($faction) use ($mask) {
+			return (($faction->race_bitmask & $mask) !== 0);
+		});
+		
+		return $restrictedFactions;
 	}
     
     public static function getBitmaskFromIDArray($arr) {

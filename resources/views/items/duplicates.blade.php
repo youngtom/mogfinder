@@ -63,7 +63,7 @@
 		        foreach ($duplicates as $displayID => $itemArr) {
 			        $restrictedClasses = false;
 			        foreach ($itemArr as $item) {
-				    	if ($item->item->allowable_classes) {
+				    	if ($item->item->allowable_classes || $item->item->allowable_races) {
 					    	$restrictedClasses = true;
 					    	break;
 				    	}
@@ -97,12 +97,23 @@
 							<?php if ($restrictedClasses) { ?>
 							<td class="class-restrictions center">
 								<?php
-									if ($item->item->allowable_classes) {
-										foreach ($item->item->getRestrictedClasses() as $class) {
+									if ($item->item->allowable_classes || $item->item->allowable_races) {
+										if ($item->item->allowable_classes) {
+											foreach ($item->item->getRestrictedClasses() as $class) {
 										
 								?>
 								<i class="game-icon-sm" style="background-image: url(<?=$class->getFile('icon_image')->getWebPath()?>)" title="<?=ucwords($class->name)?>" data-toggle="tooltip" data-placement="left"></i>
 								<?php
+											}
+										}
+										
+										if ($item->item->allowable_races) {
+											foreach ($item->item->getRestrictedFactions() as $faction) {
+										
+								?>
+								<i class="game-icon-sm" style="background-image: url(<?=$faction->getFile('icon_image')->getWebPath()?>)" title="<?=ucwords($faction->name)?>" data-toggle="tooltip" data-placement="left"></i>
+								<?php
+											}
 										}
 									} else {
 										echo '&nbsp;';
