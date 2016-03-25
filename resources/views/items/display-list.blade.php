@@ -150,7 +150,7 @@
 											$sourceTypeIDs = implode('|', $sourceTypeIDs);
 											$priority = (is_array($priorityItemIDs) && in_array($item->id, $priorityItemIDs)) ? 'priority' : '';
 											
-											if ($mogslot) {
+											if ($mogslot || $item->allowable_classes) {
 												$itemClassMask = ($item->allowable_classes) ?: 0;
 											}  elseif ($display->mogslot) {
 												$itemClassMask = ($display->mogslot->allowed_class_bitmask) ?: 0;
