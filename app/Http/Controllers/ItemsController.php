@@ -12,6 +12,7 @@ use App\ItemDisplay;
 use App\Mogslot;
 use App\MogslotCategory;
 use App\CharClass;
+use App\Faction;
 use App\Item;
 use App\ItemSource;
 use App\ItemSourceType;
@@ -126,36 +127,40 @@ class ItemsController extends Controller
     public function search($query) {
 	    $query = str_replace('+', ' ', $query);
 	    
-	    $createdItemSourceType = ItemSourceType::where('label', '=', 'CONTAINED_IN_ITEM')->first();
-		$createdFromItemBnetIDs = ItemSource::where('item_source_type_id', '=', $createdItemSourceType->id)->groupBy('bnet_source_id')->get()->lists('bnet_source_id')->toArray();
-		$createdItemBnetIDs = [];
-	    
-	    //search items (by name)
-	    $items = Item::where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->search('"' . $query . '"')->get();
-	    
-	    if (!$items->count()) {
-		    $createdItemBnetIDs = Item::whereIn('bnet_id', $createdFromItemBnetIDs)->search("'" . $query . "'")->get()->lists('bnet_id')->toArray();
+	    if (is_numeric($query)) {
+		    $items = Item::where('bnet_id', '=', $query)->get();
+	    } else {
+		    $createdItemSourceType = ItemSourceType::where('label', '=', 'CONTAINED_IN_ITEM')->first();
+			$createdFromItemBnetIDs = ItemSource::where('item_source_type_id', '=', $createdItemSourceType->id)->groupBy('bnet_source_id')->get()->lists('bnet_source_id')->toArray();
+			$createdItemBnetIDs = [];
 		    
-		    if (!count($createdItemBnetIDs)) {
-			    $items = Item::where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->search($query)->get();
-			} else {
-				$searchSource = true;
-			}
-	    }
-	    
-	    $searchSource = ($items->count() > 1);
-	    
-	    if ($searchSource || count($createdItemBnetIDs)) {
-		    //search items that are created by another item (by the source item name)
-		    if (!count($createdItemBnetIDs)) {
-			    $createdItemBnetIDs = Item::whereIn('bnet_id', $createdFromItemBnetIDs)->search($query)->get()->lists('bnet_id')->toArray();
+		    //search items (by name)
+		    $items = Item::where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->search('"' . $query . '"')->get();
+			
+		    if (!$items->count()) {
+			    $createdItemBnetIDs = Item::whereIn('bnet_id', $createdFromItemBnetIDs)->search("'" . $query . "'")->get()->lists('bnet_id')->toArray();
+			    
+			    if (!count($createdItemBnetIDs)) {
+				    $items = Item::where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->search($query)->get();
+				} else {
+					$searchSource = true;
+				}
 		    }
 		    
-		    $createdItems = Item::where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->whereHas('itemSources', function ($query) use ($createdItemBnetIDs, $createdItemSourceType) {
-			    $query->whereIn('bnet_source_id', $createdItemBnetIDs)->where('item_source_type_id', '=', $createdItemSourceType->id);
-		    })->get();
+		    $searchSource = ($items->count() > 1);
 		    
-		    $items = $items->merge($createdItems);
+		    if ($searchSource || count($createdItemBnetIDs)) {
+			    //search items that are created by another item (by the source item name)
+			    if (!count($createdItemBnetIDs)) {
+				    $createdItemBnetIDs = Item::whereIn('bnet_id', $createdFromItemBnetIDs)->search($query)->get()->lists('bnet_id')->toArray();
+			    }
+			    
+			    $createdItems = Item::where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->whereHas('itemSources', function ($query) use ($createdItemBnetIDs, $createdItemSourceType) {
+				    $query->whereIn('bnet_source_id', $createdItemBnetIDs)->where('item_source_type_id', '=', $createdItemSourceType->id);
+			    })->get();
+			    
+			    $items = $items->merge($createdItems);
+			}
 		}
 		
 	    $itemIDs = $items->lists('id')->toArray();
@@ -192,10 +197,12 @@ class ItemsController extends Controller
 		$mogslotCount = $displays->groupBy('mogslot_id')->count();
 		
 		if ($mogslotCount > 1) {
-			$allowedClassBitmask = ItemDisplay::getAllowedClassBitmaskForDisplays($displays);		    
+			$allowedClassBitmask = ItemDisplay::getAllowedClassBitmaskForDisplays($displays);
 		} else {
-			$allowedClassBitmask = ($mogslot) ? $mogslot->allowed_class_bitmask : false;
+			$allowedClassBitmask = ($mogslot) ? $mogslot->allowed_class_bitmask : false;			
 		}
+		
+		$allowedRaceBitmask = ItemDisplay::getAllowedRaceBitmaskForDisplays($displays);
 		
 		if (Item::where('allowable_classes', '>', 0)->whereIn('id', $itemIDs)->get()->count() || $mogslotCount > 1) {
 		    $classes = CharClass::orderBy('name', 'ASC')->get();
@@ -209,7 +216,19 @@ class ItemsController extends Controller
 		} else {
 			$classes = false;
 		}
+		
+		if (Item::where('allowable_races', '>', 0)->whereIn('id', $itemIDs)->get()->count()) {
+		    $factions = Faction::where('race_bitmask', '>', 0)->orderBy('name', 'ASC')->get();
+		    
+		    if ($allowedRaceBitmask) {
+			    $factions = $factions->filter(function ($faction) use ($allowedRaceBitmask) {
+				   return (($faction->race_bitmask & $allowedRaceBitmask) !== 0); 
+				});
+		    }
+		} else {
+			$factions = false;
+		}
 	    
-	    return view('items.display-list')->with('mogslot', $mogslot)->with('itemDisplays', $displays)->with('user', $user)->with('userDisplayIDs', $userDisplayIDs)->with('userItemIDs', $userItemIDs)->with('classes', $classes)->with('itemSourceTypes', $itemSourceTypes)->with('priorityItemIDs', $priorityItemIDs);
+	    return view('items.display-list')->with('mogslot', $mogslot)->with('itemDisplays', $displays)->with('user', $user)->with('userDisplayIDs', $userDisplayIDs)->with('userItemIDs', $userItemIDs)->with('classes', $classes)->with('factions', $factions)->with('itemSourceTypes', $itemSourceTypes)->with('priorityItemIDs', $priorityItemIDs);
     }
 }

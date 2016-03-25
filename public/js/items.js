@@ -57,11 +57,13 @@ $(window).on('load', function () {
 			$dropDown.addClass('all-selected');
 			$('.selected-value', $dropDown).html('All');
 			$('.btn.dropdown-toggle', $dropDown).attr('data-class', '');
+			$('.btn.dropdown-toggle', $dropDown).attr('data-faction', '');
 		} else {
 			$dropDown.removeClass('all-selected');
 			$('.selected-value', $dropDown).html($(this).html());
 			$(this).parent().hide();
 			$('.btn.dropdown-toggle', $dropDown).attr('data-class', $(this).attr('data-class-code'));
+			$('.btn.dropdown-toggle', $dropDown).attr('data-faction', $(this).attr('data-faction-code'));
 		}
 	});
 	
@@ -78,6 +80,23 @@ $(window).on('load', function () {
 		}
 		
 		$('.class-filter .dropdown-toggle').dropdown("toggle");
+		
+		return false;
+	});
+	
+	$('.faction-filter .dropdown-menu li a').on('click', function () {
+		var factionMask = parseInt($(this).attr('data-faction-mask'));
+		filterFactionItems(factionMask);
+		
+		if (factionMask) {
+			$('.panel-group').addClass('faction-filtered');
+			$('.btn.dropdown-toggle', $(this).parents('.faction-filter')).removeClass('btn-primary').addClass('btn-default');
+		} else {
+			$('.panel-group').removeClass('faction-filtered');
+			$('.btn.dropdown-toggle', $(this).parents('.faction-filter')).addClass('btn-primary').removeClass('btn-default');
+		}
+		
+		$('.faction-filter .dropdown-toggle').dropdown("toggle");
 		
 		return false;
 	});
@@ -133,6 +152,22 @@ function filterClassItems(classID) {
 	updateItemDisplayPanels(true);
 }
 
+function filterFactionItems(factionMask) {
+	$('.item-row').removeClass('invalid-faction');
+	
+	if (factionMask) {
+		$('.item-row[data-racemask!="0"]').each(function () {
+			var itemMask = parseInt($(this).attr('data-racemask'));
+			
+			if ((itemMask & factionMask) == 0) {
+				$(this).addClass('invalid-faction');
+			}
+		});
+	}
+		
+	updateItemDisplayPanels(true);
+}
+
 function filterCharacterItems(charID) {
 	$('.item-display-panel').removeClass('filtered');
 	
@@ -161,7 +196,7 @@ function filterSourceItems(sourceID) {
 
 function updateItemDisplayPanels(updateCollected) {
 	$('.item-display-panel').each(function () {
-		var $validRows = $('.item-row:not(.invalid-class,.invalid-race,.invalid-character,.invalid-source)', $(this));
+		var $validRows = $('.item-row:not(.invalid-class,.invalid-faction,.invalid-race,.invalid-character,.invalid-source)', $(this));
 		var $priorityRows = $('.item-row.priority', $(this));
 		
 		if ($validRows.length) {
@@ -187,7 +222,7 @@ function updateItemDisplayPanels(updateCollected) {
 		}
 		
 		if (updateCollected) {
-			if ($('.item-row[data-item-collected="1"]:not(.invalid-class,.invalid-race,.invalid-character,.invalid-source)', $(this)).length) {
+			if ($('.item-row[data-item-collected="1"]:not(.invalid-class,.invalid-faction,.invalid-race,.invalid-character,.invalid-source)', $(this)).length) {
 				$(this).attr('data-display-collected', 1);
 			} else {
 				$(this).attr('data-display-collected', 0);

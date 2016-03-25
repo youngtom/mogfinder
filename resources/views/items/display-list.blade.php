@@ -27,6 +27,7 @@
 							        </div>
 						        </div>
 					        </div>
+					        
 					        <?php if ($classes && count($classes) > 1) { ?>
 					        <div class="form-group class-filter-group">
 						        <p class="navbar-text">Class:</p>
@@ -40,6 +41,26 @@
 									<?php foreach ($classes as $class) { ?>
 										<li><a href="#class:<?=$class->url_token?>" data-class-id="<?=$class->id?>" data-class-code="<?=$class->url_token?>" class="<?=$class->url_token?>">
 											<i class="game-icon-sm" style="background-image: url(<?=$class->getFile('icon_image')->getWebPath()?>)"></i> <?=$class->name?></a>
+										</li>
+									<?php } ?>
+									</ul>
+								</div>
+					        </div>
+					        <?php } ?>
+					        
+					        <?php if ($factions && count($factions) > 1) { ?>
+					        <div class="form-group faction-filter-group">
+						        <p class="navbar-text">Faction:</p>
+						        <div class="btn-group navbar-btn faction-filter selectable-filter all-selected" role="group">
+									<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+										<span class="selected-value">All</span> <span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu">
+										<li class="all-select"><a href="#" data-faction-mask="0" class="show-all">Show all</a></li>
+										<li class="all-select divider" roll="separator"></li>
+									<?php foreach ($factions as $faction) { ?>
+										<li><a href="#faction:<?=strtolower($faction->name)?>" data-faction-mask="<?=$faction->race_bitmask?>" data-faction-code="<?=strtolower($faction->name)?>" class="<?=strtolower($faction->name)?>">
+											<i class="game-icon-sm" style="background-image: url(<?=$faction->getFile('icon_image')->getWebPath()?>)"></i> <?=$faction->name?></a>
 										</li>
 									<?php } ?>
 									</ul>
@@ -158,13 +179,13 @@
 												$itemClassMask = 0;
 											}
 									?>
-										<tr class="item-row <?=$priority?>" data-classmask="<?=$itemClassMask?>" data-sources="<?=($sourceTypeIDs) ?: -1?>" data-item-collected="<?=(in_array($item->id, $userItemIDs)) ? 1 : 0?>">
+										<tr class="item-row <?=$priority?>" data-classmask="<?=$itemClassMask?>" data-racemask="<?=($item->allowable_races) ?: 0?>" data-sources="<?=($sourceTypeIDs) ?: -1?>" data-item-collected="<?=(in_array($item->id, $userItemIDs)) ? 1 : 0?>">
 											<td class="itemname"><a href="http://www.wowhead.com/item=<?=$item->bnet_id?>" target="_blank" rel="<?=$item->getWowheadMarkup()?>" class="item-link q<?=$item->quality?>">[<?=$item->name?>]</a></td>
 											<td class="source"><?=$sources?></td>
 											<td class="center collected">
 											<?php 
 												if (in_array($item->id, $userItemIDs)) {
-													if ($item->allowable_classes) {
+													if ($item->allowable_classes || $item->allowable_races) {
 														echo '<i class="fa fa-btn fa-star-o"></i>';
 													} else {
 														echo '<i class="fa fa-btn fa-star"></i>';

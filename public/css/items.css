@@ -72,6 +72,7 @@ a.expand-collapse { color: #ccc; }
 .quest-toggle-btn.btn-default .fa-check-square-o { display: none; }
 
 .item-row.invalid-class,
+.item-row.invalid-faction,
 .item-row.invalid-race,
 .item-row.invalid-source,
 .item-row.invalid-character,
@@ -91,7 +92,9 @@ a.expand-collapse { color: #ccc; }
 .item-display-panel[data-display-collected="0"] .panel-heading .collected-star { display: none; }
 
 .item-display-panel[data-display-collected-partial="1"] .panel-heading .collected-star { display: none; }
-.panel-group.class-filtered .partiallly-collected-star { display: none; }
-.panel-group.class-filtered .item-display-panel[data-display-collected="1"] .panel-heading .collected-star { display: inline-block; }
+.panel-group.class-filtered .partiallly-collected-star,
+.panel-group.faction-filtered .partiallly-collected-star { display: none; }
+.panel-group.class-filtered .item-display-panel[data-display-collected="1"] .panel-heading .collected-star,
+.panel-group.faction-filtered .item-display-panel[data-display-collected="1"] .panel-heading .collected-star { display: inline-block; }
 
 .character-filter-group .dropdown-menu .realm-name { display: none; }

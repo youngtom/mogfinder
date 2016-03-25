@@ -15,6 +15,7 @@ class ItemDisplay extends Model
 	protected $primaryItemOverride = null;
 	protected $searchableColumns = ['items.name'];
 	protected $allowedClassBitmask = -1;
+	protected $allowedRaceBitmask = -1;
 	
 	public function items() {
 		return $this->hasMany('App\Item');
@@ -71,7 +72,7 @@ class ItemDisplay extends Model
 			return $this->allowedClassBitmask;
 		}
 		
-		$bitmasks = array_unique($this->items->lists('allowable_classes')->toArray());
+		$bitmasks = array_unique($this->items()->where('transmoggable', '=', 1)->lists('allowable_classes')->toArray());
 		
 		$bitmask = false;
 		foreach ($bitmasks as $_bitmask) {
@@ -95,6 +96,46 @@ class ItemDisplay extends Model
 		
 		foreach ($displays as $display) {
 			$dispBitmask = $display->getAllowedClassBitmask();
+			
+			if ($dispBitmask === null) {
+				return null;
+			}
+			
+			$bitmask = ($bitmask) ? $bitmask | $dispBitmask : $dispBitmask;
+		}
+		
+		return $bitmask;
+	}
+	
+	public function getAllowedRaceBitmask() {
+		if ($this->allowedRaceBitmask !== -1) {
+			return $this->allowedRaceBitmask;
+		}
+		
+		$bitmasks = array_unique($this->items()->where('transmoggable', '=', 1)->lists('allowable_races')->toArray());
+		
+		$bitmask = false;
+		foreach ($bitmasks as $_bitmask) {
+			if ($_bitmask == null) {
+				$bitmask = null;
+				break;
+			}
+			
+			$bitmask = ($bitmask) ? $bitmask | $_bitmask : $_bitmask;
+		}
+		
+		if (!$bitmask) {
+			$bitmask = null;
+		}
+		
+		return $this->allowedRaceBitmask = $bitmask;
+	}
+	
+	public static function getAllowedRaceBitmaskForDisplays($displays) {
+		$bitmask = false;
+		
+		foreach ($displays as $display) {
+			$dispBitmask = $display->getAllowedRaceBitmask();
 			
 			if ($dispBitmask === null) {
 				return null;

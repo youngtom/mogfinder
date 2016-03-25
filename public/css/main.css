@@ -81,6 +81,9 @@ a.warrior { color: #C79C6E !important; }
 .btn[data-class="warlock"] { background-color: rgba(148, 130, 201, 100); }
 .btn[data-class="warrior"] { background-color: rgba(199, 156, 110, 100); }
 
+.btn[data-faction="alliance"] { background-color: #114587; }
+.btn[data-faction="horde"] { background-color: #650c0e; }
+
 .mogslot-summary h3 { margin-top: 0px; }
 
 .mogslot-progress-wrapper { 
