@@ -208,11 +208,11 @@ function updateItemDisplayPanels(updateCollected) {
 				$('.display-item-link', $(this)).html($('.itemname', $validRows.first()).html());
 			}
 			
-			var numItmes = $priorityRows.length + $validRows.length;
+			var numItems = $priorityRows.length + $('.item-row:not(.invalid-class,.invalid-faction,.invalid-race,.invalid-character,.invalid-source,.priority)', $(this)).length;
 			
-			if (numItmes > 1) {
-				var addlStr = '(and ' + String(numItmes - 1) + ' other';
-				addlStr = (numItmes > 2) ? addlStr + 's)' : addlStr + ')';
+			if (numItems > 1) {
+				var addlStr = '(and ' + String(numItems - 1) + ' other';
+				addlStr = (numItems > 2) ? addlStr + 's)' : addlStr + ')';
 				$('.num-addl-items', $(this)).show().html(addlStr);
 			} else {
 				$('.num-addl-items', $(this)).hide();

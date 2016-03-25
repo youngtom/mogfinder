@@ -164,6 +164,7 @@ class ItemsController extends Controller
 		}
 		
 	    $itemIDs = $items->lists('id')->toArray();
+	    
 	    $displayIDs = array_unique($items->lists('item_display_id')->toArray());
 	    $itemsByDisplay = $items->groupBy('item_display_id');
 	    
