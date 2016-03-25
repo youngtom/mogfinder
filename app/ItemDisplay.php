@@ -14,6 +14,7 @@ class ItemDisplay extends Model
 	
 	protected $primaryItemOverride = null;
 	protected $searchableColumns = ['items.name'];
+	protected $allowedClassBitmask = -1;
 	
 	public function items() {
 		return $this->hasMany('App\Item');
@@ -63,5 +64,45 @@ class ItemDisplay extends Model
 			}
 		}
 		return false;
+	}
+	
+	public function getAllowedClassBitmask() {
+		if ($this->allowedClassBitmask !== -1) {
+			return $this->allowedClassBitmask;
+		}
+		
+		$bitmasks = array_unique($this->items->lists('allowable_classes')->toArray());
+		
+		$bitmask = false;
+		foreach ($bitmasks as $_bitmask) {
+			if ($_bitmask == null) {
+				$bitmask = null;
+				break;
+			}
+			
+			$bitmask = ($bitmask) ? $bitmask | $_bitmask : $_bitmask;
+		}
+		
+		if (!$bitmask && $this->mogslot) {
+			$bitmask = $this->mogslot->allowed_class_bitmask;
+		}
+		
+		return $this->allowedClassBitmask = $bitmask;
+	}
+	
+	public static function getAllowedClassBitmaskForDisplays($displays) {
+		$bitmask = false;
+		
+		foreach ($displays as $display) {
+			$dispBitmask = $display->getAllowedClassBitmask();
+			
+			if ($dispBitmask === null) {
+				return null;
+			}
+			
+			$bitmask = ($bitmask) ? $bitmask | $dispBitmask : $dispBitmask;
+		}
+		
+		return $bitmask;
 	}
 }

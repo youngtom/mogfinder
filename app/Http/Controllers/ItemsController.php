@@ -192,19 +192,7 @@ class ItemsController extends Controller
 		$mogslotCount = $displays->groupBy('mogslot_id')->count();
 		
 		if ($mogslotCount > 1) {
-			$allowedClassBitmask = null;
-		    foreach ($displays->groupBy('mogslot_id') as $_mogslotID => $_mogslotDisplays) {
-			    $_mogslot = Mogslot::find($_mogslotID);
-			    
-			    if ($_mogslot) {
-					if ($_mogslot->allowed_class_bitmask) {
-						$allowedClassBitmask = ($allowedClassBitmask === null) ? $_mogslot->allowed_class_bitmask : $_mogslot->allowed_class_bitmask | $allowedClassBitmask;
-					} else {
-						$allowedClassBitmask = null;
-						break;
-					}
-			    }
-		    }
+			$allowedClassBitmask = ItemDisplay::getAllowedClassBitmaskForDisplays($displays);		    
 		} else {
 			$allowedClassBitmask = $mogslot->allowed_class_bitmask;
 		}
