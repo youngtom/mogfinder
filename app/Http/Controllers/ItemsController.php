@@ -194,7 +194,7 @@ class ItemsController extends Controller
 		if ($mogslotCount > 1) {
 			$allowedClassBitmask = ItemDisplay::getAllowedClassBitmaskForDisplays($displays);		    
 		} else {
-			$allowedClassBitmask = $mogslot->allowed_class_bitmask;
+			$allowedClassBitmask = ($mogslot) ? $mogslot->allowed_class_bitmask : false;
 		}
 		
 		if (Item::where('allowable_classes', '>', 0)->whereIn('id', $itemIDs)->get()->count() || $mogslotCount > 1) {
