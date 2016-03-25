@@ -189,13 +189,33 @@ class ItemsController extends Controller
 		$itemSourceTypeIDs = ItemSource::whereIn('item_id', $itemIDs)->groupBy('item_source_type_id')->get()->lists('item_source_type_id');
 		$itemSourceTypes = ItemSourceType::where('url_token', '<>', '')->whereIn('id', $itemSourceTypeIDs)->get();
 		
-		if (Item::where('allowable_classes', '>', 0)->whereIn('id', $itemIDs)->get()->count()) {
+		$mogslotCount = $displays->groupBy('mogslot_id')->count();
+		
+		if ($mogslotCount > 1) {
+			$allowedClassBitmask = null;
+		    foreach ($displays->groupBy('mogslot_id') as $_mogslotID => $_mogslotDisplays) {
+			    $_mogslot = Mogslot::find($_mogslotID);
+			    
+			    if ($_mogslot) {
+					if ($_mogslot->allowed_class_bitmask) {
+						$allowedClassBitmask = ($allowedClassBitmask === null) ? $_mogslot->allowed_class_bitmask : $_mogslot->allowed_class_bitmask | $allowedClassBitmask;
+					} else {
+						$allowedClassBitmask = null;
+						break;
+					}
+			    }
+		    }
+		} else {
+			$allowedClassBitmask = $mogslot->allowed_class_bitmask;
+		}
+		
+		if (Item::where('allowable_classes', '>', 0)->whereIn('id', $itemIDs)->get()->count() || $mogslotCount > 1) {
 		    $classes = CharClass::orderBy('name', 'ASC')->get();
 		    
-		    if ($mogslot && $mogslot->allowed_class_bitmask) {
-			    $classes = $classes->filter(function ($class) use ($mogslot) {
+		    if ($allowedClassBitmask) {
+			    $classes = $classes->filter(function ($class) use ($allowedClassBitmask) {
 				   $classMask = pow(2, $class->id);
-				   return (($classMask & $mogslot->allowed_class_bitmask) !== 0); 
+				   return (($classMask & $allowedClassBitmask) !== 0); 
 				});
 		    }
 		} else {
