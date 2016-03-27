@@ -37,13 +37,31 @@ use App\FileUpload;
 |
 */
 
-/*
 Route::get('/test', function () {
-	$character = \App\Character::find(162);
+	$character = \App\Character::find(181);
 	
-	$character->importBnetData();
+	$questID = 35704;
+	
+	$questLocation = ItemLocation::find(19);
+	$questSourceType = ItemSourceType::where('label', '=', 'REWARD_FOR_QUEST')->first();
+	$itemSources = ItemSource::where('bnet_source_id', '=', $questID)->where('item_source_type_id', '=', $questSourceType->id)->get();
+	
+    $itemSources->each(function ($itemSource) use ($questLocation, $character) {
+	   $userItem = $character->items()->where('item_id', '=', $itemSource->item_id)->where('item_location_id', '=', $questLocation->id)->first();
+	   
+	   if (!$userItem && $itemSource->item && $itemSource->item->isTransmoggable()) {
+	   		if ($character->eligibleForQuestReward($itemSource->item, $itemSource->dynamic_quest_rewards)) {
+				$userItem = $character->addUserItem($itemSource->item, null, $questLocation, null);
+				echo 'Is eligible for item: ' . $itemSource->item->name . '<br>';
+			} else {
+				echo 'Not eligible for item: ' . $itemSource->item->name . '<br>';
+			}
+	   	} else {
+		   	echo 'Has item ' . $itemSource->item->name . '<br>';
+	   	}
+    });
 });
-*/
+
 
 Route::group(['middleware' => 'web'], function () {
     Route::auth();

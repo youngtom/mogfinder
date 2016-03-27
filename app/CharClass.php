@@ -24,7 +24,8 @@ class CharClass extends Model
 			return false;
 		} else {
 			$validStats = explode(',', $classSubtypeStat->stats);
-			$itemStats = explode(',', $classSubtypeStat->primary_stats);
+			$itemStats = explode(',', $item->primary_stats);			
+			
 			return !empty(array_intersect($validStats, $itemStats));
 		}
 	}
