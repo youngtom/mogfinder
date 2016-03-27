@@ -7,7 +7,7 @@ use App\User;
 use App\Jobs\ImportCharacterQuestItems;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
-class UpdateUserQuestData extends Command
+class ResetUserQuestData extends Command
 {
 	use DispatchesJobs;
 	
@@ -16,7 +16,7 @@ class UpdateUserQuestData extends Command
      *
      * @var string
      */
-    protected $signature = 'user:update-quests {userid}';
+    protected $signature = 'user:reset-quests {userid}';
 
     /**
      * The console command description.
@@ -42,7 +42,7 @@ class UpdateUserQuestData extends Command
      */
     public function handle()
     {
-        $userID = $this->argument('userid');
+	   	$userID = $this->argument('userid');
 	   	
 	   	if ($userID == 'all') {
 		   	$users = User::all();
@@ -58,9 +58,13 @@ class UpdateUserQuestData extends Command
         foreach ($users as $user) {
 	        $this->info('User: ' . $user->email);
 	        foreach ($user->characters as $character) {
+		        $character->quest_import_token = null;
+		        $character->quests_imported = null;
+		        $character->save();
+		        
 		        $job = (new ImportCharacterQuestItems($character->id))->onQueue('low');
 			    $this->dispatch($job);
-			    $this->line('Character quests queued: ' . $character->name . ' - ' . $character->realm->name);
+			    $this->line('Character quests reset and queued: ' . $character->name . ' - ' . $character->realm->name);
 	        }
         }
     }

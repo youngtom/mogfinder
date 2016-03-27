@@ -34,6 +34,7 @@ class Kernel extends ConsoleKernel
         Commands\ResetUserData::class,
         Commands\wowhead\ImportUntransmoggableItems::class,
         Commands\wowhead\ImportQuestItemData::class,
+        Commands\ResetUserQuestData::class,
         Commands\UpdateUserQuestData::class
     ];
 
