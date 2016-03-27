@@ -31,7 +31,9 @@ class Kernel extends ConsoleKernel
         Commands\UpdateItemData::class,
         Commands\SetupClassItemSubtypeStats::class,
         Commands\ImportDynamicQuests::class,
-        Commands\ResetUserData::class
+        Commands\ResetUserData::class,
+        Commands\wowhead\ImportUntransmoggableItems::class,
+        Commands\wowhead\ImportQuestItemData::class
     ];
 
     /**
