@@ -52,54 +52,59 @@ class ImportQuestItemData extends Command
         
         $bar = $this->output->createProgressBar(count($itemsArr));
         
+        $allQuestItemIDs = [];
+        
         foreach ($itemsArr as $itemArr) {
 	        $bnetID = trim($itemArr['id']);
-	        
-	        $items = Item::where('bnet_id', '=', $bnetID)->where('transmoggable', '=', 1)->where('imported_from_bnet', '=', 0)->get();
-	        
-	        if ($items->count()) {
-		        $scrapeWowhead = true;
-		        if (@$itemArr['source'] && $sourceMoreIndex = array_search(4, $itemArr['source'])) {
-			        $sourceArr = (@$itemArr['sourcemore'][$sourceMoreIndex]) ?: false;
-			        
-			        if ($sourceArr && array_key_exists('ti', $sourceArr)) {
-				        foreach ($items as $item) {
-						    $this->addWowheadItemSource($item, $sourceArr['ti']);
-				        }
-				        $scrapeWowhead = false;
-			        }
-		        }
+			
+			if (!in_array($bnetID, $allQuestItemIDs)) {
+		        $items = Item::where('bnet_id', '=', $bnetID)->where('transmoggable', '=', 1)->get();
 		        
-		        if ($scrapeWowhead) {
-			        $questsArr = $this->getWowheadQuestData($bnetID);
-			        
-			        if ($questsArr) {
-				        $this->line('Importing wowhead data for: ' . $bnetID);
+		        if ($items->count()) {
+			        $scrapeWowhead = true;
+			        if (@$itemArr['source'] && $sourceMoreIndex = array_search(4, $itemArr['source'])) {
+				        $sourceArr = (@$itemArr['sourcemore'][$sourceMoreIndex]) ?: false;
 				        
-						foreach ($questsArr as $questArr) {
-							$questID = $questArr['id'];
-							$allQuestItems = [$bnetID];
-							
-							if (@$questArr['itemchoices']) {
-								foreach ($questArr['itemchoices'] as $_itemArr) {
-									$allQuestItems[] = $_itemArr[0];
+				        if ($sourceArr && array_key_exists('ti', $sourceArr)) {
+					        foreach ($items as $item) {
+								$this->addWowheadItemSource($item, $sourceArr['ti']);
+					        }
+					        $scrapeWowhead = false;
+				        }
+			        }
+			        
+			        if ($scrapeWowhead) {
+				        $questsArr = $this->getWowheadQuestData($bnetID);
+				        
+				        if ($questsArr) {
+					        $this->line('Importing wowhead data for: ' . $bnetID);
+					        
+							foreach ($questsArr as $questArr) {
+								$questID = $questArr['id'];
+								$thisQuestItems = [$bnetID];
+								
+								if (@$questArr['itemchoices']) {
+									foreach ($questArr['itemchoices'] as $_itemArr) {
+										$thisQuestItems[] = $_itemArr[0];
+									}
 								}
-							}
-							
-							if (@$questArr['itemrewards']) {
-								foreach ($questArr['itemrewards'] as $_itemArr) {
-									$allQuestItems[] = $_itemArr[0];
+								
+								if (@$questArr['itemrewards']) {
+									foreach ($questArr['itemrewards'] as $_itemArr) {
+										$thisQuestItems[] = $_itemArr[0];
+									}
 								}
+								
+								$thisQuestItemIDs = array_unique($thisQuestItems);
+								$this->addWowheadItemSourceByBnetIDs($thisQuestItemIDs, $questID);
+								$allQuestItemIDs = array_merge($thisQuestItemIDs, $allQuestItemIDs);
 							}
-							
-							$allQuestItemIDs = array_unique($allQuestItems);
-							$this->addWowheadItemSourceByBnetIDs($allQuestItemIDs, $questID);
+						} else {
+							$this->error('Unable to pull wowhead data for item: ' . $bnetID);
 						}
-					} else {
-						$this->error('Unable to pull wowhead data for item: ' . $bnetID);
-					}
-		        }
-	        }
+			        }
+			    }
+		    }
 			
 	        $bar->advance();
         }
@@ -108,12 +113,10 @@ class ImportQuestItemData extends Command
     }
     
     private function addWowheadItemSourceByBnetIDs($bnetIDArr, $sourceID) {
-	    $items = Item::whereIn('bnet_id', $bnetIDArr)->where('transmoggable', '=', 1)->where('imported_from_bnet', '=', 0)->get();
+	    $items = Item::whereIn('bnet_id', $bnetIDArr)->where('transmoggable', '=', 1)->get();
 	    
 	    foreach ($items as $item) {
 		    $this->addWowheadItemSource($item, $sourceID);
-		    $item->imported_from_bnet = 1;
-		    $item->save();
 	    }
     }
     
