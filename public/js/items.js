@@ -222,7 +222,7 @@ function updateItemDisplayPanels(updateCollected) {
 		}
 		
 		if (updateCollected) {
-			if ($('.item-row[data-item-collected="1"]:not(.invalid-class,.invalid-faction,.invalid-race,.invalid-character,.invalid-source)', $(this)).length) {
+			if ($('.item-row[data-item-collected="1"]:not(.invalid-class,.invalid-faction,.invalid-race)', $(this)).length) {
 				$(this).attr('data-display-collected', 1);
 			} else {
 				$(this).attr('data-display-collected', 0);
