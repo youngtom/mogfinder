@@ -97,8 +97,6 @@ class ImportQuestItemData extends Command
 						$this->error('Unable to pull wowhead data for item: ' . $bnetID);
 					}
 		        }
-	        } else {
-		        $this->error('No items found matching bnet_id: ' . $bnetID);
 	        }
 			
 	        $bar->advance();
