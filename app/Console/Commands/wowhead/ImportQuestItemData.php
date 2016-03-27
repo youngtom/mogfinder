@@ -77,8 +77,6 @@ class ImportQuestItemData extends Command
 				        $questsArr = $this->getWowheadQuestData($bnetID);
 				        
 				        if ($questsArr) {
-					        $this->line('Importing wowhead data for: ' . $bnetID);
-					        
 							foreach ($questsArr as $questArr) {
 								$questID = $questArr['id'];
 								$thisQuestItems = [$bnetID];
