@@ -63,7 +63,9 @@ class ImportQuestItemData extends Command
 			        $sourceArr = (@$itemArr['sourcemore'][$sourceMoreIndex]) ?: false;
 			        
 			        if ($sourceArr && array_key_exists('ti', $sourceArr)) {
-				        $this->addWowheadItemSource($item, $sourceArr['ti']);
+				        foreach ($items as $item) {
+						    $this->addWowheadItemSource($item, $sourceArr['ti']);
+				        }
 				        $scrapeWowhead = false;
 			        }
 		        }
