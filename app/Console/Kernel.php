@@ -33,7 +33,8 @@ class Kernel extends ConsoleKernel
         Commands\ImportDynamicQuests::class,
         Commands\ResetUserData::class,
         Commands\wowhead\ImportUntransmoggableItems::class,
-        Commands\wowhead\ImportQuestItemData::class
+        Commands\wowhead\ImportQuestItemData::class,
+        Commands\UpdateUserQuestData::class
     ];
 
     /**
