@@ -128,7 +128,7 @@ class ItemsController extends Controller
 	    $query = str_replace('+', ' ', $query);
 	    
 	    if (is_numeric($query)) {
-		    $items = Item::where('bnet_id', '=', $query)->get();
+		    $items = Item::where('bnet_id', '=', $query)->where('transmoggable', '=', 1)->where('item_display_id', '>', 0)->get();
 	    } else {
 		    $createdItemSourceType = ItemSourceType::where('label', '=', 'CONTAINED_IN_ITEM')->first();
 			$createdFromItemBnetIDs = ItemSource::where('item_source_type_id', '=', $createdItemSourceType->id)->groupBy('bnet_source_id')->get()->lists('bnet_source_id')->toArray();
