@@ -41,7 +41,7 @@ class UpdateItemDisplayRenders extends Command
 	    $itemDisplays = ItemDisplay::where('render_image_id', '=', null)->where('transmoggable', '=', 1)->get();
 	    $bar = $this->output->createProgressBar(count($itemDisplays));
 	    
-	    $itemDisplays->each(function($itemDisplay) use ($bar) {
+	    foreach ($itemDisplays as $itemDisplay) {
 			$file = $itemDisplay->downloadRenderFile();
 			
 			if (!$file) {
@@ -49,7 +49,7 @@ class UpdateItemDisplayRenders extends Command
 			}
 			
 			$bar->advance();
-	    });
+	    }
 	    
 	    $bar->finish();
     }
