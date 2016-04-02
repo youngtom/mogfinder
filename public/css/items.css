@@ -76,7 +76,7 @@ a.expand-collapse { color: #ccc; }
 .item-row.invalid-race,
 .item-row.invalid-source,
 .item-row.invalid-character,
-.item-row.quest-filtered { display: none; }
+.item-row.quest-filtered { opacity: .5; }
 
 .item-row.priority { background-color: #222; display: table-row !important; }
 
