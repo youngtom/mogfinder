@@ -3,6 +3,7 @@
 namespace App;
 
 use Config;
+use App\Realm;
 
 class BnetWowApi
 {
@@ -40,6 +41,12 @@ class BnetWowApi
 		return $this->_getEndpointData($endpoint, $region, $params, 60*10);
 	}
 	
+	public function getAuctionData(Realm $realm) {
+		$endpoint = '/auction/data/' . $realm->name;
+		
+		return $this->_getEndpointData($endpoint, $realm->region, [], 360);
+	}
+	
     private function _getEndpointData($endpoint, $region = 'us', $params = array(), $expirationOverride = false) {
 	    $searchURL = str_replace('{$region}', strtolower($region), Config::get('settings.bnet_api_base_url')) . $endpoint;
 	    $searchURL .= (count($params)) ? '?' . http_build_query($params) : '';
@@ -50,7 +57,7 @@ class BnetWowApi
 		if ($cache = BnetApiCache::where('request_uri', '=', $searchURL)->where('expiration', '>', time())->orderBy('expiration', 'DESC')->first()) {
 			return json_decode($cache->data, true);
 		} else {
-			$res = $this->_makeRequest($url);
+			$res = self::makeRequest($url);
 			
 			if ($res) {
 				$cache = new BnetApiCache;
@@ -70,7 +77,7 @@ class BnetWowApi
 		}
 	}
 	
-	private function _makeRequest($url) {
+	public static function makeRequest($url) {
 		if (self::$client === null) {
 			self::$client = new \GuzzleHttp\Client();
 		}

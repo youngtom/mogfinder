@@ -16,6 +16,8 @@ use App\Faction;
 use App\Item;
 use App\ItemSource;
 use App\ItemSourceType;
+use App\Auction;
+use DB;
 
 class ItemsController extends Controller
 {
@@ -186,7 +188,7 @@ class ItemsController extends Controller
 	    $user = Auth::user();
 	    
 	    $dispIds = $displays->lists('id');
-	    $userItems = $user->userItems()->whereIn('item_display_id', $displays->lists('id'))->get();
+	    $userItems = $user->userItems()->whereIn('item_display_id', $dispIds)->get();
 	    $userDisplayIDs = array_unique($userItems->lists('item_display_id')->toArray());
 	    $userItemIDs = $userItems->lists('item_id')->toArray();
 	    
@@ -231,5 +233,37 @@ class ItemsController extends Controller
 		}
 	    
 	    return view('items.display-list')->with('mogslot', $mogslot)->with('itemDisplays', $displays)->with('user', $user)->with('userDisplayIDs', $userDisplayIDs)->with('userItemIDs', $userItemIDs)->with('classes', $classes)->with('factions', $factions)->with('itemSourceTypes', $itemSourceTypes)->with('priorityItemIDs', $priorityItemIDs);
+    }
+    
+    public function showAuctions() {
+	    $user = Auth::user();
+	    $dispIds = DB::table('item_displays')->where('transmoggable', '=', 1)->orderBy('bnet_display_id', 'ASC')->lists('id');
+	    $userDisplayIDs = DB::table('user_items')->where('user_id', '=', $user->id)->groupBy('item_display_id')->lists('item_display_id');
+	    $missingDisplayIDs = array_diff($dispIds, $userDisplayIDs);
+	    
+	    $realms = $user->getUserAuctionRealms();
+	    $auctions = Auction::whereIn('item_display_id', $missingDisplayIDs)->whereIn('realm_id', $realms->lists('id')->toArray())->get();
+	    
+	    $itemsChecked = [];
+	    $auctions = $auctions->filter(function ($auction) use ($itemsChecked, $user) {
+		    $cacheToken = $auction->item_id . '|' . $auction->realm_id;
+		    echo 'Checking auction ' . $auction->realm->name . ' - ' . $auction->item->name . ' - ';
+		    if (!array_key_exists($cacheToken, $itemsChecked)) {
+			    $realmChars = $user->characters()->whereIn('realm_id', $auction->realm->getConnectedRealms()->lists('id')->toArray())->get();
+			    
+			    $valid = false;
+			    foreach ($realmChars as $char) {
+					if ($char->canUseItem($auction->item)) {
+						$valid = true;
+						break;
+					}
+			    }
+			    
+			    $itemsChecked[$cacheToken] = $valid;
+		    }
+		    return $itemsChecked[$cacheToken];
+	    });
+	    
+	    echo $auctions->count();
     }
 }

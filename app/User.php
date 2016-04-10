@@ -202,4 +202,17 @@ class User extends Authenticatable
 	    
 	    return $dupeItems;
     }
+    
+    public function getUserAuctionRealms() {
+	    $realms = collect();
+	    $realmIDs = Character::where('user_id', '=', $this->id)->groupBy('realm_id')->get()->lists('realm_id');
+	    
+	    foreach ($realmIDs as $realmID) {
+		    $realm = Realm::find($realmID);
+		    
+		    $realms = $realms->merge($realm->getConnectedRealms());
+	    }
+	    
+	    return $realms;
+    }
 }
