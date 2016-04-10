@@ -245,9 +245,8 @@ class ItemsController extends Controller
 	    $auctions = Auction::whereIn('item_display_id', $missingDisplayIDs)->whereIn('realm_id', $realms->lists('id')->toArray())->get();
 	    
 	    $itemsChecked = [];
-	    $auctions = $auctions->filter(function ($auction) use ($itemsChecked, $user) {
+	    $auctionsByDisplay = $auctions->filter(function ($auction) use ($itemsChecked, $user) {
 		    $cacheToken = $auction->item_id . '|' . $auction->realm_id;
-		    echo 'Checking auction ' . $auction->realm->name . ' - ' . $auction->item->name . ' - ';
 		    if (!array_key_exists($cacheToken, $itemsChecked)) {
 			    $realmChars = $user->characters()->whereIn('realm_id', $auction->realm->getConnectedRealms()->lists('id')->toArray())->get();
 			    
@@ -262,8 +261,14 @@ class ItemsController extends Controller
 			    $itemsChecked[$cacheToken] = $valid;
 		    }
 		    return $itemsChecked[$cacheToken];
-	    });
+	    })->groupBy('item_display_id');
 	    
-	    echo $auctions->count();
+	    echo $auctionsByDisplay->count() . ' displays<br>';
+	    foreach ($auctionsByDisplay as $displayID => $auctions) {
+		    echo 'DisplayID: ' . $displayID . '<br>';
+		    foreach ($auctions as $auction) {
+			    echo ' - ' . $auction->item->name . '<br>';
+		    }
+	    }
     }
 }
