@@ -18,7 +18,9 @@ class Realm extends Model
     }
     
     public function updateAuctionData() {
-	    if ($this->parent_realm_id)
+	    if ($this->parent_realm_id) {
+		    return false;
+	    }
 	    
 	    if (self::$apiClient === null) {
 			self::$apiClient = new BnetWowApi(Config::get('settings.bnet_api_key'), Config::get('settings.bnet_api_locale'));  
