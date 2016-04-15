@@ -10,6 +10,7 @@ class CharClass extends Model
 	use \App\Http\Traits\FileHandler;
 	
 	public $table = 'classes';
+	protected $visible = ['id', 'name'];
 	
     public function characters() {
         return $this->hasMany('App\Character');

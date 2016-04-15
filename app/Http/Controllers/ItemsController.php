@@ -91,7 +91,7 @@ class ItemsController extends Controller
 		        }
 	        }
 	        
-	        $characters = Character::whereIn('id', $charIDs)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');    
+	        $characters = Character::whereIn('id', $charIDs)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');
         }
                 
         return view('items.duplicates')->with('duplicates', $dupeItems)->with('characters', $characters)->with('selectedCharacter', $selectedCharacter);
@@ -235,9 +235,85 @@ class ItemsController extends Controller
 	    return view('items.display-list')->with('mogslot', $mogslot)->with('itemDisplays', $displays)->with('user', $user)->with('userDisplayIDs', $userDisplayIDs)->with('userItemIDs', $userItemIDs)->with('classes', $classes)->with('factions', $factions)->with('itemSourceTypes', $itemSourceTypes)->with('priorityItemIDs', $priorityItemIDs);
     }
     
-    public function showAuctions() {
+    public function showAuctions(Request $request) {
 	    $user = Auth::user();
-	    $dispIds = DB::table('item_displays')->where('transmoggable', '=', 1)->orderBy('bnet_display_id', 'ASC')->lists('id');
+	    
+	    $classes = CharClass::orderBy('name', 'ASC')->get();;
+	    $mogslotCategories = MogslotCategory::all();
+	    $mogslotsByCategory = Mogslot::orderBy('simple_label', 'ASC')->get()->groupBy('mogslot_category_id');
+	    
+	    $class = $request->input('class') ? CharClass::find($request->input('class')) : false;
+	    $slotID = $request->input('slot') ?: false;
+	    if ($slotID) {
+		    $selectedSlot = Mogslot::find($slotID);
+		    if ($selectedSlot) {
+			    $catID = $selectedSlot->mogslot_category_id;
+		    } else {
+			    $slotID = false;
+		    }
+	    } else {
+		    $selectedSlot = false;
+		    $catID = $request->input('cat') ?: false;
+	    }
+	    
+	    if ($catID) {
+		    $selectedCat = MogslotCategory::find($catID);
+		    if (!$selectedCat) {
+			    $catID = false;
+		    }
+	    } else {
+		    $selectedCat = false;
+	    }
+	    $auctions = false;
+	    $error = false;
+	    
+	    if ($catID || $slotID) {
+		    if ($slotID) {
+			    $mogslots = Mogslot::where('id', '=', $slotID)->get();
+		    } elseif ($catID) {
+			    $mogslots = Mogslot::where('mogslot_category_id', '=', $catID)->get();
+		    } else {
+			    $mogslots = Mogslot::all();
+		    }
+			
+		    if ($class) {
+			    $classmask = pow(2, $class->id);
+			    $mogslots = $mogslots->filter(function ($mogslot) use ($classmask) {
+					return ($mogslot->allowed_class_bitmask === null || (($classmask & $mogslot->allowed_class_bitmask) !== 0));
+			    });
+		    } else {
+			    $classmask = false;
+		    }
+		    
+		    if (!$mogslots->count()) {
+			    return view('items.auctions')->with('classes', $classes)->with('mogslotCategories', $mogslotCategories)->with('mogslots', $mogslotsByCategory)->with('error', 'There was an error with the search. Please try again.')->with('selectedClass', $class)->with('selectedCat', $selectedCat)->with('selectedSlot', $selectedSlot);
+		    }
+		    
+		    if ($classmask) {
+			    $dispIds = Item::leftJoin('item_displays', function ($join) {
+				    $join->on('items.item_display_id', '=', 'item_displays.id');
+			    })->whereIn('item_displays.mogslot_id', $mogslots->lists('id')->toArray())->whereRaw('(items.allowable_classes IS NULL OR items.allowable_classes & ? <> 0) AND items.transmoggable = 1', [$classmask])->groupBy('items.item_display_id')->get()->lists('item_display_id')->toArray();
+		    } else {
+			    $dispIds = Item::leftJoin('item_displays', function ($join) {
+				    $join->on('items.item_display_id', '=', 'item_displays.id');
+			    })->whereIn('item_displays.mogslot_id', $mogslots->lists('id')->toArray())->where('items.transmoggable', '=', 1)->groupBy('items.item_display_id')->get()->lists('item_display_id')->toArray();
+		    }
+		    
+		    $auctions = $this->auctionSearch($dispIds);
+		    
+		    if (!$auctions->count()) {
+			    $error = 'No auctions were found matching your search.';
+		    }
+	    } elseif ($class) {
+		    $error = 'Please select an item type.';
+	    }
+	    
+	    return view('items.auctions')->with('classes', $classes)->with('mogslotCategories', $mogslotCategories)->with('mogslots', $mogslotsByCategory)->with('auctions', $auctions)->with('selectedClass', $class)->with('selectedCat', $selectedCat)->with('selectedSlot', $selectedSlot)->with('error', $error);
+    }
+    
+    public function auctionSearch($dispIds) {
+	    $user = Auth::user();
+	    
 	    $userDisplayIDs = DB::table('user_items')->where('user_id', '=', $user->id)->groupBy('item_display_id')->lists('item_display_id');
 	    $missingDisplayIDs = array_diff($dispIds, $userDisplayIDs);
 	    
@@ -245,8 +321,28 @@ class ItemsController extends Controller
 	    $auctions = Auction::whereIn('item_display_id', $missingDisplayIDs)->whereIn('realm_id', $realms->lists('id')->toArray())->get();
 	    
 	    $itemsChecked = [];
-	    $auctionsByDisplay = $auctions->filter(function ($auction) use ($itemsChecked, $user) {
-		    $cacheToken = $auction->item_id . '|' . $auction->realm_id;
+	    $itemCounts = [];
+	    $uniqueAuctions = [];
+	    $auctionsByDisplay = $auctions->sortBy(function ($auction, $key) {
+			return $auction->buyout ?: $auction->bid;
+		})->filter(function ($auction) use (&$itemsChecked, &$itemCounts, &$uniqueAuctions, $user) {
+			$auctionSig = $auction->getSignature();
+			if (in_array($auctionSig, $uniqueAuctions)) {
+				return false;
+			}
+			$uniqueAuctions[] = $auctionSig;
+			
+		    $cacheToken = md5($auction->item_id . '|' . $auction->realm_id);
+		    
+		    if (!array_key_exists($cacheToken, $itemCounts)) {
+			    $itemCounts[$cacheToken] = 0;
+		    }
+		    $itemCounts[$cacheToken]++;
+		    
+		    if ($itemCounts[$cacheToken] > 2) {
+			    return false;
+		    }
+		    
 		    if (!array_key_exists($cacheToken, $itemsChecked)) {
 			    $realmChars = $user->characters()->whereIn('realm_id', $auction->realm->getConnectedRealms()->lists('id')->toArray())->get();
 			    
@@ -260,15 +356,10 @@ class ItemsController extends Controller
 			    
 			    $itemsChecked[$cacheToken] = $valid;
 		    }
+		    
 		    return $itemsChecked[$cacheToken];
 	    })->groupBy('item_display_id');
-	    
-	    echo $auctionsByDisplay->count() . ' displays<br>';
-	    foreach ($auctionsByDisplay as $displayID => $auctions) {
-		    echo 'DisplayID: ' . $displayID . '<br>';
-		    foreach ($auctions as $auction) {
-			    echo ' - ' . $auction->item->name . '<br>';
-		    }
-	    }
+		
+		return $auctionsByDisplay;
     }
 }

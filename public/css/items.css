@@ -8,6 +8,10 @@
 .item-list-table .source { width: 40% }
 .item-list-table .class-restrictions { width: 15%; }
 .item-list-table .center { text-align: center; vertical-align: middle; }
+.auction-list-table .item { width: 35% }
+.auction-list-table .seller { width: 15% }
+.auction-list-table .realm { width: 15% }
+.auction-list-table .price { width: 17.5% }
 #display-accordion .item-list-table .itemname { width: 50%; }
 
 a.expand-collapse { color: #ccc; }
@@ -98,3 +102,6 @@ a.expand-collapse { color: #ccc; }
 .panel-group.faction-filtered .item-display-panel[data-display-collected="1"] .panel-heading .collected-star { display: inline-block; }
 
 .character-filter-group .dropdown-menu .realm-name { display: none; }
+
+.navbar-form .control-label { margin-right: 10px; }
+.navbar-form .form-group { margin-right: 20px; }

@@ -25,6 +25,18 @@ class Auction extends Model
 	    return self::$validItemIDs;
     }
     
+    public function getSignature() {
+	    return md5(implode('||', [$this->seller, $this->item_id, $this->bonuses, $this->realm, $this->bid, $this->buyout]));
+    }
+    
+    public static function formatPrice($price) {
+	    $g = floor($price / 10000);
+	    $r = $price % 10000;
+	    $s = floor($r / 100);
+	    $c = $r % 100;
+	    return number_format($g) . 'g ' . $s . 's ' . $c . 'c';
+    }
+    
     public static function processAuctionData($realm, $data) {
 	    $validIDs = self::getValidItemIDs();
 	    $out = [];
