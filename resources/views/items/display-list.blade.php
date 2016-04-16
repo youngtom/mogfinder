@@ -122,7 +122,7 @@
 	            <div class="collected-togglable panel panel-default item-display-panel" data-display-collected="<?=($collected) ? 1 : 0?>" data-display-collected-partial="<?=($restrictedClassMask && count($restrictedClasses)) ? 1 : 0?>">
 	                <div class="panel-heading collapsed" id="display-heading-<?=$display->id?>" role="button" data-toggle="collapse" data-parent="#display-accordion" href="#display-<?=$display->id?>" aria-expanded="false" aria-controls="display-<?=$display->id?>">
 		                <i class="fa fa-btn fa-plus expand-icon" title="expand"></i>
-		                <i class="fa fa-btn fa-minus collapse-icon" title="collapse"></i> Display <?=$display->id?>:
+		                <i class="fa fa-btn fa-minus collapse-icon" title="collapse"></i> Display <?=$display->id?>
 		                <span class="display-item-info">
 			                -
 			                <span class="display-item-link"><a href="http://www.wowhead.com/item=<?=$display->getPrimaryItem()->bnet_id?>" target="_blank" rel="<?=$display->getPrimaryItem()->getWowheadMarkup()?>" class="item-link q<?=$display->getPrimaryItem()->quality?>">[<?=$display->getPrimaryItem()->name?>]</a></span>
