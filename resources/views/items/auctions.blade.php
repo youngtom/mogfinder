@@ -74,7 +74,7 @@
 			        $display = \App\ItemDisplay::find($displayID);
 		    ?>
 	            <div class="panel panel-default item-display-panel">
-	                <div class="panel-heading"><a href="<?=$display->getURL('wardrobe')?>" class="display-link">Display <?=$displayID?></a> <?=(!$selectedSlot) ? '(' . $display->mogslot->label . ')' : ''?></div>
+	                <div class="panel-heading"><a href="<?=$display->getURL('wardrobe')?>" class="display-link">Display <?=$displayID?></a> <?=(!$selectedSlot) ? '(' . $display->mogslot->singular_label . ')' : ''?></div>
 	                <table class="table table-hover auction-list-table">
 	                    <thead>
 	                        <tr>
