@@ -122,7 +122,7 @@
 	            <div class="collected-togglable panel panel-default item-display-panel" data-display-collected="<?=($collected) ? 1 : 0?>" data-display-collected-partial="<?=($restrictedClassMask && count($restrictedClasses)) ? 1 : 0?>">
 	                <div class="panel-heading collapsed" id="display-heading-<?=$display->id?>" role="button" data-toggle="collapse" data-parent="#display-accordion" href="#display-<?=$display->id?>" aria-expanded="false" aria-controls="display-<?=$display->id?>">
 		                <i class="fa fa-btn fa-plus expand-icon" title="expand"></i>
-		                <i class="fa fa-btn fa-minus collapse-icon" title="collapse"></i> Display ID: <?=$display->id?>
+		                <i class="fa fa-btn fa-minus collapse-icon" title="collapse"></i> Display <?=$display->id?>:
 		                <span class="display-item-info">
 			                -
 			                <span class="display-item-link"><a href="http://www.wowhead.com/item=<?=$display->getPrimaryItem()->bnet_id?>" target="_blank" rel="<?=$display->getPrimaryItem()->getWowheadMarkup()?>" class="item-link q<?=$display->getPrimaryItem()->quality?>">[<?=$display->getPrimaryItem()->name?>]</a></span>
@@ -142,10 +142,10 @@
 			            <div class="panel-body row">
 				            <div class="col-md-3 render-col">
 					            <?php if ($render = $display->getFile('render_image')) { ?>
-					            <div class="item-render-wrapper">
+					            <a href="<?=$display->getURL('wardrobe')?>" class="item-render-wrapper">
 						            <div class="item-display-render" style="background-image: url(<?=$render->getWebPath(280, 280, 'crop', 0, 0)?>)"></div>
 						            <img src="<?=asset('img/blank.png')?>" />
-					            </div>
+					            </a>
 					            <?php } ?>
 				            </div>
 				            <div class="col-md-9 item-list-col">

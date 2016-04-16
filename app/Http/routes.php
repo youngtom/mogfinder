@@ -54,14 +54,15 @@ Route::group(['middleware' => 'web'], function () {
 	Route::get('/home', 'HomeController@index');
     
     //Admin helpers routes
-    Route::get('/items/set-mogslot-icons/{mogslotID?}/{iconID?}', 'ItemsController@setMogslotIcons');
+    Route::get('/wardrobe/set-mogslot-icons/{mogslotID?}/{iconID?}', 'ItemsController@setMogslotIcons');
     
-    //Items routes
-    Route::get('/items', 'ItemsController@index');
-    Route::get('/items/auctions', 'ItemsController@showAuctions');
-    Route::get('/items/duplicates', 'ItemsController@duplicates');
-    Route::get('/items/duplicates/{selectedCharacterURL}', 'ItemsController@duplicates');
-    Route::get('/items/{group}/{category}/{mogslotURL}', 'ItemsController@showSlot')->where('group', '(armor|weapons)');
+    //wardrobe routes
+    Route::get('/wardrobe', 'ItemsController@index');
+    Route::get('/wardrobe/auctions', 'ItemsController@showAuctions');
+    Route::get('/wardrobe/duplicates', 'ItemsController@duplicates');
+    Route::get('/wardrobe/duplicates/{selectedCharacterURL}', 'ItemsController@duplicates');
+    Route::get('/wardrobe/{group}/{category}/{mogslotURL}', 'ItemsController@showSlot')->where('group', '(armor|weapons)');
+    Route::get('/wardrobe/{group}/{category}/{mogslotURL}/{displayID}', 'ItemsController@showDisplay')->where('group', '(armor|weapons)');
     
     //Search routes
     Route::get('/search', function () {

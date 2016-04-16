@@ -9,7 +9,7 @@
 			foreach ($display->items as $item) {
 				if ($item->icon_image_id && !in_array($item->icon_image_id, $icons)) {
 					$icons[] = $item->icon_image_id;
-					echo '<a href="' . url('/items/set-mogslot-icons/' . $mogslot->id . '/' . $item->icon_image_id) . '"><img src="' . $item->getFile('icon_image')->getWebPath() . '" /></a>';
+					echo '<a href="' . url('/wardrobe/set-mogslot-icons/' . $mogslot->id . '/' . $item->icon_image_id) . '"><img src="' . $item->getFile('icon_image')->getWebPath() . '" /></a>';
 				}
 			}
 		}

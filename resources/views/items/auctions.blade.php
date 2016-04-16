@@ -24,7 +24,7 @@
 				        <div class="navbar-header">
 					        <div class="navbar-brand">Auction Search</div>
 				        </div>
-				        <form class="navbar-form" action="{{ url('/items/auctions') }}" method="get">
+				        <form class="navbar-form" action="{{ url('/wardrobe/auctions') }}" method="get">
 					        <div class="form-group">
 						        <label class="control-label" for="class">Class:</label>
 						        <select class="form-control" name="class" id="class">
@@ -74,7 +74,7 @@
 			        $display = \App\ItemDisplay::find($displayID);
 		    ?>
 	            <div class="panel panel-default item-display-panel">
-	                <div class="panel-heading">Display ID: <?=$displayID?> <?=(!$selectedSlot) ? '(' . $display->mogslot->label . ')' : ''?></div>
+	                <div class="panel-heading">Display <a href="<?=$display->getURL('wardrobe')?>"><?=$displayID?></a> <?=(!$selectedSlot) ? '(' . $display->mogslot->label . ')' : ''?></div>
 	                <table class="table table-hover auction-list-table">
 	                    <thead>
 	                        <tr>
@@ -88,9 +88,9 @@
 	                    <tbody>
 						<?php foreach ($displayAuctions as $auction) { ?>
 							<tr class="item-row auction-row">
-								<td class="itemname"><a href="http://www.wowhead.com/item=<?=$auction->item->bnet_id?>" target="_blank" rel="<?=($auction->bonuses) ? 'bonus=' . str_replace(',', ':', $auction->bonuses) : ''?>" class="item-link q<?=$auction->item->quality?>">[<?=$auction->item->name?>]</a></td>
-								<td class="charrealm"><?=$auction->realm->name?> (<?=$auction->realm->region?>)</td>
-								<td class="charname"><?=$auction->seller?></td>
+								<td class="item"><a href="http://www.wowhead.com/item=<?=$auction->item->bnet_id?>" target="_blank" rel="<?=($auction->bonuses) ? 'bonus=' . str_replace(',', ':', $auction->bonuses) : ''?>" class="item-link q<?=$auction->item->quality?>">[<?=$auction->item->name?>]</a></td>
+								<td class="realm"><?=$auction->realm->name?> (<?=$auction->realm->region?>)</td>
+								<td class="seller"><?=$auction->seller?></td>
 								<td class="price"><?=$auction->bid ? \App\Auction::formatPrice($auction->bid): '&nbsp;'?></td>
 								<td class="price"><?=$auction->buyout ? \App\Auction::formatPrice($auction->buyout) : '&nbsp;'?></td>
 							</tr>

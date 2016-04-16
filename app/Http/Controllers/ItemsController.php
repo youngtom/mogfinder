@@ -299,7 +299,7 @@ class ItemsController extends Controller
 			    })->whereIn('item_displays.mogslot_id', $mogslots->lists('id')->toArray())->where('items.transmoggable', '=', 1)->groupBy('items.item_display_id')->get()->lists('item_display_id')->toArray();
 		    }
 		    
-		    $auctions = $this->auctionSearch($dispIds);
+		    $auctions = $this->auctionSearch($dispIds)->groupBy('item_display_id');
 		    
 		    if (!$auctions->count()) {
 			    $error = 'No auctions were found matching your search.';
@@ -323,7 +323,7 @@ class ItemsController extends Controller
 	    $itemsChecked = [];
 	    $itemCounts = [];
 	    $uniqueAuctions = [];
-	    $auctionsByDisplay = $auctions->sortBy(function ($auction, $key) {
+	    $auctions = $auctions->sortBy(function ($auction, $key) {
 			return $auction->buyout ?: $auction->bid;
 		})->filter(function ($auction) use (&$itemsChecked, &$itemCounts, &$uniqueAuctions, $user) {
 			$auctionSig = $auction->getSignature();
@@ -358,8 +358,61 @@ class ItemsController extends Controller
 		    }
 		    
 		    return $itemsChecked[$cacheToken];
-	    })->groupBy('item_display_id');
+	    });
 		
-		return $auctionsByDisplay;
+		return $auctions;
+    }
+    
+    public function showDisplay($group, $categoryURL, $mogslotURL, $displayID) {
+	    $display = ItemDisplay::find($displayID);
+	    
+	    if (!$display || !$display->mogslot || !$display->mogslot->mogslotCategory || $display->mogslot->mogslotCategory->url_token != $categoryURL || $display->mogslot->simple_url_token != $mogslotURL || $display->mogslot->mogslotCategory->group != $group) {
+		    return App::abort(404);
+	    }
+	    
+	    $user = Auth::user();
+	    
+	    $userItems = $user->userItems()->where('item_display_id', '=', $display->id)->get();
+	    $userItemIDs = $userItems->lists('item_id')->toArray();
+		$displayItems = $display->items()->where('transmoggable', '=', 1)->get();
+		
+		if (Item::where('allowable_classes', '>', 0)->whereIn('id', $displayItems->lists('id')->toArray())->get()->count()) {
+		    $classes = CharClass::orderBy('name', 'ASC')->get();
+		    
+		    if ($display->mogslot->allowed_class_bitmask) {
+			    $classes = $classes->filter(function ($class) use ($display) {
+				   $classMask = pow(2, $class->id);
+				   return (($classMask & $display->mogslot->allowed_class_bitmask) !== 0); 
+				});
+		    }
+		} else {
+			$classes = false;
+		}
+		
+		$unlockedClasses = false;
+		if ($userItems->count()) {
+			$restrictedClassMask = 0;
+			foreach ($displayItems as $item) {
+				if (in_array($item->id, $userItemIDs)) {
+					if (!$item->allowable_classes) {
+						$restrictedClassMask = false;
+						break;
+					}
+					
+					$restrictedClassMask = $restrictedClassMask | $item->allowable_classes;
+				}
+			}
+			
+			if ($restrictedClassMask) {
+				$unlockedClasses = $classes->filter(function ($class) use ($restrictedClassMask) {
+					$classMask = pow(2, $class->id);
+					return (($restrictedClassMask & $classMask) !== 0);
+				})->lists('name')->toArray();
+			}
+		}
+		
+		$auctions = $this->auctionSearch([$display->id]);
+	    
+	    return view('items.display-details')->with('display', $display)->with('userItems', $userItems)->with('displayItems', $displayItems)->with('unlockedClasses', $unlockedClasses)->with('auctions', $auctions);
     }
 }

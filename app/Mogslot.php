@@ -13,4 +13,8 @@ class Mogslot extends Model
 	public function itemDisplays() {
 		return $this->hasMany('App\ItemDisplay');
 	}
+	
+	public function mogslotCategory() {
+		return $this->belongsTo('App\MogslotCategory');
+	}
 }

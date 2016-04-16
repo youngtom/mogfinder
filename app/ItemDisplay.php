@@ -33,6 +33,10 @@ class ItemDisplay extends Model
 		return $this->belongsTo('App\Mogslot');
 	}
 	
+	public function getURL($base) {
+		return url('/' . $base . '/' . $this->mogslot->mogslotCategory->group . '/' . $this->mogslot->mogslotCategory->url_token . '/' . $this->mogslot->simple_url_token . '/' . $this->id);
+	}
+	
 	public function getPrimaryItem($search = null) {
 		if ($this->primaryItemOverride) {
 			return $this->primaryItemOverride;

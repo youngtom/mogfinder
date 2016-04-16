@@ -28,6 +28,11 @@ a.expand-collapse { color: #ccc; }
 	margin-top: 2px;
 }
 
+.auction-list-row {	
+	margin-top: 50px;
+	padding: 0 25px;
+}
+
 .item-render-wrapper {
 	position: relative;
 	display: inline-block;

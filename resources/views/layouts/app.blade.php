@@ -74,10 +74,10 @@
                         <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-suitcase"></i> Wardrobe <i class="fa fa-fw fa-caret-down"></i></a>
                         <ul id="demo" class="collapse">
                             <li>
-                                <a href="{{ url('/items') }}">Overview</a>
+                                <a href="{{ url('/wardrobe') }}">Overview</a>
                             </li>
                             <li>
-                                <a href="{{ url('/items/duplicates') }}">Duplicates</a>
+                                <a href="{{ url('/wardrobe/duplicates') }}">Duplicates</a>
                             </li>
                         </ul>
                     </li>

@@ -16,7 +16,7 @@
 					       $total = count($mogslot->itemDisplays);
 					       $percent = round($userCount / $total, 2) * 100;
 				    ?>
-			        <a href="<?=url('/items/' . $group . '/' . $category->url_token . '/' . $mogslot->simple_url_token)?>" class="mogslot-progress-wrapper">
+			        <a href="<?=url('/wardrobe/' . $group . '/' . $category->url_token . '/' . $mogslot->simple_url_token)?>" class="mogslot-progress-wrapper">
 			        	<i class="game-icon-sm" style="background-image: url(<?=($mogslot->icon_image_id) ? $mogslot->getFile('icon_image')->getWebPath() : ''?>)"></i>
 			        	<div class="progress">
 				        	<div class="progress-bar" role="progressbar" aria-valuenow="<?=$userCount?>" aria-valuemin="0" aria-valuemax="<?=$total?>" style="width: <?=$percent?>%;"></div>
