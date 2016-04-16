@@ -70,9 +70,9 @@
                     <li class="{{ set_active('home') }}">
                         <a href="{{ url('/dashboard') }}"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
                     </li>
-                    <li class="{{ set_active('items*') }}">
+                    <li class="{{ set_active('wardrobe*') }}">
                         <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-suitcase"></i> Wardrobe <i class="fa fa-fw fa-caret-down"></i></a>
-                        <ul id="demo" class="collapse">
+                        <ul id="demo" class="<?=(set_active('wardrobe*')) ? '' : 'collapse'?>">
                             <li>
                                 <a href="{{ url('/wardrobe') }}">Overview</a>
                             </li>
