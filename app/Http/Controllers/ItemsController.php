@@ -411,7 +411,9 @@ class ItemsController extends Controller
 			}
 		}
 		
-		$auctions = $this->auctionSearch([$display->id]);
+		if (!$userItems->count()) {
+			$auctions = $this->auctionSearch([$display->id]);
+		}
 	    
 	    return view('items.display-details')->with('display', $display)->with('userItems', $userItems)->with('displayItems', $displayItems)->with('unlockedClasses', $unlockedClasses)->with('auctions', $auctions);
     }
