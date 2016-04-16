@@ -77,6 +77,9 @@
                                 <a href="{{ url('/wardrobe') }}">Overview</a>
                             </li>
                             <li>
+                                <a href="{{ url('/wardrobe/auctions') }}">Auction Search</a>
+                            </li>
+                            <li>
                                 <a href="{{ url('/wardrobe/duplicates') }}">Duplicates</a>
                             </li>
                         </ul>
