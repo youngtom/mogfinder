@@ -115,3 +115,5 @@ a.warrior { color: #C79C6E !important; }
 .mogslot-progress-wrapper:hover .progress .progress-label.summary { opacity: 0; }
 .mogslot-progress-wrapper .progress .progress-label.mogslot-info { opacity: 0; }
 .mogslot-progress-wrapper:hover .progress .progress-label.mogslot-info { opacity: 1; }
+
+.panel-default > .panel-heading a.display-link { color: #ccc; }
