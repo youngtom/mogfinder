@@ -53,7 +53,7 @@ class Realm extends Model
 									'region' => $this->region
 								]);
 								
-								$realm->parent_realm_id = $realm->id;
+								$realm->parent_realm_id = $this->id;
 								$realm->auction_data_timestamp = $dataLastModified;
 								$realm->save();
 							}
