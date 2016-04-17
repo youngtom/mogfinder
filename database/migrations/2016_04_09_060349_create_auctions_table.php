@@ -22,8 +22,8 @@ class CreateAuctionsTable extends Migration
 			$table->integer('realm_id')->nullable()->unsigned();
 			$table->foreign('realm_id')->references('id')->on('realms')->onDelete('cascade');
 			$table->string('seller');
-			$table->integer('bid')->nullable();
-			$table->integer('buyout')->nullable();
+			$table->bigInteger('bid')->nullable();
+			$table->bigInteger('buyout')->nullable();
 			$table->string('timeleft')->nullable();
 			$table->string('bonuses')->nullable();
 			$table->boolean('updated')->default(0);
