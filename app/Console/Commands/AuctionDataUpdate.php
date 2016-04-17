@@ -43,7 +43,7 @@ class AuctionDataUpdate extends Command
      */
     public function handle()
     {   
-        $timestamp = time() - 15*60;
+        $timestamp = time() - 30*60;
         $realms = Realm::whereNull('parent_realm_id')->where('auction_import_queued', '=', 0)->where('auction_data_timestamp', '<=', $timestamp)->orWhere('auction_data_timestamp', '=', null)->get();
         
         foreach ($realms as $realm) {
