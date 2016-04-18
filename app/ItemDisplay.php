@@ -17,6 +17,25 @@ class ItemDisplay extends Model
 	protected $allowedClassBitmask = -1;
 	protected $allowedRaceBitmask = -1;
 	
+	public function updateRestrictions($save = true) {
+		$classmask = $racemask = 0;
+		foreach ($this->items as $item) {
+			$classmask = ($item->allowable_classes && $classmask !== null) ? $classmask | $item->allowable_classes : null;
+			$racemask = ($item->allowable_races && $racemask !== null) ? $racemask | $item->allowable_races : null;
+			
+			if ($classmask === null && $racemask === null) {
+				break;
+			}
+		}
+		
+		$this->restricted_classes = $classmask ?: null;
+		$this->restricted_races = $racemask ?: null;
+		
+		if ($save) {
+			$this->save();
+		}
+	}
+	
 	public function items() {
 		return $this->hasMany('App\Item');
 	}
@@ -71,37 +90,13 @@ class ItemDisplay extends Model
 		return false;
 	}
 	
-	public function getAllowedClassBitmask() {
-		if ($this->allowedClassBitmask !== -1) {
-			return $this->allowedClassBitmask;
-		}
-		
-		$bitmasks = array_unique($this->items()->where('transmoggable', '=', 1)->lists('allowable_classes')->toArray());
-		
-		$bitmask = false;
-		foreach ($bitmasks as $_bitmask) {
-			if ($_bitmask == null) {
-				$bitmask = null;
-				break;
-			}
-			
-			$bitmask = ($bitmask) ? $bitmask | $_bitmask : $_bitmask;
-		}
-		
-		if (!$bitmask && $this->mogslot) {
-			$bitmask = $this->mogslot->allowed_class_bitmask;
-		}
-		
-		return $this->allowedClassBitmask = $bitmask;
-	}
-	
 	public static function getAllowedClassBitmaskForDisplays($displays) {
 		$bitmask = false;
 		
 		foreach ($displays as $display) {
 			$dispBitmask = $display->getAllowedClassBitmask();
 			
-			if ($dispBitmask === null) {
+			if ($display->restricted_classes === null) {
 				return null;
 			}
 			
@@ -111,37 +106,11 @@ class ItemDisplay extends Model
 		return $bitmask;
 	}
 	
-	public function getAllowedRaceBitmask() {
-		if ($this->allowedRaceBitmask !== -1) {
-			return $this->allowedRaceBitmask;
-		}
-		
-		$bitmasks = array_unique($this->items()->where('transmoggable', '=', 1)->lists('allowable_races')->toArray());
-		
-		$bitmask = false;
-		foreach ($bitmasks as $_bitmask) {
-			if ($_bitmask == null) {
-				$bitmask = null;
-				break;
-			}
-			
-			$bitmask = ($bitmask) ? $bitmask | $_bitmask : $_bitmask;
-		}
-		
-		if (!$bitmask) {
-			$bitmask = null;
-		}
-		
-		return $this->allowedRaceBitmask = $bitmask;
-	}
-	
 	public static function getAllowedRaceBitmaskForDisplays($displays) {
 		$bitmask = false;
 		
 		foreach ($displays as $display) {
-			$dispBitmask = $display->getAllowedRaceBitmask();
-			
-			if ($dispBitmask === null) {
+			if ($display->restricted_races === null) {
 				return null;
 			}
 			

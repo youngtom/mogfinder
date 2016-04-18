@@ -7,6 +7,7 @@ use Config;
 use App\Race;
 use App\Faction;
 use Sofa\Eloquence\Eloquence;
+use App\ItemDisplay;
 
 class Item extends Model
 {
@@ -15,6 +16,24 @@ class Item extends Model
 	
 	private static $apiClient = null;
 	protected $searchableColumns = ['name', 'bnet_id'];
+	
+	public static function boot() {
+		parent::boot();
+		
+		self::saved(function ($item) {
+			if ($item->itemDisplay && ($item->isDirty('item_display_id') || $item->isDirty('allowable_classes') || $item->isDirty('allowable_races'))) {
+				$item->itemDisplay->updateRestrictions();
+			}
+		});
+		
+		self::deleted(function ($item) {
+			$display = ItemDisplay::find($item->item_display_id);
+			
+			if ($display) {
+				$display->updateRestrictions();
+			}
+		});
+	}
 	
 	public function inventoryType() {
         return $this->belongsTo('App\InventoryType');

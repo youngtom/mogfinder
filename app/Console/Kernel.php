@@ -37,7 +37,9 @@ class Kernel extends ConsoleKernel
         Commands\wowhead\ImportQuestItemData::class,
         Commands\ResetUserQuestData::class,
         Commands\UpdateUserQuestData::class,
-        Commands\AuctionDataUpdate::class
+        Commands\AuctionDataUpdate::class,
+        Commands\UpdateItemDisplayRestrictions::class,
+        Commands\UpdateUserItemDisplays::class
     ];
 
     /**
