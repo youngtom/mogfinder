@@ -60,6 +60,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('/wardrobe', 'ItemsController@index');
     Route::get('/wardrobe/auctions', 'ItemsController@showAuctions');
     Route::get('/wardrobe/duplicates', 'ItemsController@duplicates');
+    Route::get('/wardrobe/{characterURL}', 'ItemsController@index');
     Route::get('/wardrobe/duplicates/{selectedCharacterURL}', 'ItemsController@duplicates');
     Route::get('/wardrobe/{group}/{category}/{mogslotURL}', 'ItemsController@showSlot')->where('group', '(armor|weapons)');
     Route::get('/wardrobe/{group}/{category}/{mogslotURL}/{displayID}', 'ItemsController@showDisplay')->where('group', '(armor|weapons)');

@@ -40,6 +40,10 @@ class User extends Authenticatable
 	    return $this->hasMany('App\UserItem');
     }
     
+    public function userItemDisplays() {
+	    return $this->hasMany('App\UserItemDisplay');
+    }
+    
     public function characters() {
 	    return $this->hasMany('App\Character');
     }

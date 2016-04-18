@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use Auth;
 use App\Character;
 use App\ItemDisplay;
+use App\UserItemDisplay;
 use App\Mogslot;
 use App\MogslotCategory;
 use App\CharClass;
@@ -26,19 +27,50 @@ class ItemsController extends Controller
         $this->middleware('auth');
     }
     
-    public function index() {
+    public function index($characterURL = false) {
 	    $user = Auth::user();
 	    
-	    $mogslotCategories = MogslotCategory::all()->groupBy('group');
-	    
-	    $userMogslotCounts = [];
-	    $mogslots = Mogslot::all();
-	    
-	    foreach ($mogslots as $mogslot) {
-		    $userMogslotCounts[$mogslot->id] = count($user->userItems()->whereIn('item_display_id', $mogslot->itemDisplays->lists('id'))->get()->groupBy('item_display_id'));
+	    if ($characterURL) {
+		    $character = Character::where('user_id', '=', $user->id)->where('url_token', '=', $characterURL)->first();
+		    
+		    if (!$character) {
+			    return App::abort(404);
+		    }
+		    
+		    $classmask = pow(2, $character->class_id);
+		    $racemask = pow(2, $character->race_id);
+		    $mogslots = Mogslot::whereRaw('allowed_class_bitmask IS NULL OR allowed_class_bitmask & ? <> 0', [$classmask])->orderBy('inventory_type_id', 'ASC')->get();
+	    } else {
+		    $character = false;
+		    $mogslots = Mogslot::orderBy('inventory_type_id', 'ASC')->get();
 	    }
 	    
-	    return view('items.overview')->with('categories', $mogslotCategories)->with('userMogslotCounts', $userMogslotCounts);
+	    $mogslotCategories = MogslotCategory::whereIn('id', $mogslots->lists('mogslot_category_id')->toArray())->get()->groupBy('group');
+	    $mogslotsByCategory = $mogslots->groupBy('mogslot_category_id');
+	    $userMogslotCounts = $totalMogslotCounts = [];
+	    
+	    foreach ($mogslots as $mogslot) {
+		    if ($character) { 
+			    $mogslotItemDisplayIDs = array_unique($mogslot->itemDisplays->filter(function ($display) use ($classmask, $racemask) {
+				    return (($display->restricted_races === null || ($display->restricted_races & $racemask) != 0) && ($display->restricted_classes === null || ($display->restricted_classes & $classmask) != 0));
+				})->lists('id')->toArray());
+		    } else {
+			    $mogslotItemDisplayIDs = array_unique($mogslot->itemDisplays->lists('id')->toArray());
+		    }
+		    
+		    $totalMogslotCounts[$mogslot->id] = count($mogslotItemDisplayIDs);
+		    
+		    $mogslotUserDisplays = $user->userItemDisplays()->whereIn('item_display_id', $mogslotItemDisplayIDs)->get();
+		    if ($character) {
+			    $userMogslotCounts[$mogslot->id] = $mogslotUserDisplays->filter(function ($display) use ($classmask, $racemask) {
+				    return (($display->restricted_races === null || ($display->restricted_races & $racemask) != 0) && ($display->restricted_classes === null || ($display->restricted_classes & $classmask) != 0));
+			    })->count();
+		    } else {
+			    $userMogslotCounts[$mogslot->id] = $mogslotUserDisplays->count();
+		    }
+	    }
+	    
+	    return view('items.overview')->with('categories', $mogslotCategories)->with('mogslotsByCategory', $mogslotsByCategory)->with('userMogslotCounts', $userMogslotCounts)->with('totalMogslotCounts', $totalMogslotCounts)->with('character', $character);
     }
     
     public function setMogslotIcons($mogslotID = null, $iconID = null) {
