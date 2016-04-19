@@ -1,4 +1,4 @@
-$(window).on('load', function () {
+$(document).ready(function () {
 	$('select#cat').on('change', function () {
 		filterClassSelect($('option:selected', $(this)).attr('data-classmask'));
 		
@@ -15,6 +15,8 @@ $(window).on('load', function () {
 	$('select#class').on('change', function () {
 		filterSlotSelect($('option:selected', $(this)).attr('data-classmask'));
 	}).trigger('change');
+	
+	$.getScript('//wow.zamimg.com/widgets/power.js');
 });
 
 function filterClassSelect(filterMask) {
