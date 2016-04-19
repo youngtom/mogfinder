@@ -94,8 +94,6 @@ class ItemDisplay extends Model
 		$bitmask = false;
 		
 		foreach ($displays as $display) {
-			$dispBitmask = $display->getAllowedClassBitmask();
-			
 			if ($display->restricted_classes === null) {
 				return null;
 			}
