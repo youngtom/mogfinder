@@ -23,9 +23,6 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-    
-    <script type="text/javascript" src="//wow.zamimg.com/widgets/power.js"></script><script>var wowhead_tooltips = { "colorlinks": false, "iconizelinks": true, "renamelinks": false }</script>
-
 </head>
 
 <body>
@@ -101,6 +98,8 @@
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>
 	<script src="{{ asset('js/main.js') }}"></script>
 	@yield('js')
+    
+    <script type="text/javascript" src="//wow.zamimg.com/widgets/power.js"></script><script>var wowhead_tooltips = { "colorlinks": false, "iconizelinks": true, "renamelinks": false }</script>
 	
 	<script>
 	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

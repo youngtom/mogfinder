@@ -31,8 +31,8 @@
 										<span class="selected-value">All</span> <span class="caret"></span>
 										<?php } ?>
 									</button>
-									<ul class="dropdown-menu">
-										<li class="all-select"><a href="<?=url('items/duplicates')?>" data-class-id="0" class="show-all">Show all</a></li>
+									<ul class="dropdown-menu scrollable-menu">
+										<li class="all-select"><a href="<?=url('wardrobe/duplicates')?>" data-class-id="0" class="show-all">Show all</a></li>
 										<li class="all-select divider" roll="separator"></li>
 									<?php 
 											foreach ($characters as $realmID => $characterArr) {
@@ -42,7 +42,7 @@
 												foreach ($characterArr as $character) {
 									?>
 										<li>
-											<a href="<?=url('items/duplicates/' . $character->url_token)?>" data-character-id="<?=$character->id?>">
+											<a href="<?=url('wardrobe/duplicates/' . $character->url_token)?>" data-character-id="<?=$character->id?>">
 												<i class="game-icon-sm" style="background-image: url(<?=($character->charClass) ? $character->charClass->getFile('icon_image')->getWebPath() : ''?>)"></i> <?=$character->name?><span class="realm-name"> - <?=$character->realm->name?> (<?=$character->realm->region?>)</span>
 											</a>
 										</li>

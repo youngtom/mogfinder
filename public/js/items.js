@@ -1,4 +1,6 @@
-$(window).on('load', function () {
+var selectedClass = false, selectedFaction = false, selectedSource = false;
+
+$(document).ready(function () {
 	$('.collected-toggle-btn').on('click', function () {
 		var collected = parseInt($(this).attr('data-collected'));
 		
@@ -67,8 +69,10 @@ $(window).on('load', function () {
 		}
 	});
 	
-	$('.class-filter .dropdown-menu li a').on('click', function () {
+	$('.class-filter .dropdown-menu li a').on('click', function (e, manual) {
 		var classID = parseInt($(this).attr('data-class-id'));
+		selectedClass = classID ? $(this).attr('data-class-code') : false;
+		
 		filterClassItems(classID);
 		
 		if (classID) {
@@ -79,13 +83,18 @@ $(window).on('load', function () {
 			$('.btn.dropdown-toggle', $(this).parents('.class-filter')).addClass('btn-primary').removeClass('btn-default');
 		}
 		
-		$('.class-filter .dropdown-toggle').dropdown("toggle");
-		
+		if (!manual) {			
+			$('.class-filter .dropdown-toggle').dropdown("toggle");
+			
+			updateURL();	
+		}
 		return false;
 	});
 	
-	$('.faction-filter .dropdown-menu li a').on('click', function () {
+	$('.faction-filter .dropdown-menu li a').on('click', function (e, manual) {
 		var factionMask = parseInt($(this).attr('data-faction-mask'));
+		selectedFaction = factionMask ? $(this).attr('data-faction-code') : false;
+		
 		filterFactionItems(factionMask);
 		
 		if (factionMask) {
@@ -96,13 +105,18 @@ $(window).on('load', function () {
 			$('.btn.dropdown-toggle', $(this).parents('.faction-filter')).addClass('btn-primary').removeClass('btn-default');
 		}
 		
-		$('.faction-filter .dropdown-toggle').dropdown("toggle");
-		
+		if (!manual) {			
+			$('.faction-filter .dropdown-toggle').dropdown("toggle");
+			
+			updateURL();	
+		}
 		return false;
 	});
 	
-	$('.source-filter .dropdown-menu li a').on('click', function () {
+	$('.source-filter .dropdown-menu li a').on('click', function (e, manual) {
 		var sourceID = $(this).attr('data-source-id');
+		selectedSource = sourceID ? $(this).attr('data-source-code') : false;
+		
 		filterSourceItems(sourceID);
 		
 		if (sourceID != '0') {
@@ -113,8 +127,11 @@ $(window).on('load', function () {
 			$('.source-filter .dropdown-toggle').addClass('btn-default').removeClass('btn-success');
 		}
 		
-		$('.source-filter .dropdown-toggle').dropdown("toggle");
-		
+		if (!manual) {			
+			$('.source-filter .dropdown-toggle').dropdown("toggle");
+			
+			updateURL();	
+		}
 		return false;
 	});
 	
@@ -132,6 +149,31 @@ $(window).on('load', function () {
 		
 		return false;
 	});
+	
+	if (window.location.hash) {
+		var urlArr = window.location.hash.replace('#', '').split(';');
+		var urlObj = {};
+		var a;
+		
+		for (i = 0; i < urlArr.length; i++) {
+			if (urlArr[i].indexOf(':')) {
+				a = urlArr[i].split(':');
+				urlObj[a[0]] = a[1];
+			}
+		}
+		
+		if ('class' in urlObj) {
+			$('.class-filter .dropdown-menu li a[data-class-code="' + urlObj.class + '"]').trigger('click', [true]);
+		}
+		
+		if ('faction' in urlObj) {
+			$('.faction-filter .dropdown-menu li a[data-faction-code="' + urlObj.faction + '"]').trigger('click', [true]);
+		}
+		
+		if ('source' in urlObj) {
+			$('.source-filter .dropdown-menu li a[data-source-code="' + urlObj.source + '"]').trigger('click', [true]);
+		}
+	}
 });
 
 function filterClassItems(classID) {
@@ -244,4 +286,26 @@ function resetScroll() {
 	*/
 	$('.panel-collapse').collapse('hide');
 	$(window).scrollTop(0);
+}
+
+function updateURL() {
+	var urlArr = [];
+	
+	if (selectedClass) {
+		urlArr.push('class:' + selectedClass);
+	}
+	
+	if (selectedFaction) {
+		urlArr.push('faction:' + selectedFaction);
+	}
+	
+	if (selectedSource) {
+		urlArr.push('source:' + selectedSource);
+	}
+	
+	if (urlArr.length) {
+		window.location.hash = urlArr.join(';');
+	} else {
+		window.location.hash = '';
+	}
 }

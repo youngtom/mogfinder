@@ -1,3 +1,9 @@
+.scrollable-menu {
+	height: auto;
+	max-height: 290px;
+	overflow-x: hidden;
+}
+
 .navbar-form input, .form-inline input {
 	width:auto;
 }

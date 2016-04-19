@@ -70,7 +70,13 @@ class ItemsController extends Controller
 		    }
 	    }
 	    
-	    return view('items.overview')->with('categories', $mogslotCategories)->with('mogslotsByCategory', $mogslotsByCategory)->with('userMogslotCounts', $userMogslotCounts)->with('totalMogslotCounts', $totalMogslotCounts)->with('character', $character);
+	    if ($character) {
+		    $characters = Character::where('id', '<>', $character->id)->where('user_id', '=', $user->id)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');
+	    } else {
+		    $characters = Character::where('user_id', '=', $user->id)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');
+	    }
+	    
+	    return view('items.overview')->with('categories', $mogslotCategories)->with('mogslotsByCategory', $mogslotsByCategory)->with('userMogslotCounts', $userMogslotCounts)->with('totalMogslotCounts', $totalMogslotCounts)->with('selectedCharacter', $character)->with('characters', $characters);
     }
     
     public function setMogslotIcons($mogslotID = null, $iconID = null) {
@@ -129,7 +135,7 @@ class ItemsController extends Controller
         return view('items.duplicates')->with('duplicates', $dupeItems)->with('characters', $characters)->with('selectedCharacter', $selectedCharacter);
     }
     
-    public function showSlot($group, $categoryURL, $mogslotURL) {
+    public function showSlot(Request $request, $group, $categoryURL, $mogslotURL) {
 	    $category = MogslotCategory::where('group', '=', $group)->where('url_token', '=', $categoryURL)->first();
 	    
 	    if (!$category) {
@@ -142,18 +148,7 @@ class ItemsController extends Controller
 		    return App::abort(404);
 	    }
 	    
-	    $mogslotIDs = [$mogslot->id];
-	    /*
-	    if ($mogslot->cosmetic) {
-		    $cosmeticSlots = Mogslot::where('cosmetic', '=', 1)->where('id', '<>', $mogslot->id)->where('inventory_type_id', '=', $mogslot->inventory_type_id)->get();
-		    
-		    foreach ($cosmeticSlots as $slot) {
-			    $mogslotIDs[] = $slot->id;
-		    }
-		}
-		*/
-	    
-	    $displays = ItemDisplay::where('transmoggable', '=', 1)->whereIn('mogslot_id', $mogslotIDs)->orderBy('bnet_display_id', 'ASC')->get();
+	    $displays = ItemDisplay::where('transmoggable', '=', 1)->where('mogslot_id', '=', $mogslot->id)->orderBy('bnet_display_id', 'ASC')->get();
 	    
 	    return $this->showItemDisplays($displays, $mogslot);
     }
