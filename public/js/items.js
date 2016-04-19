@@ -174,6 +174,8 @@ $(document).ready(function () {
 			$('.source-filter .dropdown-menu li a[data-source-code="' + urlObj.source + '"]').trigger('click', [true]);
 		}
 	}
+	
+	$.getScript('//wow.zamimg.com/widgets/power.js');
 });
 
 function filterClassItems(classID) {
