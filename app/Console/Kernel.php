@@ -39,7 +39,9 @@ class Kernel extends ConsoleKernel
         Commands\UpdateUserQuestData::class,
         Commands\AuctionDataUpdate::class,
         Commands\UpdateItemDisplayRestrictions::class,
-        Commands\UpdateUserItemDisplays::class
+        Commands\UpdateUserItemDisplays::class,
+        Commands\ImportBnetZoneData::class,
+        Commands\ItemSourceDataImportHelper::class
     ];
 
     /**

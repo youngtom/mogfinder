@@ -16,7 +16,7 @@ class CreateBnetApiCacheTable extends Migration
             $table->increments('id');
             $table->string('endpoint');
             $table->string('request_uri');
-			$table->text('data');
+			$table->longText('data');
 			$table->integer('expiration');
 			$table->timestamps();
         });

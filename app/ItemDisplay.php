@@ -36,6 +36,23 @@ class ItemDisplay extends Model
 		}
 	}
 	
+	public function updateTransmoggable($save = true) {
+		$transmoggable = false;
+		
+		foreach ($this->items as $item) {
+			if ($item->isTransmoggable()) {
+				$transmoggable = true;
+				break;
+			}
+		}
+		
+		$this->transmoggable = ($transmoggable) ? 1 : 0;
+		
+		if ($save) {
+			$this->save();
+		}
+	}
+	
 	public function items() {
 		return $this->hasMany('App\Item');
 	}

@@ -4,6 +4,10 @@
 	<link href="{{ asset('css/items.css') }}" rel="stylesheet">
 @stop
 
+@section('js')
+	<script src="{{ asset('js/items.js') }}"></script>
+@stop
+
 @section('content')
 <div class="container-fluid">
 	<div class="col-md-10 col-md-offset-1">

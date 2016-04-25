@@ -47,11 +47,14 @@ class BnetWowApi
 		return $this->_getEndpointData($endpoint, $realm->region, [], 360);
 	}
 	
+	public function getZoneData() {
+		return $this->_getEndpointData('/zone/', 'us');
+	}
+	
     private function _getEndpointData($endpoint, $region = 'us', $params = array(), $expirationOverride = false) {
 	    $searchURL = str_replace('{$region}', strtolower($region), Config::get('settings.bnet_api_base_url')) . $endpoint;
 	    $searchURL .= (count($params)) ? '?' . http_build_query($params) : '';
 	    $params = array_merge($this->defaultParameters, $params);
-	    $endpoint = '/' . trim($endpoint, '/');
 	    $url = str_replace('{$region}', strtolower($region), Config::get('settings.bnet_api_base_url')) . $endpoint . '?' . http_build_query($params);
 	    
 		if ($cache = BnetApiCache::where('request_uri', '=', $searchURL)->where('expiration', '>', time())->orderBy('expiration', 'DESC')->first()) {

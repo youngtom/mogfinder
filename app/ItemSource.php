@@ -15,6 +15,10 @@ class ItemSource extends Model
         return $this->belongsTo('App\ItemSourceType');
 	}
 	
+	public function zone() {
+        return $this->belongsTo('App\Zone');
+	}
+	
 	public function getWowheadLink(Item $item) {
 		if (!$this->itemSourceType->wowhead_link_format) {
 			return false;

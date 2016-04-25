@@ -24,6 +24,10 @@ class Item extends Model
 			if ($item->itemDisplay && ($item->isDirty('item_display_id') || $item->isDirty('allowable_classes') || $item->isDirty('allowable_races'))) {
 				$item->itemDisplay->updateRestrictions();
 			}
+			
+			if ($item->itemDisplay && $item->isDirty('transmoggable')) {
+				$item->itemDisplay->updateTransmoggable();
+			}
 		});
 		
 		self::deleted(function ($item) {
@@ -31,6 +35,7 @@ class Item extends Model
 			
 			if ($display) {
 				$display->updateRestrictions();
+				$display->updateTransmoggable();
 			}
 		});
 	}
@@ -187,7 +192,7 @@ class Item extends Model
 				$display->bnet_display_id = $data['displayInfoId'];
 				$display->item_subtype_id = $item->item_subtype_id;
 				$display->inventory_type_id = $invTypeID;
-				$display->transmoggable = $item->transmoggable;
+				//$display->transmoggable = $item->transmoggable;
 				$display->save();
 			}
 			
