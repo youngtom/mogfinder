@@ -50,6 +50,10 @@ class ItemSourceDataImportHelper extends Command
 		
 		$lineByItem = [];
 		
+		$diffToBonusMap = [
+			2 => [642]
+		];
+		
 		foreach ($sourceData as $str) {
 			preg_match_all('/\[(")?(?P<itemid>[0-9:]+)(")?\] \= \{(?P<sourceid>\d)([#,](?P<data>.+))?\},/', $str, $matches);
 			
@@ -85,10 +89,30 @@ class ItemSourceDataImportHelper extends Command
 				$bonus = ($numRows > 1 && $bonus != 'default') ? $bonus : null;
 				
 				list($sourceID, $data) = explode('||', $sData);
+				$sourceArr = explode(',', $data);
 				
-				$items = Item::where('bnet_id', '=', $itemID)->where('bonus', '=', $bonus)->get();
+				if ($sourceID == 8) {
+					$items = Item::where('bnet_id', '=', $itemID)->get();
+				} else {
+					$items = Item::where('bnet_id', '=', $itemID)->where('bonus', '=', $bonus)->get();
+				}
 				
 				if (!$items->count()) {
+					if ($sourceID == 1) {
+						$dropInfo = str_replace('"', '', $sourceArr[0]);
+						$dropInfo = str_replace('"', '', $dropInfo);
+						$dropInfoArr = explode('#', $dropInfo);
+						
+						$diff = (@$dropInfoArr[3]) ?: false;
+						
+						if ($diff && array_key_exists($diff, $diffToBonusMap)) {
+							$this->line('Checking alt bonus');
+							$items = Item::where('bnet_id', '=', $itemID)->whereIn('bonus', $diffToBonusMap[$diff])->get();
+						}
+					}
+				}
+				
+				if (!$items->count() && $sourceID != 5) {
 					$itemInfo = ($bonus) ? $itemID . ':' . $bonus : $itemID;
 					$this->line('No item found: ' . $itemInfo . ' -- ' . $sData);
 					fwrite($fp, 'No item found: ' . $itemInfo . ' -- ' . $sData . "\n");
