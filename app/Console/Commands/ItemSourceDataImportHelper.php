@@ -106,13 +106,12 @@ class ItemSourceDataImportHelper extends Command
 						$diff = (@$dropInfoArr[3]) ?: false;
 						
 						if ($diff && array_key_exists($diff, $diffToBonusMap)) {
-							$this->line('Checking alt bonus');
 							$items = Item::where('bnet_id', '=', $itemID)->whereIn('bonus', $diffToBonusMap[$diff])->get();
 						}
 					}
 				}
 				
-				if (!$items->count() && $sourceID != 5) {
+				if (!$items->count()) {
 					$itemInfo = ($bonus) ? $itemID . ':' . $bonus : $itemID;
 					$this->line('No item found: ' . $itemInfo . ' -- ' . $sData);
 					fwrite($fp, 'No item found: ' . $itemInfo . ' -- ' . $sData . "\n");
