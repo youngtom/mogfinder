@@ -12,6 +12,10 @@ class Boss extends Model
 		return $this->belongsTo('App\Boss', 'parent_boss_id');
 	}
 	
+	public function zone() {
+		return $this->belongsTo('App\Zone');
+	}
+	
 	public function encounter() {
 		if ($this->parent_boss_id) {
 			return $this->parentBoss;
