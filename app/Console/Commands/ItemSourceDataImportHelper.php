@@ -242,14 +242,13 @@ class ItemSourceDataImportHelper extends Command
 						
 					} elseif ($sourceID == 4) { //World Drop
 						$sourceArr = explode(',', $data);
-						$this->line($data);
 						
 						if (count($sourceArr) == 1 && $sourceArr[0]) {
 							$sourceBnetID = $sourceArr[0];
 							
 							$zone = Zone::where('bnet_id', '=', $sourceBnetID)->first();
 							
-							if ($zone && $zone->is_dungeon || $zone->is_raid) {
+							if ($zone && ($zone->is_dungeon || $zone->is_raid)) {
 								foreach ($items as $item) {
 									foreach ($item->itemSources as $source) {
 										if ($source->item_source_type_id != 15 || $source->bnet_source_id != $sourceBnetIDs) {
