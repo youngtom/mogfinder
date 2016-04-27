@@ -107,7 +107,7 @@ class ItemSourceDataImportHelper extends Command
 						$bonus = ($bonus) ?: 'default';
 						if ($sourceID == 8 || $sourceID == 4) {
 							list($_null, $existingData) = (@$lineByItem[$bnetID]['default']) ? explode('||', $lineByItem[$bnetID]['default']) : [null, ''];
-							$data = implode(',', array_unique(array_merge(explode(',', $data), explode(',', $existingData))));
+							$data = $existingData ? implode(',', array_unique(array_merge(explode(',', $data), explode(',', $existingData)))) : $data;
 							$bonus = 'default';
 						}
 						
