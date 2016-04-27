@@ -252,22 +252,24 @@ class ItemSourceDataImportHelper extends Command
 						if (count($sourceArr) == 1 && $sourceBnetID && ($zone && ($zone->is_dungeon || $zone->is_raid))) {
 							foreach ($items as $item) {
 								foreach ($item->itemSources as $source) {
-									if ($source->item_source_type_id != 15 || $source->bnet_source_id != $sourceBnetIDs) {
+									if ($source->item_source_type_id != 4 && ($source->item_source_type_id != 15 || $source->bnet_source_id != $sourceBnetIDs)) {
 										fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . " (Zone)\n");
 										//$source->delete();
 									}
 								}
 								
-								$source = ItemSource::where('item_id', '=', $item->id)->where('bnet_source_id', '=', $sourceBnetID)->where('item_source_type_id', '=', 15)->first();
-								
-								if (false && !$source) {
-									$source = new ItemSource;
-									$source->item_id = $item->id;
-									$source->bnet_source_id = $sourceBnetID;
-									$source->item_source_type_id = 15;
-									$source->zone_id = $zone->id;
-									$source->import_source = 'ItemSourceDataImportHelper';
-									$source->save();
+								if (!$item->itemSources->count()) {
+									$source = ItemSource::where('item_id', '=', $item->id)->where('bnet_source_id', '=', $sourceBnetID)->where('item_source_type_id', '=', 15)->first();
+									
+									if (false && !$source) {
+										$source = new ItemSource;
+										$source->item_id = $item->id;
+										$source->bnet_source_id = $sourceBnetID;
+										$source->item_source_type_id = 15;
+										$source->zone_id = $zone->id;
+										$source->import_source = 'ItemSourceDataImportHelper';
+										$source->save();
+									}
 								}
 							}
 						} else {
