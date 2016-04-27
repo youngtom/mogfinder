@@ -235,7 +235,16 @@ class ItemSourceDataImportHelper extends Command
 							foreach ($item->itemSources as $source) {
 								if ($source->item_source_type_id != 5) {
 									fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
-									//$source->delete();
+									$source->delete();
+								}
+								
+								$source = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=' 17)->first();
+								
+								if (!$source) {
+									$source = new ItemSource;
+									$source->item_id = $item->id;
+									$source->item_source_type_id = 17;
+									$source->save();
 								}
 							}
 						}
@@ -253,7 +262,6 @@ class ItemSourceDataImportHelper extends Command
 							
 							foreach ($sourceArr as $sourceBnetID) {
 								$newSourceID = ($sourceBnetID > 0) ? 16 : 12; // 16 - created from, 12 - contained in
-								
 								$source = ItemSource::where('item_id', '=', $item->id)->where('bnet_source_id', '=', abs($sourceBnetID))->whereIn('item_source_type_id', [12, 16])->first();
 								
 								if (!$source) {
