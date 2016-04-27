@@ -43,7 +43,7 @@ class ItemSourceDataImportHelper extends Command
      */
     public function handle()
     {
-		$sourceToImport = 6;
+		$sourceToImport = 5;
 		
         list($modes, $encounters, $instances) = file(storage_path() . '/app/imports/extradata.txt');
 		$modes = explode('|', $modes);
@@ -113,7 +113,7 @@ class ItemSourceDataImportHelper extends Command
 				}
 			}
 		}
-		
+		die;
 		$bar = $this->output->createProgressBar($lineCount);
 		
 		foreach ($lineByItem as $itemID => $lines) {
@@ -231,7 +231,14 @@ class ItemSourceDataImportHelper extends Command
 					} elseif ($sourceID == 4) { //World Drop
 						
 					} elseif ($sourceID == 5) { //Legacy
-						
+						foreach ($items as $item) {
+							foreach ($item->itemSources as $source) {
+								if ($source->item_source_type_id != 5) {
+									fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
+									//$source->delete();
+								}
+							}
+						}
 					} elseif ($sourceID == 6) { //Created
 						$sourceArr = explode(',', $data);
 						$sourceBnetIDs = array_map('abs', $sourceArr);
