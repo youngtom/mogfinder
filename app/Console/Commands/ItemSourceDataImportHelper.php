@@ -43,7 +43,7 @@ class ItemSourceDataImportHelper extends Command
      */
     public function handle()
     {
-		$sourceToImport = 5;
+		$sourceToImport = 6;
 		
         list($modes, $encounters, $instances) = file(storage_path() . '/app/imports/extradata.txt');
 		$modes = explode('|', $modes);
@@ -250,21 +250,21 @@ class ItemSourceDataImportHelper extends Command
 									$source->delete();
 								}
 							}
-						}
-						
-						foreach ($sourceArr as $sourceBnetID) {
-							$newSourceID = ($sourceBnetID > 0) ? 16 : 12; // 16 - created from, 12 - contained in
 							
-							$source = ItemSource::where('item_id', '=', $item->id)->where('bnet_source_id', '=', abs($sourceBnetID))->whereIn('item_source_type_id', [12, 16])->first();
-							
-							if (!$source) {
-								$source = new ItemSource;
-								$source->item_id = $item->id;
-								$source->bnet_source_id = abs($sourceBnetID);
-								$source->import_source = 'ItemSourceDataImportHelper';
+							foreach ($sourceArr as $sourceBnetID) {
+								$newSourceID = ($sourceBnetID > 0) ? 16 : 12; // 16 - created from, 12 - contained in
+								
+								$source = ItemSource::where('item_id', '=', $item->id)->where('bnet_source_id', '=', abs($sourceBnetID))->whereIn('item_source_type_id', [12, 16])->first();
+								
+								if (!$source) {
+									$source = new ItemSource;
+									$source->item_id = $item->id;
+									$source->bnet_source_id = abs($sourceBnetID);
+									$source->import_source = 'ItemSourceDataImportHelper';
+								}
+								$source->item_source_type_id = $newSourceID;
+								$source->save();
 							}
-							$source->item_source_type_id = $newSourceID;
-							$source->save();
 						}
 					}
 				}
