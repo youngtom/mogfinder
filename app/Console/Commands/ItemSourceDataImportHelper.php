@@ -241,7 +241,7 @@ class ItemSourceDataImportHelper extends Command
 					} elseif ($sourceID == 3) { //Vendor
 						
 					} elseif ($sourceID == 4) { //World Drop
-						$sourceArr = explode(',', $data);
+						$sourceArr = explode(',', trim($data));
 						
 						if (count($sourceArr) == 1 && $sourceArr[0]) {
 							$sourceBnetID = $sourceArr[0];
@@ -269,30 +269,26 @@ class ItemSourceDataImportHelper extends Command
 										$source->save();
 									}
 								}
-							} else {
-								if ($zone) {
-									$this->line('Zone not valid: ' . $zone->name);
-								} else {
-									$this->line('Zone not found: ' . $sourceBnetID);
-								}
 							}
 						} else {
 							foreach ($items as $item) {
 								foreach ($item->itemSources as $source) {
-									if ($source->item_source_type_id != 3) {
+									if ($source->item_source_type_id != 3 && $source->item_source_type_id != 4) {
 										fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
 										//$source->delete();
 									}
 								}
 								
-								$source = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=', 3)->first();
-								
-								if (false && !$source) {
-									$source = new ItemSource;
-									$source->item_id = $item->id;
-									$source->item_source_type_id = 3;
-									$source->import_source = 'ItemSourceDataImportHelper';
-									$source->save();
+								if (!$item->itemSources->count())
+									$source = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=', 3)->first();
+									
+									if (false && !$source) {
+										$source = new ItemSource;
+										$source->item_id = $item->id;
+										$source->item_source_type_id = 3;
+										$source->import_source = 'ItemSourceDataImportHelper';
+										$source->save();
+									}
 								}
 							}
 						}
