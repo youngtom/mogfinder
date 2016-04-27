@@ -43,7 +43,7 @@ class ItemSourceDataImportHelper extends Command
      */
     public function handle()
     {
-		$sourceToImport = 1;
+		$sourceToImport = 6;
 		
         list($modes, $encounters, $instances) = file(storage_path() . '/app/imports/extradata.txt');
 		$modes = explode('|', $modes);
@@ -73,15 +73,15 @@ class ItemSourceDataImportHelper extends Command
 		
 		$sourceData = file(storage_path() . '/app/imports/sourcedata_new.txt');
 		$sourceToImportStr = ($sourceToImport) ?: 'all';
-		$fp = fopen(storage_path() . '/app/imports/sourcedata.out_' . $sourceToImportStr . '.txt', 'a');
-		
-		$bar = $this->output->createProgressBar(count($sourceData));
+		$fp = fopen(storage_path() . '/app/imports/sourcedata.out_' . $sourceToImportStr . '.txt', 'w');
 		
 		$lineByItem = [];
 		
 		$diffToBonusMap = [
 			2 => [642]
 		];
+		
+		$lineCount = 0;
 		
 		foreach ($sourceData as $str) {
 			preg_match_all('/\[(")?(?P<itemid>[0-9:]+)(")?\] \= \{(?P<sourceid>\d)([#,](?P<data>.+))?\},/', $str, $matches);
@@ -106,12 +106,15 @@ class ItemSourceDataImportHelper extends Command
 						
 						$bonus = ($bonus) ?: 'default';
 						$lineByItem[$bnetID][$bonus] = $sourceID . '||' . $data;
+						$lineCount++;
 					} else {
 						$this->line('Problem with line: ' . $str);
 					}
 				}
 			}
 		}
+		
+		$bar = $this->output->createProgressBar($lineCount);
 		
 		foreach ($lineByItem as $itemID => $lines) {
 			$numRows = count($lines);
@@ -220,6 +223,41 @@ class ItemSourceDataImportHelper extends Command
 									$source->save();
 								}
 							}
+						}
+					} elseif ($sourceID == 2) { //Quest
+						
+					} elseif ($sourceID == 3) { //Vendor
+						
+					} elseif ($sourceID == 4) { //World Drop
+						
+					} elseif ($sourceID == 5) { //Legacy
+						
+					} elseif ($sourceID == 6) { //Created
+						$sourceArr = explode(',', $data);
+						$sourceBnetIDs = array_map('abs', $sourceArr);
+						
+						foreach ($items as $item) {
+							foreach ($item->itemSources as $source) {
+								if (($source->item_source_type_id != 12 && $source->item_source_type_id != 16) || !in_array($source->bnet_source_id, $sourceBnetIDs)) {
+									fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
+									$source->delete();
+								}
+							}
+						}
+						
+						foreach ($sourceArr as $sourceBnetID) {
+							$newSourceID = ($sourceBnetID > 0) ? 16 : 12; // 16 - created from, 12 - contained in
+							
+							$source = ItemSource::where('item_id', '=', $item->id)->where('bnet_source_id', '=', $sourceBnetID)->whereIn('item_source_type_id', [12, 16])->first();
+							
+							if (!$source) {
+								$source = new ItemSource;
+								$source->item_id = $item->id;
+								$source->bnet_source_id = $sourceBnetID;
+								$source->import_source = 'ItemSourceDataImportHelper';
+							}
+							$source->item_source_type_id = $newSourceID;
+							$source->save();
 						}
 					}
 				}
