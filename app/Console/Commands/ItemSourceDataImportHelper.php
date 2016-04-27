@@ -253,7 +253,7 @@ class ItemSourceDataImportHelper extends Command
 							foreach ($items as $item) {
 								foreach ($item->itemSources as $source) {
 									if ($source->item_source_type_id != 15 || $source->bnet_source_id != $sourceBnetIDs) {
-										fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
+										fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . " (Zone)\n");
 										//$source->delete();
 									}
 								}
@@ -274,7 +274,7 @@ class ItemSourceDataImportHelper extends Command
 							foreach ($items as $item) {
 								foreach ($item->itemSources as $source) {
 									if ($source->item_source_type_id != 3 && $source->item_source_type_id != 4) {
-										fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
+										fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . " (World)\n");
 										//$source->delete();
 									}
 								}
