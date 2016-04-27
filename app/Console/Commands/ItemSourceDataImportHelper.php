@@ -43,7 +43,7 @@ class ItemSourceDataImportHelper extends Command
      */
     public function handle()
     {
-		$sourceToImport = 5;
+		$sourceToImport = 4;
 		
         list($modes, $encounters, $instances) = file(storage_path() . '/app/imports/extradata.txt');
 		$modes = explode('|', $modes);
@@ -105,8 +105,20 @@ class ItemSourceDataImportHelper extends Command
 						}
 						
 						$bonus = ($bonus) ?: 'default';
+						if ($sourceID == 8 || $sourceID == 4) {
+							list($_null, $existingData) = (@$lineByItem[$bnetID]['default']) ? explode('||', $lineByItem[$bnetID]['default']) : [null, ''];
+							$data = implode(',', array_unique(array_merge(explode(',', $data), explode(',', $existingData))));
+							$bonus = 'default';
+						}
+						
 						$lineByItem[$bnetID][$bonus] = $sourceID . '||' . $data;
 						$lineCount++;
+						
+						if ($bonus != 'default') {
+							$this->info($str);
+						} else {
+							//$this->error($str);
+						}
 					} else {
 						$this->line('Problem with line: ' . $str);
 					}
@@ -126,7 +138,7 @@ class ItemSourceDataImportHelper extends Command
 				
 				$sourceArr = explode(',', $data);
 				
-				if ($sourceID == 8) {
+				if ($sourceID == 8 || $sourceID == 4) {
 					$items = Item::where('bnet_id', '=', $itemID)->get();
 				} else {
 					if ($sourceID == 1 && !$bonus && $numRows > 1) {
@@ -229,7 +241,31 @@ class ItemSourceDataImportHelper extends Command
 					} elseif ($sourceID == 3) { //Vendor
 						
 					} elseif ($sourceID == 4) { //World Drop
+						$sourceArr = explode(',', $data);
 						
+						if (count($sourceArr == 1)) {
+							$sourceBnetID = $sourceArr[0];
+							
+							foreach ($items as $item) {
+								foreach ($item->itemSources as $source) {
+									if ($source->item_source_type_id != 15 || $source->bnet_source_id != $sourceBnetIDs) {
+										fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
+										//$source->delete();
+									}
+								}
+								
+								$source = ItemSource::where('item_id', '=', $item->id)->where('bnet_source_id', '=', $sourceBnetID)->where('item_source_type_id', '=', 15)->first();
+								
+								if (false && !$source) {
+									$source = new ItemSource;
+									$source->item_id = $item->id;
+									$source->bnet_source_id = $sourceBnetID;
+									$source->item_source_type_id = 15;
+									$source->import_source = 'ItemSourceDataImportHelper';
+									$source->save();
+								}
+							}
+						}
 					} elseif ($sourceID == 5) { //Legacy
 						foreach ($items as $item) {
 							foreach ($item->itemSources as $source) {
@@ -237,15 +273,15 @@ class ItemSourceDataImportHelper extends Command
 									fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
 									$source->delete();
 								}
-								
-								$source = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=', 17)->first();
-								
-								if (!$source) {
-									$source = new ItemSource;
-									$source->item_id = $item->id;
-									$source->item_source_type_id = 17;
-									$source->save();
-								}
+							}
+															
+							$source = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=', 17)->first();
+							
+							if (!$source) {
+								$source = new ItemSource;
+								$source->item_id = $item->id;
+								$source->item_source_type_id = 17;
+								$source->save();
 							}
 						}
 					} elseif ($sourceID == 6) { //Created
