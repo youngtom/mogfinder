@@ -249,9 +249,8 @@ class ItemSourceDataImportHelper extends Command
 							
 							$zone = Zone::where('bnet_id', '=', $sourceBnetID)->first();
 							
-							if ($zone->is_dungeon || $zone->is_raid) {
+							if ($zone && $zone->is_dungeon || $zone->is_raid) {
 								foreach ($items as $item) {
-									$this->line($zone->name . ' - ' . $item->name);
 									foreach ($item->itemSources as $source) {
 										if ($source->item_source_type_id != 15 || $source->bnet_source_id != $sourceBnetIDs) {
 											fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
@@ -271,10 +270,11 @@ class ItemSourceDataImportHelper extends Command
 										$source->save();
 									}
 								}
+							} else {
+								$this->line('Zone not valid: ' . $sourceBnetID);
 							}
 						} else {
 							foreach ($items as $item) {
-								$this->line('World Drop - ' . $item->name);
 								foreach ($item->itemSources as $source) {
 									if ($source->item_source_type_id != 3) {
 										fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
