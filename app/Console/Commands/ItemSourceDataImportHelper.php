@@ -242,6 +242,7 @@ class ItemSourceDataImportHelper extends Command
 						
 					} elseif ($sourceID == 4) { //World Drop
 						$sourceArr = explode(',', $data);
+						$this->line($data);
 						
 						if (count($sourceArr) == 1 && $sourceArr[0]) {
 							$sourceBnetID = $sourceArr[0];
@@ -250,6 +251,7 @@ class ItemSourceDataImportHelper extends Command
 							
 							if ($zone->is_dungeon || $zone->is_raid) {
 								foreach ($items as $item) {
+									$this->line($zone->name . ' - ' . $item->name);
 									foreach ($item->itemSources as $source) {
 										if ($source->item_source_type_id != 15 || $source->bnet_source_id != $sourceBnetIDs) {
 											fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
@@ -272,6 +274,7 @@ class ItemSourceDataImportHelper extends Command
 							}
 						} else {
 							foreach ($items as $item) {
+								$this->line('World Drop - ' . $item->name);
 								foreach ($item->itemSources as $source) {
 									if ($source->item_source_type_id != 3) {
 										fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
