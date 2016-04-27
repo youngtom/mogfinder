@@ -125,6 +125,7 @@ class ItemSourceDataImportHelper extends Command
 				}
 			}
 		}
+		dd($lineByItem[647]);
 
 		$bar = $this->output->createProgressBar($lineCount);
 		
@@ -243,7 +244,7 @@ class ItemSourceDataImportHelper extends Command
 					} elseif ($sourceID == 4) { //World Drop
 						$sourceArr = explode(',', $data);
 						
-						if (count($sourceArr == 1)) {
+						if (count($sourceArr) == 1) {
 							$sourceBnetID = $sourceArr[0];
 							
 							foreach ($items as $item) {
@@ -256,11 +257,18 @@ class ItemSourceDataImportHelper extends Command
 								
 								$source = ItemSource::where('item_id', '=', $item->id)->where('bnet_source_id', '=', $sourceBnetID)->where('item_source_type_id', '=', 15)->first();
 								
+								$zone = Zone::where('bnet_id', '=', $sourceBnetID)->first();
+								
+								if (!$zone->is_dungeon && !$zone->is_raid) {
+									$this->line('Item (' . $item->name . ' - ' . $item->bnet_id . ') Zone (' . $zone->name . ')');
+								}
+								
 								if (false && !$source) {
 									$source = new ItemSource;
 									$source->item_id = $item->id;
 									$source->bnet_source_id = $sourceBnetID;
 									$source->item_source_type_id = 15;
+									$source->zone_id = $zone->id;
 									$source->import_source = 'ItemSourceDataImportHelper';
 									$source->save();
 								}
