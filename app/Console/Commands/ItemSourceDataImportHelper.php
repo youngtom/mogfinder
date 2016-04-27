@@ -43,7 +43,7 @@ class ItemSourceDataImportHelper extends Command
      */
     public function handle()
     {
-		$sourceToImport = 6;
+		$sourceToImport = 5;
 		
         list($modes, $encounters, $instances) = file(storage_path() . '/app/imports/extradata.txt');
 		$modes = explode('|', $modes);
