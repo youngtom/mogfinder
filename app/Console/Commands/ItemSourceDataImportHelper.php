@@ -270,7 +270,11 @@ class ItemSourceDataImportHelper extends Command
 									}
 								}
 							} else {
-								$this->line('Zone not valid: ' . $sourceBnetID);
+								if ($zone) {
+									$this->line('Zone not valid: ' . $zone->name);
+								} else {
+									$this->line('Zone not found: ' . $sourceBnetID);
+								}
 							}
 						} else {
 							foreach ($items as $item) {
