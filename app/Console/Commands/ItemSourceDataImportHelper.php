@@ -243,31 +243,31 @@ class ItemSourceDataImportHelper extends Command
 					} elseif ($sourceID == 4) { //World Drop
 						$sourceArr = explode(',', trim($data));
 						
-						if (count($sourceArr) == 1 && $sourceArr[0]) {
-							$sourceBnetID = $sourceArr[0];
-							
+						$sourceBnetID = $sourceArr[0];
+						
+						if ($sourceBnetID) {
 							$zone = Zone::where('bnet_id', '=', $sourceBnetID)->first();
-							
-							if ($zone && ($zone->is_dungeon || $zone->is_raid)) {
-								foreach ($items as $item) {
-									foreach ($item->itemSources as $source) {
-										if ($source->item_source_type_id != 15 || $source->bnet_source_id != $sourceBnetIDs) {
-											fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
-											//$source->delete();
-										}
+						}
+						
+						if (count($sourceArr) == 1 && $sourceBnetID && ($zone && ($zone->is_dungeon || $zone->is_raid))) {
+							foreach ($items as $item) {
+								foreach ($item->itemSources as $source) {
+									if ($source->item_source_type_id != 15 || $source->bnet_source_id != $sourceBnetIDs) {
+										fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
+										//$source->delete();
 									}
-									
-									$source = ItemSource::where('item_id', '=', $item->id)->where('bnet_source_id', '=', $sourceBnetID)->where('item_source_type_id', '=', 15)->first();
-									
-									if (false && !$source) {
-										$source = new ItemSource;
-										$source->item_id = $item->id;
-										$source->bnet_source_id = $sourceBnetID;
-										$source->item_source_type_id = 15;
-										$source->zone_id = $zone->id;
-										$source->import_source = 'ItemSourceDataImportHelper';
-										$source->save();
-									}
+								}
+								
+								$source = ItemSource::where('item_id', '=', $item->id)->where('bnet_source_id', '=', $sourceBnetID)->where('item_source_type_id', '=', 15)->first();
+								
+								if (false && !$source) {
+									$source = new ItemSource;
+									$source->item_id = $item->id;
+									$source->bnet_source_id = $sourceBnetID;
+									$source->item_source_type_id = 15;
+									$source->zone_id = $zone->id;
+									$source->import_source = 'ItemSourceDataImportHelper';
+									$source->save();
 								}
 							}
 						} else {
