@@ -33,7 +33,7 @@ class ItemSource extends Model
 	}
 	
 	public function getSourceText() {
-		if ($this->itemSourceType->label == 'CONTAINED_IN_ITEM' && $item = Item::where('bnet_id', '=', $this->bnet_source_id)->first()) {
+		if (($this->itemSourceType->label == 'CONTAINED_IN_ITEM' || $this->itemSourceType->label == 'CREATED_BY_ITEM') && $item = Item::where('bnet_id', '=', $this->bnet_source_id)->first()) {
 			$replace = [
 				'{$item_name}' => $item->name,
 				'{$item_quality}' => $item->quality
