@@ -238,7 +238,7 @@ class ItemSourceDataImportHelper extends Command
 									$source->delete();
 								}
 								
-								$source = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=' 17)->first();
+								$source = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=', 17)->first();
 								
 								if (!$source) {
 									$source = new ItemSource;
