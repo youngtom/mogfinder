@@ -197,8 +197,8 @@ class ItemSourceDataImportHelper extends Command
 						if (count($sourceBosses)) {
 							foreach ($items as $item) {
 								foreach ($item->itemSources as $source) {
-									if ($source->item_source_type_id != 4 || !in_array($source->bnet_source_id, $sourceBossBnetIDs)) {
-										fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id);
+									if ($source->item_source_type_id != 2 && ($source->item_source_type_id != 4 || !in_array($source->bnet_source_id, $sourceBossBnetIDs))) {
+										fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
 										$source->delete();
 									}
 								}
@@ -209,6 +209,7 @@ class ItemSourceDataImportHelper extends Command
 									if (!$source) {
 										$source = new ItemSource;
 										$source->item_id = $item->id;
+										$source->item_source_type_id = 4;
 										$source->bnet_source_id = $boss->bnet_id;
 										$source->import_source = 'ItemSourceDataImportHelper';
 									}
