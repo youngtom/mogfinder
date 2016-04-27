@@ -279,7 +279,7 @@ class ItemSourceDataImportHelper extends Command
 									}
 								}
 								
-								if (!$item->itemSources->count())
+								if (!$item->itemSources->count()) {
 									$source = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=', 3)->first();
 									
 									if (false && !$source) {
