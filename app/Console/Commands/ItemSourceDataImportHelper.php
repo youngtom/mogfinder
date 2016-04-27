@@ -113,7 +113,7 @@ class ItemSourceDataImportHelper extends Command
 				}
 			}
 		}
-		die;
+
 		$bar = $this->output->createProgressBar($lineCount);
 		
 		foreach ($lineByItem as $itemID => $lines) {
