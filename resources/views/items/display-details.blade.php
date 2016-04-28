@@ -46,10 +46,12 @@
 						foreach ($displayItems as $item) {
 							$sources = $sourceTypeIDs = [];
 							foreach ($item->itemSources as $itemSource) {
-								$sourceText = ($itemSource->getWowheadLink($item) && $itemSource->itemSourceType->context_label) ? '<a href="' . $itemSource->getWowheadLink($item) . '" target="_blank">' . $itemSource->getSourceText() . '</a>' : $itemSource->itemSourceType->simple_label;
-								
-								$sources[] = $sourceText;
-								$sourceTypeIDs[] = $itemSource->itemSourceType->id;
+								if ($itemSource->itemSourceType->url_token) {
+									$sourceText = ($itemSource->getWowheadLink($item) && $itemSource->itemSourceType->context_label) ? '<a href="' . $itemSource->getWowheadLink($item) . '" target="_blank">' . $itemSource->getSourceText() . '</a>' : $itemSource->itemSourceType->simple_label;
+									
+									$sources[] = $sourceText;
+									$sourceTypeIDs[] = $itemSource->itemSourceType->id;
+								}
 							}
 							$sources = implode(', ', $sources);
 							$sourceTypeIDs = implode('|', $sourceTypeIDs);
