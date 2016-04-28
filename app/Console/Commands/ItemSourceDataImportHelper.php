@@ -115,10 +115,6 @@ class ItemSourceDataImportHelper extends Command
 							$bonus = 'default';
 						}
 						
-						$arr = explode(',', $data);
-						if (count($arr) > 2)
-						$this->line(trim($str));
-						
 						$lineByItem[$bnetID][$bonus] = $sourceID . '||' . $data;
 						$lineCount++;
 					} else {
@@ -243,7 +239,7 @@ class ItemSourceDataImportHelper extends Command
 						
 						foreach ($items as $item) {
 							foreach ($item->itemSources as $source) {
-								if ($source->item_source_type_id != 7 || !in_array($source->bnet_source_id, $sourceArr)) {
+								if ($source->item_source_type_id != 2 && $source->item_source_type_id != 11 && ($source->item_source_type_id != 7 || !in_array($source->bnet_source_id, $sourceArr))) {
 									fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
 									//$source->delete();
 								}
