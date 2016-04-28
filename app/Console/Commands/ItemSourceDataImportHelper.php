@@ -257,10 +257,10 @@ class ItemSourceDataImportHelper extends Command
 										$source->bnet_source_id = $zone->bnet_id;
 										$source->zone_id = $zone->id;
 										$source->import_source = 'ItemSourceDataImportHelper';
-										$source->save();
+										//$source->save();
 									} elseif ($source->item_source_type_id == 6) {
 										$source->zone_id = $zone->id;
-										$source->save();
+										//$source->save();
 									}
 								}
 								
