@@ -17,7 +17,7 @@ class ItemSourceDataImportHelper extends Command
      *
      * @var string
      */
-    protected $signature = 'items:import-sources';
+    protected $signature = 'items:import-sources {sourceID}';
 
     /**
      * The console command description.
@@ -43,7 +43,11 @@ class ItemSourceDataImportHelper extends Command
      */
     public function handle()
     {
-		$sourceToImport = 4;
+		$sourceToImport = $this->argument('sourceID');
+		
+		if (!$sourceToImport) {
+			$this->error('Please specify a source ID');
+		}
 		
         list($modes, $encounters, $instances) = file(storage_path() . '/app/imports/extradata.txt');
 		$modes = explode('|', $modes);
@@ -113,12 +117,6 @@ class ItemSourceDataImportHelper extends Command
 						
 						$lineByItem[$bnetID][$bonus] = $sourceID . '||' . $data;
 						$lineCount++;
-						
-						if ($bonus != 'default') {
-							$this->info($str);
-						} else {
-							//$this->error($str);
-						}
 					} else {
 						$this->line('Problem with line: ' . $str);
 					}
@@ -344,6 +342,33 @@ class ItemSourceDataImportHelper extends Command
 								$source->save();
 							}
 						}
+					} elseif ($sourceID == 7) { //Achievement
+						$sourceArr = explode(',', $data);
+						
+						foreach ($items as $item) {
+							foreach ($item->itemSources as $source) {
+								if ($source->item_source_type_id != 13 || !in_array($source->bnet_source_id, $sourceArr)) {
+									fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
+									//$source->delete();
+								}
+							}
+							
+							foreach ($sourceArr as $sourceBnetID) {
+								break;
+								$source = ItemSource::where('item_id', '=', $item->id)->where('bnet_source_id', '=', $sourceBnetID)->where('item_source_type_id', '=', 13)->first();
+								
+								if (!$source) {
+									$source = new ItemSource;
+									$source->item_id = $item->id;
+									$source->bnet_source_id = $sourceBnetID;
+									$source->item_source_type_id = 13;
+									$source->import_source = 'ItemSourceDataImportHelper';
+									$source->save();
+								}
+							}
+						}
+					} elseif ($sourceID == 8) { //Profession
+						
 					}
 				}
 				$bar->advance();
