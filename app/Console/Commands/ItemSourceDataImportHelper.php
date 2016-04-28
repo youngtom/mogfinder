@@ -371,15 +371,13 @@ class ItemSourceDataImportHelper extends Command
 						$sourceBnetID = $sourceArr[0];
 						
 						foreach ($items as $item) {
-							$found = false;
 							foreach ($item->itemSources as $source) {
 								if ($source->item_source_type_id != 11) {
 									if ($source->item_source_type_id == 1) {
 										$source->item_source_type_id == 11;
 										$source->bnet_source_id = $sourceBnetID;
 										$source->import_source = 'ItemSourceDataImportHelper';
-										//$source->save();
-										$found = true;
+										$source->save();
 									} else {
 										fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
 										//$source->delete();
@@ -387,7 +385,7 @@ class ItemSourceDataImportHelper extends Command
 								}
 							}
 							
-							if (false && !$found) {
+							if (!$item->itemSources->count()) {
 								$source = ItemSource::where('item_id', '=', $item->id)->where('bnet_source_id', '=', $sourceBnetID)->where('item_source_type_id', '=', 11)->first();
 								
 								if (!$source) {
