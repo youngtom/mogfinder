@@ -300,7 +300,6 @@ class ItemSourceDataImportHelper extends Command
 								}
 							}
 						}
-						*/
 					} elseif ($sourceID == 5) { //Legacy
 						foreach ($items as $item) {
 							foreach ($item->itemSources as $source) {
