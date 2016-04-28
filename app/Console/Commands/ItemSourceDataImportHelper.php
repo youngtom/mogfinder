@@ -257,14 +257,14 @@ class ItemSourceDataImportHelper extends Command
 										$source->bnet_source_id = $zone->bnet_id;
 										$source->zone_id = $zone->id;
 										$source->import_source = 'ItemSourceDataImportHelper';
-										//$source->save();
+										$source->save();
 									} elseif ($source->item_source_type_id == 6) {
 										$source->zone_id = $zone->id;
-										//$source->save();
+										$source->save();
 									}
 								}
 								
-								if (false && !$item->itemSources->count()) {
+								if (!$item->itemSources->count()) {
 									$source = ItemSource::where('item_id', '=', $item->id)->where('bnet_source_id', '=', $sourceBnetID)->where('item_source_type_id', '=', 15)->first();
 									
 									if (!$source) {
@@ -281,13 +281,13 @@ class ItemSourceDataImportHelper extends Command
 						} else {
 							foreach ($items as $item) {
 								foreach ($item->itemSources as $source) {
-									if ($source->item_source_type_id != 3 && $source->item_source_type_id != 4 && $source->item_source_type_id != 15) {
+									if ($source->item_source_type_id != 3 && $source->item_source_type_id != 4 && $source->item_source_type_id != 15 && $source->item_source_type_id != 6) {
 										fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . " (World)\n");
-										//$source->delete();
+										$source->delete();
 									}
 								}
 								
-								if (false && !$item->itemSources->count()) {
+								if (!$item->itemSources->count()) {
 									$source = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=', 3)->first();
 									
 									if (!$source) {
