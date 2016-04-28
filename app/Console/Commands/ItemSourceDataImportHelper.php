@@ -367,7 +367,38 @@ class ItemSourceDataImportHelper extends Command
 							}
 						}
 					} elseif ($sourceID == 8) { //Profession
+						$sourceArr = explode(',', $data);
+						$sourceBnetID = $source[0];
 						
+						foreach ($items as $item) {
+							$found = false;
+							foreach ($item->itemSources as $source) {
+								if ($source->item_source_type_id != 11) {
+									if ($source->item_source_type_id == 1) {
+										$source->item_source_type_id == 11;
+										$source->bnet_source_id = $sourceBnetID;
+										//$source->save();
+										$found = true;
+									} else {
+										fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
+										//$source->delete();
+									}
+								}
+							}
+							
+							if (false && !$found) {
+								$source = ItemSource::where('item_id', '=', $item->id)->where('bnet_source_id', '=', $sourceBnetID)->where('item_source_type_id', '=', 11)->first();
+								
+								if (!$source) {
+									$source = new ItemSource;
+									$source->item_id = $item->id;
+									$source->bnet_source_id = $sourceBnetID;
+									$source->item_source_type_id = 11;
+									$source->import_source = 'ItemSourceDataImportHelper';
+									$source->save();
+								}
+							}
+						}
 					}
 				}
 				$bar->advance();
