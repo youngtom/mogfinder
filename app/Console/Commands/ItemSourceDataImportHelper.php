@@ -249,6 +249,13 @@ class ItemSourceDataImportHelper extends Command
 							$zone = Zone::where('bnet_id', '=', $sourceBnetID)->first();
 						}
 						
+						foreach ($items as $item) {
+							if ($sourceBnetID && $zone && !($zone->is_dungeon || $zone->is_raid)) {
+								fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $sourceBnetID . ' typeID: ' . 15 . " (Zone)\n");
+							}
+						}
+						
+						/*
 						if (count($sourceArr) == 1 && $sourceBnetID && ($zone && ($zone->is_dungeon || $zone->is_raid))) {
 							foreach ($items as $item) {
 								foreach ($item->itemSources as $source) {
@@ -294,6 +301,7 @@ class ItemSourceDataImportHelper extends Command
 								}
 							}
 						}
+						*/
 					} elseif ($sourceID == 5) { //Legacy
 						foreach ($items as $item) {
 							foreach ($item->itemSources as $source) {
