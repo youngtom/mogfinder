@@ -368,7 +368,7 @@ class ItemSourceDataImportHelper extends Command
 						}
 					} elseif ($sourceID == 8) { //Profession
 						$sourceArr = explode(',', $data);
-						$sourceBnetID = $source[0];
+						$sourceBnetID = $sourceArr[0];
 						
 						foreach ($items as $item) {
 							$found = false;
@@ -378,16 +378,16 @@ class ItemSourceDataImportHelper extends Command
 										$source->item_source_type_id == 11;
 										$source->bnet_source_id = $sourceBnetID;
 										$source->import_source = 'ItemSourceDataImportHelper';
-										$source->save();
+										//$source->save();
 										$found = true;
 									} else {
 										fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
-										$source->delete();
+										//$source->delete();
 									}
 								}
 							}
 							
-							if (!$found) {
+							if (false && !$found) {
 								$source = ItemSource::where('item_id', '=', $item->id)->where('bnet_source_id', '=', $sourceBnetID)->where('item_source_type_id', '=', 11)->first();
 								
 								if (!$source) {
