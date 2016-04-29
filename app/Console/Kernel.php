@@ -41,7 +41,8 @@ class Kernel extends ConsoleKernel
         Commands\UpdateItemDisplayRestrictions::class,
         Commands\UpdateUserItemDisplays::class,
         Commands\ImportBnetZoneData::class,
-        Commands\ItemSourceDataImportHelper::class
+        Commands\ItemSourceDataImportHelper::class,
+        Commands\ImportQuestZoneData::class
     ];
 
     /**
