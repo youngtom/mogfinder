@@ -23,6 +23,25 @@ use App\Boss;
 
 class TestController extends Controller
 {
+	public function index() {
+		$item = Item::find(45418);
+		$character = Character::find(182);
+		$bound = 0;
+		
+		$alts = $character->user->getOtherCharacters($character, ($bound === 0));
+							        
+        $found = false;
+        $alts->each(function ($alt) use ($item, &$found) { 
+	        if ($alt->canUseItem($item)) {
+				$found = $alt;
+				echo $alt->name;
+				return false;
+			}
+        });
+		
+		dd($found);
+	}
+	
     public function checkDeletedSources($id) {
 	    $sourceData = file(storage_path() . '/app/imports/sourcedata.out_' . $id . '.txt');
 	    $out = [];

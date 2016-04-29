@@ -40,15 +40,18 @@ use App\Boss;
 |
 */
 
-Route::get('/test/check-deleted-sources/{id}', '\App\Http\Controllers\TestController@checkDeletedSources');
-Route::get('/test/list-sources/{id}', '\App\Http\Controllers\TestController@listSources');
-Route::get('/test/list-sourceless-items', '\App\Http\Controllers\TestController@listSourcelessItems');
-
 Route::group(['middleware' => 'web'], function () {
     Route::auth();
     
     Route::get('/', 'HomeController@index');
 	Route::get('/home', 'HomeController@index');
+	
+	//test routes
+	Route::get('/test', 'TestController@index');
+	Route::get('/test/check-deleted-sources/{id}', 'TestController@checkDeletedSources');
+	Route::get('/test/list-sources/{id}', 'TestController@listSources');
+	Route::get('/test/list-sourceless-items', 'TestController@listSourcelessItems');
+
     
     //Admin helpers routes
     Route::get('/wardrobe/set-mogslot-icons/{mogslotID?}/{iconID?}', 'ItemsController@setMogslotIcons');

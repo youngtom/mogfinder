@@ -161,7 +161,7 @@ class Character extends Model
 				    
 					    if ($userItem) {
 						    $userItem->item_location_id = $itemLocation->id;
-						    $userItem->bound = 1;
+						    $userItem->bound = $bound;
 						    $userItem->save();
 					    } else {
 						    $item = Item::findItemFromLink($itemLink);
