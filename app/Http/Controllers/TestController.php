@@ -55,7 +55,9 @@ class TestController extends Controller
 	    $out = [];
 	    
 		foreach ($items as $item) {
-			$out[] = '<a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
+			if (!$item->itemSources->count()) {
+				$out[] = $item->bnet_id . ': <a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
+			}
 		}
 		
 		return view('test')->with('out', $out)->with('newline', "<br>");
