@@ -181,6 +181,7 @@ class Character extends Model
 							        });
 							        
 							        if ($found) {
+								        \Log::info('Item (' . $item->name . ') usable on alt (' . $found->name . ' - ' . $found->realm->name . ')');
 								        $userItem = $this->addUserItem($item, $itemLink, $itemLocation, $bound);
 							        }
 						        }
