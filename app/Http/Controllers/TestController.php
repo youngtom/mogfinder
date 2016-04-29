@@ -24,9 +24,13 @@ use App\Boss;
 class TestController extends Controller
 {
 	public function index() {
-		$item = Item::find(45418);
+		$item = Item::findItemFromLink('|cff1eff00|Hitem:55774:0:0:0:0:0:-36:132907049:1:0:0:0:0|h[Bluefen Cord of the Sorcerer]|h|r');
 		$character = Character::find(182);
 		$bound = 0;
+		
+		if ($character->canUseItem($item)) {
+			echo 'Yes';
+		}
 		
 		$alts = $character->user->getOtherCharacters($character, ($bound === 0));
 							        
