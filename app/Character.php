@@ -170,7 +170,7 @@ class Character extends Model
 						        if ($this->canUseItem($item)) {
 							    	$userItem = $this->addUserItem($item, $itemLink, $itemLocation, $bound);
 						        } elseif ($bound != 1) {
-							        $alts = $this->user->getOtherCharacters($this, ($bound === 0));
+							        $alts = $this->user->getOtherCharacters($this, ((int)$bound === 0));
 							        
 							        $found = false;
 							        $alts->each(function ($alt) use ($item, &$found) { 
