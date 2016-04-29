@@ -265,13 +265,12 @@ class ItemSourceDataImportHelper extends Command
 							foreach ($item->itemSources as $source) {
 								if ($source->item_source_type_id != 2 || !in_array($source->bnet_source_id, $sourceArr)) {
 									fwrite($fp, 'Deleting source - itemID: ' . $item->id . ' bnetID: ' . $source->bnet_source_id . ' typeID: ' . $source->item_source_type_id . "\n");
-									//$source->delete();
+									$source->delete();
 								}
 							}
 							
 							foreach ($sourceArr as $sourceBnetID) {
-								break;
-								$source = ItemSource::where('item_id', '=', $item->id)->where('bnet_source_id', '=', $sourceBnetID)->where('item_source_type_id', '=', 7)->first();
+								$source = ItemSource::where('item_id', '=', $item->id)->where('bnet_source_id', '=', $sourceBnetID)->where('item_source_type_id', '=', 2)->first();
 								
 								if (!$source) {
 									$source = new ItemSource;
