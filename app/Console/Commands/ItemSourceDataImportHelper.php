@@ -115,8 +115,6 @@ class ItemSourceDataImportHelper extends Command
 							$bonus = 'default';
 						}
 						
-						$this->line(trim($str));
-						
 						$lineByItem[$bnetID][$bonus] = $sourceID . '||' . $data;
 						$lineCount++;
 					} else {
@@ -125,7 +123,6 @@ class ItemSourceDataImportHelper extends Command
 				}
 			}
 		}
-		die;
 
 		$bar = $this->output->createProgressBar($lineCount);
 		
@@ -280,7 +277,7 @@ class ItemSourceDataImportHelper extends Command
 									$source = new ItemSource;
 									$source->item_id = $item->id;
 									$source->bnet_source_id = $sourceBnetID;
-									$source->item_source_type_id = 3;
+									$source->item_source_type_id = 2;
 									$source->import_source = 'ItemSourceDataImportHelper';
 									$source->save();
 								}
