@@ -80,23 +80,21 @@ class TestController extends Controller
 	    $out = [];
 	    
 		foreach ($items as $item) {
-			if (!$item->itemSources->count()) {
-				$out[] = $item->bnet_id . ': <a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
-				
-				$otherItemIDs = Item::where('bnet_id', '=', $item->bnet_id)->orWhere('name', '=', $item->name)->get()->lists('id')->toArray();
-				
-				$sources = ItemSource::whereIn('item_id', $otherItemIDs)->orderBy('item_id', 'ASC')->get();
-				
-				if ($sources->count()) {
-					$out[] = '<ul>';
-					foreach ($sources as $source) {
-						$out[] = '<li><a href="' . $source->getWowheadLink($source->item) . '">' . $source->getSourceText() . '</a>: <a href="http://www.wowhead.com/item=' . $source->item->bnet_id . '" class="q' . $source->item->quality . '" rel="' . $source->item->getWowheadMarkup() . '">[' . $source->item->name . ']</a></li>';
-					}
-					$out[] = '</ul>';	
+			$out[] = $item->bnet_id . ': <a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
+			
+			$otherItemIDs = Item::where('bnet_id', '=', $item->bnet_id)->orWhere('name', '=', $item->name)->get()->lists('id')->toArray();
+			
+			$sources = ItemSource::whereIn('item_id', $otherItemIDs)->orderBy('item_id', 'ASC')->get();
+			
+			if ($sources->count()) {
+				$out[] = '<ul>';
+				foreach ($sources as $source) {
+					$out[] = '<li><a href="' . $source->getWowheadLink($source->item) . '">' . $source->getSourceText() . '</a>: <a href="http://www.wowhead.com/item=' . $source->item->bnet_id . '" class="q' . $source->item->quality . '" rel="' . $source->item->getWowheadMarkup() . '">[' . $source->item->name . ']</a></li>';
 				}
-				
-				$out[] = '<br><br>';
+				$out[] = '</ul>';	
 			}
+			
+			$out[] = '<br><br>';
 		}
 		
 		return view('test')->with('out', $out)->with('newline', "\n");
