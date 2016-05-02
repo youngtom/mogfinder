@@ -42,7 +42,8 @@ class Kernel extends ConsoleKernel
         Commands\UpdateUserItemDisplays::class,
         Commands\ImportBnetZoneData::class,
         Commands\ItemSourceDataImportHelper::class,
-        Commands\ImportQuestZoneData::class
+        Commands\ImportQuestZoneData::class,
+        Commands\wowhead\UpdateZoneDropSources::class
     ];
 
     /**
