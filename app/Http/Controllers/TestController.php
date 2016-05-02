@@ -74,9 +74,9 @@ class TestController extends Controller
     }
     
     public function listSourcelessItems() {
-	    $itemIDs = array_unique(ItemSource::all()->lists('item_id')->toArray());
-	    
-	    $items = Item::whereNotIn('id', $itemIDs)->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->get();
+	    $items = Item::whereNotIn('id', function ($query) {
+		    $query->select('item_id')->from('item_sources');
+	    })->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->get();
 	    $out = [];
 	    
 		foreach ($items as $item) {
