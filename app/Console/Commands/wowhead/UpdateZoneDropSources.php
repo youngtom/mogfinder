@@ -89,19 +89,21 @@ class UpdateZoneDropSources extends Command
 					        $this->line('- Converting to boss drop');
 					    }
 			        } else { //verify that item drops from a single zone
-				        $zoneBnetID = false;
+				        $zoneID = false;
 				        foreach ($dataArr as $data) {
-					        if ($zoneBnetID !== false && $zoneBnetID != $data['location'][0]) {
-						        $this->info(' - Item comes from multiple zones: ' . $source->item->bnet_id . ' (ItemID: ' . $source->item->id . ')');
-						        /*
-						        $source->item_source_type_id = 3;
-						        $source->bnet_source_id = null;
-						        $source->zone_id = null;
-						        */
-						        break;
-					        } else {
+					        if (@$data['location'] && @$data['location'][0]) {
 						        $zoneBnetID = $data['location'][0];
-					        }
+						        
+						        if ($zoneID !== false && $zoneBnetID != $zoneID) {
+							        $this->info(' - Item comes from multiple zones: ' . $source->item->bnet_id . ' (ItemID: ' . $source->item->id . ')');
+							        /*
+							        $source->item_source_type_id = 3;
+							        $source->bnet_source_id = null;
+							        $source->zone_id = null;
+							        */
+							        break;
+						        }
+						    }
 				        }
 				        
 				        if ($zoneBnetID && $zoneBnetID != $source->zone->bnet_id) {
@@ -161,6 +163,7 @@ class UpdateZoneDropSources extends Command
 			$json = preg_replace('/(")?(count)(?(1)\1|)/', '"count"', $json);
 			$json = preg_replace('/(")?(outof)(?(1)\1|)/', '"outof"', $json);
 			$json = preg_replace('/(")?(personal_loot)(?(1)\1|)/', '"personal_loot"', $json);
+			$json = preg_replace('/(")?(undefined)(?(1)\1|)/', '"undefined"', $json);
 			
 			return json_decode($json, true);
 		} else {
