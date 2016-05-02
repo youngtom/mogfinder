@@ -85,7 +85,7 @@ class TestController extends Controller
 				
 				$sources = ItemSource::whereIn('item_id', $otherItemIDs)->orderBy('item_id', 'ASC')->get();
 				
-				if ($souces->count()) {
+				if ($sources->count()) {
 					$out[] = '<ul>';
 					foreach ($sources as $source) {
 						$out[] = '<li><a href="' . $source->getWowheadLink($source->item) . '">' . $source->getSourceText() . '</a>: <a href="http://www.wowhead.com/item=' . $source->item->bnet_id . '" class="q' . $source->item->quality . '" rel="' . $source->item->getWowheadMarkup() . '">[' . $source->item->name . ']</a></li>';
