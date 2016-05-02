@@ -11,6 +11,7 @@ use App\Boss;
 class UpdateZoneDropSources extends Command
 {
 	private static $client = null;
+	private static $itemDataCache = [];
     /**
      * The name and signature of the console command.
      *
@@ -46,12 +47,38 @@ class UpdateZoneDropSources extends Command
         
         foreach ($sources as $source) {
 	        if ($source->item->transmoggable) {
-		        $dataArr = $this->getWowheadSourceData($source->item->bnet_id);
+		        $dataArr = $this->getWowheadSourceData($source->item->bnet_id, 'npc');
 		        
 		        $this->info('Checking: ' . $source->item->bnet_id . ' - SourceID: ' . $source->id);
 		        
 		        if ($dataArr === false) {
-			        $this->error('Invalid source data for: ' . $source->item->bnet_id);
+			        $dataArr = $this->getWowheadSourceData($source->item->bnet_id, 'object');
+			        
+			        if (!$dataArr) {
+			        	$this->error('Invalid source data for: ' . $source->item->bnet_id);
+			        } else {
+				        if (count($dataArr) == 1) {
+					        $zoneBnetID = $data['location'][0];
+					        $objectID = $data['id'];
+					        
+					        if ($zoneBnetID != $source->zone->bnet_id) {
+						        $zone = Zone::where('bnet_id', '=', $zoneBnetID)->first();
+					        } else {
+						        $zone = $source->zone;
+					        }
+					        
+					        if ($zone && $objectID) {
+						        $source->item_source_type_id = 6;
+						        $source->bnet_source_id = $objectID;
+						        $source->zone_id = $zone->id;
+						        $source->dynamic_quest_rewards = 1;
+						        $source->save();
+								$this->line('- Converting to object drop');
+							}
+					    } else {
+						    $this->error('Item comes from multiple objects, ignoring');
+					    }
+			        }
 		        } elseif ($dataArr === null) {
 			        $this->error('Malformed json for : ' . $source->item->bnet_id);
 		        } else {
@@ -77,7 +104,11 @@ class UpdateZoneDropSources extends Command
 					        $boss = Boss::where('bnet_id', '=', $npcID)->where('zone_id', '=', $zone->id)->first();
 					        
 					        if (!$boss) {
-						        $this->error('Item is not a boss drop: ' . $source->item->bnet_id);
+						        if ($zone->is_raid) {
+							        $this->error('Item is not a boss drop (raid): ' . $source->item->bnet_id);
+						        } else {
+							        $this->error('Item is not a boss drop (dungeon): ' . $source->item->bnet_id);
+						        }
 						        $convert = false;
 					        }
 				        }
@@ -129,32 +160,34 @@ class UpdateZoneDropSources extends Command
         }
     }
     
-    private function getWowheadSourceData($itemID) {
-	    if (self::$client === null) {
-			self::$client = new \GuzzleHttp\Client();
-		}
-		
-	    $url = 'http://www.wowhead.com/item=' . $itemID;
-	    
-	    try {
-			$res = self::$client->request('GET', $url);
-		} catch (\Exception $e) {
-			return false;
-		}
-		
-		if ($res) {
-			$html = (string)$res->getBody();
-		} else {
-			return false;
+    private function getWowheadSourceData($itemID, $dropType = 'npc') {
+	    if (!array_key_exists($itemID, self::$itemDataCache)) {
+		    if (self::$client === null) {
+				self::$client = new \GuzzleHttp\Client();
+			}
+			
+		    $url = 'http://www.wowhead.com/item=' . $itemID;
+		    
+		    try {
+				$res = self::$client->request('GET', $url);
+			} catch (\Exception $e) {
+				return false;
+			}
+			
+			if ($res) {
+				self::$itemDataCache[$itemID] = (string)$res->getBody();
+			} else {
+				return false;
+			}
 		}
 		
 		$matches = [];
 		$json = false;
-		$arr = explode('new Listview', $html);
+		$arr = explode('new Listview', self::$itemDataCache[$itemID]);
 	
 		foreach ($arr as $str) {
 			$str = preg_replace('/[\n\r]/', '', $str);
-			preg_match_all('/\(\{template\: \'npc\'(.+), data\: (?P<data>\[(.+)\])\}\);/', $str, $matches);
+			preg_match_all('/\(\{template\: \'' . preg_quote($dropType) . '\'(.+), data\: (?P<data>\[(.+)\])\}\);/', $str, $matches);
 			
 			if (@$matches['data'][0]) {
 				$json = $matches['data'][0];
