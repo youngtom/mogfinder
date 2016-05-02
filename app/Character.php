@@ -206,7 +206,12 @@ class Character extends Model
 		    }
 		}
 		
-		UserItem::where('item_location_id', '<>', $questLocation->id)->where('character_id', '=', $this->id)->whereNotIn('id', $charItemIDs)->delete();
+		$deleteItems = UserItem::where('item_location_id', '<>', $questLocation->id)->where('character_id', '=', $this->id)->whereNotIn('id', $charItemIDs)->get();
+		
+		foreach($deleteItems as $item) {
+			$item->delete();
+		}
+		
 		$this->latest_chardata = null;
 		$this->save();
 						
