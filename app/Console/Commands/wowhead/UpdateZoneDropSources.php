@@ -102,22 +102,22 @@ class UpdateZoneDropSources extends Command
 						        $convert = false;
 					        }
 					        
-					        if ($convert && ($zone->is_raid || $zone->is_dungeon)) { //verify npcid is a boss
-						        $boss = Boss::where('bnet_id', '=', $npcID)->where('zone_id', '=', $zone->id)->first();
-						        
-						        if (!$boss) {
-							        if ($zone->is_raid) {
-								        $this->error('Item is not a boss drop (raid): ' . $source->item->bnet_id);
-							        } else {
-								        $this->error('Item is not a boss drop (dungeon): ' . $source->item->bnet_id);
-							        }
-							        $convert = false;
+					        $boss = Boss::where('bnet_id', '=', $npcID)->first();
+					        $boss = ($boss) ? $boss->encounter() : false;
+					        
+					        if ($convert && !$boss && ($zone->is_raid || $zone->is_dungeon)) { //verify npcid is a boss
+						        if ($zone->is_raid) {
+							        $this->error('Item is not a boss drop (raid): ' . $source->item->bnet_id);
+						        } else {
+							        $this->error('Item is not a boss drop (dungeon): ' . $source->item->bnet_id);
 						        }
+						        $convert = false;
 					        }
 					        
 					        if ($convert) {
 						        $source->item_source_type_id = 4;
 						        $source->bnet_source_id = $npcID;
+						        $source->boss_id = ($boss) ? $boss->id : null;
 						        $source->zone_id = $zone->id;
 						        $this->line('- Converting to boss drop (' . $data['count'] . ')');
 						    }
