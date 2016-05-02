@@ -6,4 +6,10 @@
 
 @section('content')
 <?=implode($newline, $out)?>
+
+<?php
+	if (@$pagination) {
+		echo $pagination->render();
+	}
+?>
 @endsection

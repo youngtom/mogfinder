@@ -76,7 +76,7 @@ class TestController extends Controller
     public function listSourcelessItems() {
 	    $items = Item::whereNotIn('id', function ($query) {
 		    $query->select('item_id')->from('item_sources');
-	    })->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->get();
+	    })->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->paginate(500);
 	    $out = [];
 	    
 		foreach ($items as $item) {
@@ -97,7 +97,7 @@ class TestController extends Controller
 			$out[] = '<br><br>';
 		}
 		
-		return view('test')->with('out', $out)->with('newline', "\n");
+		return view('test')->with('out', $out)->with('newline', "\n")->with('pagination', $items);
     }
     
     public function listSources($id) {
