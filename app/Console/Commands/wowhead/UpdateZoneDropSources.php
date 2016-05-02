@@ -106,8 +106,8 @@ class UpdateZoneDropSources extends Command
 						    }
 				        }
 				        
-				        if ($zoneBnetID && $zoneBnetID != $source->zone->bnet_id) {
-					        $newZone = Zone::where('bnet_id', '=', $zoneBnetID)->first();
+				        if ($zoneID && $zoneID != $source->zone->bnet_id) {
+					        $newZone = Zone::where('bnet_id', '=', $zoneID)->first();
 				        } else {
 					        $newZone = false;
 				        }
