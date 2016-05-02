@@ -96,6 +96,7 @@ class UpdateZoneDropSources extends Command
 						        
 						        if ($zoneID !== false && $zoneBnetID != $zoneID) {
 							        $this->info(' - Item comes from multiple zones: ' . $source->item->bnet_id . ' (ItemID: ' . $source->item->id . ')');
+							        $zoneID = false;
 							        /*
 							        $source->item_source_type_id = 3;
 							        $source->bnet_source_id = null;
@@ -103,6 +104,8 @@ class UpdateZoneDropSources extends Command
 							        */
 							        break;
 						        }
+						        
+						        $zoneID = $zoneBnetID;
 						    }
 				        }
 				        
