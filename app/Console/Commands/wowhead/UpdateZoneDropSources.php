@@ -58,6 +58,7 @@ class UpdateZoneDropSources extends Command
 			        	$this->error('Invalid source data for: ' . $source->item->bnet_id);
 			        } else {
 				        if (count($dataArr) == 1) {
+					        $data = $dataArr[0];
 					        $zoneBnetID = $data['location'][0];
 					        $objectID = $data['id'];
 					        
@@ -87,38 +88,42 @@ class UpdateZoneDropSources extends Command
 				        $zoneBnetID = $data['location'][0];
 				        $npcID = $data['id'];
 				        
-				        if ($zoneBnetID != $source->zone->bnet_id) {
-					        $zone = Zone::where('bnet_id', '=', $zoneBnetID)->first();
-				        } else {
-					        $zone = $source->zone;
-				        }
-				        
-				        $convert = true;
-				        
-				        if (!$zone) {
-					        $this->error('Invalid zone (' . $zoneBnetID . ') for: ' . $source->item->bnet_id);
-					        $convert = false;
-				        }
-				        
-				        if ($convert && ($zone->is_raid || $zone->is_dungeon)) { //verify npcid is a boss
-					        $boss = Boss::where('bnet_id', '=', $npcID)->where('zone_id', '=', $zone->id)->first();
+				        if ($data['count'] > 0) {
+					        if ($zoneBnetID != $source->zone->bnet_id) {
+						        $zone = Zone::where('bnet_id', '=', $zoneBnetID)->first();
+					        } else {
+						        $zone = $source->zone;
+					        }
 					        
-					        if (!$boss) {
-						        if ($zone->is_raid) {
-							        $this->error('Item is not a boss drop (raid): ' . $source->item->bnet_id);
-						        } else {
-							        $this->error('Item is not a boss drop (dungeon): ' . $source->item->bnet_id);
-						        }
+					        $convert = true;
+					        
+					        if (!$zone) {
+						        $this->error('Invalid zone (' . $zoneBnetID . ') for: ' . $source->item->bnet_id);
 						        $convert = false;
 					        }
-				        }
-				        
-				        if ($convert) {
-					        $source->item_source_type_id = 4;
-					        $source->bnet_source_id = $npcID;
-					        $source->zone_id = $zone->id;
-					        $this->line('- Converting to boss drop');
-					    }
+					        
+					        if ($convert && ($zone->is_raid || $zone->is_dungeon)) { //verify npcid is a boss
+						        $boss = Boss::where('bnet_id', '=', $npcID)->where('zone_id', '=', $zone->id)->first();
+						        
+						        if (!$boss) {
+							        if ($zone->is_raid) {
+								        $this->error('Item is not a boss drop (raid): ' . $source->item->bnet_id);
+							        } else {
+								        $this->error('Item is not a boss drop (dungeon): ' . $source->item->bnet_id);
+							        }
+							        $convert = false;
+						        }
+					        }
+					        
+					        if ($convert) {
+						        $source->item_source_type_id = 4;
+						        $source->bnet_source_id = $npcID;
+						        $source->zone_id = $zone->id;
+						        $this->line('- Converting to boss drop');
+						    }
+						} else {
+							$this->error('Ignoring 0% dropchance');
+						}
 			        } else { //verify that item drops from a single zone
 				        $zoneID = false;
 				        foreach ($dataArr as $data) {
