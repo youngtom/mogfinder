@@ -119,7 +119,7 @@ class UpdateZoneDropSources extends Command
 						        $source->item_source_type_id = 4;
 						        $source->bnet_source_id = $npcID;
 						        $source->zone_id = $zone->id;
-						        $this->line('- Converting to boss drop');
+						        $this->line('- Converting to boss drop (' . $data['count'] . ')');
 						    }
 						} else {
 							$this->error('Ignoring 0% dropchance');
