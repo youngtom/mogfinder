@@ -122,7 +122,14 @@ class UpdateZoneDropSources extends Command
 						        $this->line('- Converting to boss drop (' . $data['count'] . ')');
 						    }
 						} else {
-							$this->error('Ignoring 0% dropchance');
+							if (stristr(self::$itemDataCache[$source->item->bnet_id], 'This item\'s source is no longer available/removed.')) {
+								$source->item_source_type_id = 17;
+						        $source->bnet_source_id = null;
+						        $source->zone_id = null;
+								$this->error('Converting to legacy item');
+							} else {
+								$this->error('Ignoring 0% dropchance');
+							}
 						}
 			        } else { //verify that item drops from a single zone
 				        $zoneID = false;
