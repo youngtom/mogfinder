@@ -44,10 +44,8 @@ class UpdateZoneDropSources extends Command
     {
         $sources = ItemSource::where('item_source_type_id', '=', 15)->where('dynamic_quest_rewards', '=', 0)->get();
         
-        $count = 0;
         foreach ($sources as $source) {
 	        if ($source->item->transmoggable) {
-		        $count++;
 		        $dataArr = $this->getWowheadSourceData($source->item->bnet_id);
 		        
 		        $this->info('Checking: ' . $source->item->bnet_id . ' - SourceID: ' . $source->id);
@@ -122,11 +120,6 @@ class UpdateZoneDropSources extends Command
 			        $source->dynamic_quest_rewards = 1;
 			        $source->save();
 		        }
-	        }
-	        
-	        if ($count >= 10) {
-		        $this->line('stopping');
-		        break;
 	        }
         }
     }
