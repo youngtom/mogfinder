@@ -8,6 +8,7 @@ use App\Race;
 use App\Faction;
 use Sofa\Eloquence\Eloquence;
 use App\ItemDisplay;
+use App\WowheadCache;
 
 class Item extends Model
 {
@@ -352,4 +353,369 @@ class Item extends Model
 		    return false;
 	    }
     }
+    
+    // wowhead source import functions
+    
+	public function importWowheadSources() {
+		$html = WowheadCache::getItemHtml($this->bnet_id);
+		
+		if (stristr($html, '<b style="color: red">This item\'s source is no longer available/removed.</b>')) {
+			\Log::info('Removing non-legacy sources for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+			
+			$legacySource = ItemSource::where('item_id', '=', $this->id)->where('item_source_type_id', '=', 17)->first();
+			
+			if (!$legacySource) {
+				$legacySource = new ItemSource;
+				$legacySource->item_id = $this->id;
+				$legacySource->item_source_type_id = 17;
+				$legacySource->import_source = 'wowheadImport';
+				$legacySource->save();
+			}
+			
+			ItemSource::where('item_id', '=', $this->id)->where('item_source_type_id', '<>', 17)->delete();
+			
+			return;
+		} elseif (stristr($html, '<b style="color: red">This item is not available to players.</b>')) {
+			$this->transmoggable = 0;
+			\Log::info('Setting unavailable item as untransmoggable: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+			return;
+		}
+		
+		if ($html) {
+			$sourceData = $this->_processWowheadHtml($html);
+			
+			if (!$sourceData || !count($sourceData)) {
+				\Log::info('Source data not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+				return false;
+			}
+			
+			foreach ($sourceData as $type => $dataArr) {
+				switch ($type) {
+					case 'npc|dropped-by':
+						$this->_processWowheadDropData($dataArr);
+						break;
+					case 'object|contained-in-object':
+						$this->_processWowheadObjectData($dataArr);
+						break;
+					case 'spell|created-by-spell':
+						$this->_processWowheadCreateBySpellData($dataArr);
+						break;
+					case 'npc|sold-by':
+						$this->_processWowheadVendorData($dataArr);
+						break;
+					case 'quest|reward-from-q':
+						$this->_processWowheadQuestData($dataArr);
+						break;
+					case 'item|contained-in-item':
+						$this->_processWowheadContainedInItemData($dataArr);
+						break;
+					case 'item|created-by-item':
+						$this->_processWowheadCreatedByItemData($dataArr);
+						break;
+				}
+			}
+		}
+	}
+	
+	private function _processWowheadDropData($dataArr) {
+		$filteredDataArr = [];
+		
+		foreach ($dataArr as $data) {
+			if ($data['count'] > 0) {
+				$filteredDataArr[] = $data;
+			}
+		}
+		
+		$dataArr = $filteredDataArr;
+		
+		if (!count($dataArr)) {
+			return false;
+		}
+		
+		if (count($dataArr) == 1) {
+	        $data = $dataArr[0];
+	        $zoneBnetID = $data['location'][0];
+	        $npcID = $data['id'];
+	        
+	        $zone = Zone::where('bnet_id', '=', $zoneBnetID)->first();
+	        
+	        if (!$zone) {
+		        \Log::info('Zone (' . $zoneBnetID . ') not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+		        return false;
+	        }
+	        
+	        $boss = Boss::where('bnet_id', '=', $npcID)->first();
+	        $boss = ($boss) ? $boss->encounter() : false;
+	        $bossIDArr = ($boss) ? [$npcID, $boss->id] : [$npcID];
+	        
+	        if (!$boss && ($zone->is_raid || $zone->is_dungeon)) {
+		        \Log::info('Boss (' . $zoneBnetID . ') not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+		        return false;
+	        }
+	        
+	        $source = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=', 4)->whereIn('bnet_source_id', $bossIDArr)->first();
+	        
+	        if (!$source) {
+		        $source = new ItemSource;
+		        $source->item_id = $item->id;
+		        $source->item_source_type_id = 4;
+		        $source->bnet_source_id = $npcID;
+		        $source->import_source = 'wowheadImport';
+	        }
+	        
+	        $source->boss_id = ($boss) ? $boss->id : null;
+	        $source->zone_id = $zone->id;
+	        $source->save();
+	        return true;
+        } else { //verify that item drops from a single zone
+	        $zoneID = false;
+	        foreach ($dataArr as $data) {
+		        if (@$data['location'] && @$data['location'][0]) {
+			        $zoneBnetID = $data['location'][0];
+			        
+			        if ($zoneID !== false && $zoneBnetID != $zoneID) {
+				        $zoneID = false;
+				        
+				        if (!$this->itemSources->count()) {
+					        $source = new ItemSource;
+					        $source->item_id = $item->id;
+					        $source->item_source_type_id = 3;
+					        $source->import_source = 'wowheadImport';
+					        $source->save();
+					        return true;
+				        }
+			        }
+			        
+			        $zoneID = $zoneBnetID;
+			    }
+	        }
+	        
+	        if ($zoneID) {
+				$zone = Zone::where('bnet_id', '=', $zoneID)->first();
+		        
+		        if (!$zone) {
+			        \Log::info('Zone (' . $zoneID . ') not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+			        return false;
+		        }
+		        
+		        $source = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=', 15)->where('bnet_source_id', '=', $zoneID)->first();
+			        
+		        if (!$source) {
+			        $source = new ItemSource;
+			        $source->item_id = $item->id;
+			        $source->item_source_type_id = 15;
+				    $source->bnet_source_id = $zoneID;
+			        $source->zone_id = $zone->id;
+			        $source->import_source = 'wowheadImport';
+			        $source->save();
+		        }
+		        return true;
+	        }
+        }
+        
+        return false;
+	}
+	
+	private function _processWowheadObjectData($dataArr) {
+		if (count($dataArr) == 1) {
+	        $data = $dataArr[0];
+	        
+	        if (count($data['location']) == 1) {
+		        $zoneBnetID = $data['location'][0];
+		        $objectID = $data['id'];
+		        
+		        $zone = Zone::where('bnet_id', '=', $zoneBnetID)->first();
+		        
+		        if ($zone && $objectID) {
+			        $source = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=', 6)->first();
+			        
+			        if (!$source) {
+				        $source = new ItemSource;
+				        $source->item_id = $item->id;
+				        $source->item_source_type_id = 6;
+				        $source->bnet_source_id = $objectID;
+				        $source->zone_id = $zone->id;
+				        $source->import_source = 'wowheadImport';
+				        $source->save();
+			        }
+			        
+					$this->line('- Converting to object drop');
+				}
+	        } else {
+		        \Log::info('Item contained in object in ' . count($data['location']) . ' zones: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+	        }
+	    } else {
+		    \Log::info('Item contained in multiple objects: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+	    }
+	}
+	
+	private function _processWowheadCreateBySpellData($dataArr) {
+		if (count($dataArr) != 1) {
+			\Log::info('Item created by multiple spells: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+			return false;
+		}
+		
+		$data = $dataArr[0];
+		$spellID = $data['id'];
+		
+		$sourceTypeID = (@$data['skill']) ? 11 : 1;
+		
+		$source = ItemSource::where('item_id', '=', $item->id)->whereIn('item_source_type_id', [11, 1])->first();
+			        
+	    if (!$source) {
+	        $source = new ItemSource;
+	        $source->item_id = $item->id;
+	        $source->import_source = 'wowheadImport';
+	    }
+	    
+	    $source->item_source_type_id = $sourceTypeID;
+	    $source->bnet_source_id = $spellID;
+	    $source->save();
+	}
+	
+	private function _processWowheadVendorData($dataArr) {
+		foreach ($dataArr as $data) {
+			$vendorID = $data['id'];
+			if (count($data['location']) == 1) {
+				$zoneBnetID = $data['location'][0];
+				
+				$zone = Zone::where('bnet_id', '=', $zoneBnetID)->first();
+	        
+		        if (!$zone) {
+			        \Log::info('Zone (' . $zoneBnetID . ') not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+		        }
+			} else {
+				$zone = false;
+			}
+			
+			$factionID = false;
+			if (@$data['react']) {
+				$alliance = $horde = false;
+				if ($data['react'][0] == 1) {
+					$alliance = true;
+				}
+				
+				if ($data['react'][1] == 1) {
+					$horde = true;
+				}
+				
+				if ($alliance && !$horde) {
+					$factionID = 1;
+				} elseif (!$alliance && $horde) {
+					$factionID = 2;
+				}
+			}
+			
+			$source = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=', 2)->where('bnet_source_id', '=', $vendorID)->first();
+			
+			if (!$source) {
+				$source = new ItemSource;
+		        $source->item_id = $item->id;
+		        $source->item_source_type_id = 2;
+		        $source->bnet_source_id = $vendorID;
+		        $source->import_source = 'wowheadImport';
+			}
+			
+			$source->zone_id = ($zone) ? $zone->id : $source->zone_id;
+			$source->faction_id = ($factionID) ?: null;
+			$source->save();
+		}
+	}
+	
+	private function _processWowheadQuestData($dataArr) {
+		foreach ($dataArr as $questArr) {
+			$questID = $questArr['id'];
+			
+			$itemSource = ItemSource::where('item_source_type_id', '=', 7)->where('bnet_source_id', '=', $questID)->where('item_id', '=', $item->id)->first();
+	    
+		    if (!$itemSource) {
+			    $itemSource = new ItemSource;
+			    $itemSource->item_id = $item->id;
+			    $itemSource->item_source_type_id = 7;
+			    $itemSource->bnet_source_id = $questID;
+			    $itemSource->import_source = 'wowheadImport';
+		    }
+		    
+		    if (@$questArr['side'] && ($questArr['side'] == 1 || $questArr['side'] == 2)) {
+			    $itemSource->faction_id = $questArr['side'];
+		    }
+		    $itemSource->save();
+		}
+	}
+	
+	private function _processWowheadContainedInItemData($dataArr) {
+		foreach ($dataArr as $data) {
+			$itemBnetID = $data['id'];
+			
+			$itemSource = ItemSource::where('item_source_type_id', '=', 12)->where('bnet_source_id', '=', $itemBnetID)->where('item_id', '=', $item->id)->first();
+	    
+		    if (!$itemSource) {
+			    $itemSource = new ItemSource;
+			    $itemSource->item_id = $item->id;
+			    $itemSource->item_source_type_id = 12;
+			    $itemSource->bnet_source_id = $itemBnetID;
+			    $itemSource->import_source = 'wowheadImport';
+			    $itemSource->save();
+		    }
+		    
+		    $itemSource->save();
+		}
+	}
+	
+	private function _processWowheadCreatedByItemData($dataArr) {
+		foreach ($dataArr as $data) {
+			$itemBnetID = $data['id'];
+			
+			$itemSource = ItemSource::where('item_source_type_id', '=', 16)->where('bnet_source_id', '=', $itemBnetID)->where('item_id', '=', $item->id)->first();
+	    
+		    if (!$itemSource) {
+			    $itemSource = new ItemSource;
+			    $itemSource->item_id = $item->id;
+			    $itemSource->item_source_type_id = 16;
+			    $itemSource->bnet_source_id = $itemBnetID;
+			    $itemSource->import_source = 'wowheadImport';
+			    $itemSource->save();
+		    }
+		    
+		    $itemSource->save();
+		}
+	}
+	
+	private function _processWowheadHtml($html) {
+		$types = ['npc|dropped-by', 'object|contained-in-object', 'quest|reward-from-q', 'npc|sold-by', 'item|contained-in-item', 'spell|created-by-spell', 'item|created-by-item'];
+		
+		$matches = [];
+		$json = false;
+		$arr = explode('new Listview', self::$itemDataCache[$itemID]);
+		
+		$out = [];
+		
+		foreach ($types as $dropTypeStr) {
+			list($dropType, $dropSubtype) = explode('|', $dropTypeStr);
+			
+			foreach ($arr as $str) {
+				$str = preg_replace('/[\n\r]/', '', $str);
+				preg_match_all('/\(\{template\: \'' . preg_quote($dropType) . '\', id\: \'' . preg_quote($dropSubtype) . '\', (.+), data\: (?P<data>\[(.+)\])\}\);/', $str, $matches);
+				
+				if (@$matches['data'][0]) {
+					$json = $matches['data'][0];
+					
+					$json = preg_replace('/(")?(count)(?(1)\1|)/', '"count"', $json);
+					$json = preg_replace('/(")?(outof)(?(1)\1|)/', '"outof"', $json);
+					$json = preg_replace('/(")?(personal_loot)(?(1)\1|)/', '"personal_loot"', $json);
+					$json = preg_replace('/(")?(undefined)(?(1)\1|)/', '"undefined"', $json);
+					
+					$json = json_decode($json, true);
+					
+					if (!$json) {
+						die('Malformed json for item: ' . $item->bnet_id);
+					}
+					
+					break;
+				}
+			}
+		}
+		
+		return $out;
+	}
 }

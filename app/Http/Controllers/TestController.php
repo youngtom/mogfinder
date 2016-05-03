@@ -24,26 +24,21 @@ use App\Boss;
 class TestController extends Controller
 {
 	public function index() {
-		$item = Item::findItemFromLink('|cff1eff00|Hitem:55774:0:0:0:0:0:-36:132907049:1:0:0:0:0|h[Bluefen Cord of the Sorcerer]|h|r');
-		$character = Character::find(182);
-		$bound = 0;
+		$items = Item::where('item_level', '=', 610)->get();
 		
-		if ($character->canUseItem($item)) {
-			echo 'Yes';
+		$ids = [];
+		
+		foreach ($items as $item) {
+			foreach ($item->itemSources as $source) {
+				if ($source->item_source_type_id == 3) {
+					$ids[] = $item->id;
+					echo $item->name . '<br>';
+					break;
+				}
+			}
 		}
 		
-		$alts = $character->user->getOtherCharacters($character, ($bound === 0));
-							        
-        $found = false;
-        $alts->each(function ($alt) use ($item, &$found) { 
-	        if ($alt->canUseItem($item)) {
-				$found = $alt;
-				echo $alt->name;
-				return false;
-			}
-        });
-		
-		dd($found);
+		echo implode(',', $ids);
 	}
 	
     public function checkDeletedSources($id) {

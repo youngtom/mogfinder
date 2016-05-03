@@ -43,7 +43,8 @@ class Kernel extends ConsoleKernel
         Commands\ImportBnetZoneData::class,
         Commands\ItemSourceDataImportHelper::class,
         Commands\ImportQuestZoneData::class,
-        Commands\wowhead\UpdateZoneDropSources::class
+        Commands\wowhead\UpdateZoneDropSources::class,
+        Commands\wowhead\ImportMissingItemSources::class
     ];
 
     /**
