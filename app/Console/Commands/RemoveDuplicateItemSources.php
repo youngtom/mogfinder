@@ -51,9 +51,12 @@ class RemoveDuplicateItemSources extends Command
 			
 			$this->info('itemID: ' . $res->item_id . ' - bnetSourceID: ' . $res->bnet_source_id . ' - type: ' . $res->item_source_type_id);
 			$count = 0;
-			$keepsource = null;
+
 			foreach ($sources as $source) {
-				$this->line($source->toJson());
+				if ($count > 0) {
+					$source->delete();
+				}
+				$count++;
 			}
 	    }
     }
