@@ -554,9 +554,7 @@ class Item extends Model
 				        $source->zone_id = $zone->id;
 				        $source->import_source = 'wowheadImport';
 				        $source->save();
-			        }
-			        
-					$this->line('- Converting to object drop');
+			        }					
 				}
 	        } else {
 		        \Log::info('Item contained in object in ' . count($data['location']) . ' zones: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
