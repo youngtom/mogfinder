@@ -659,12 +659,14 @@ class Item extends Model
 	}
 	
 	private function _processWowheadContainedInItemData($dataArr) {
+		$ignoreItems = [127854, 127853, 127855, 122486, 122485, 122484, 118531, 118530, 118529]; // WoD raid loot boxes
+		
 		foreach ($dataArr as $data) {
 			$itemBnetID = $data['id'];
 			
 			$itemSource = ItemSource::where('item_source_type_id', '=', 12)->where('bnet_source_id', '=', $itemBnetID)->where('item_id', '=', $this->id)->first();
 	    
-		    if (!$itemSource) {
+		    if (!$itemSource && !in_array($itemBnetID, $ignoreItems)) {
 			    $itemSource = new ItemSource;
 			    $itemSource->item_id = $this->id;
 			    $itemSource->item_source_type_id = 12;
@@ -672,8 +674,6 @@ class Item extends Model
 			    $itemSource->import_source = 'wowheadImport';
 			    $itemSource->save();
 		    }
-		    
-		    $itemSource->save();
 		}
 	}
 	
@@ -691,8 +691,6 @@ class Item extends Model
 			    $itemSource->import_source = 'wowheadImport';
 			    $itemSource->save();
 		    }
-		    
-		    $itemSource->save();
 		}
 	}
 	
