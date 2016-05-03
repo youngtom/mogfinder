@@ -24,21 +24,33 @@ use App\Boss;
 class TestController extends Controller
 {
 	public function index() {
-		$items = Item::where('item_level', '=', 610)->get();
+		$bosses = [
+			'1048|71543' => '110784,110785,112382,112383,112416,112417,112418,112419,112420,112421,112422,112423,112424,112425,112425,112425,112428,112429,112445,112447,112448',
+			'1057|71734' => '112702,112949,112950,112951,112952,112953'
+		];
 		
-		$ids = [];
-		
-		foreach ($items as $item) {
-			foreach ($item->itemSources as $source) {
-				if ($source->item_source_type_id == 3) {
-					$ids[] = $item->id;
-					echo $item->name . '<br>';
-					break;
-				}
-			}
+		foreach ($bosses as $bossStr => $itemStr) {
+			list($bossID, $bossBnetID) = explode('|', $bossStr);
+			$itemBnetIDs = explode(',', $itemStr);
+			
+			$boss = Boss::findOrFail($bossID);
+			
+			$items = Item::whereIn('bnet_id', $itemBnetIDs)->whereNotIn('id', function ($query) {
+		    	$query->select('item_id')->from('item_sources');
+		    })->get();
+		    
+		    foreach ($items as $item) {
+			    $source = new ItemSource;
+			    $source->item_id = $item->id;
+			    $source->item_source_type_id = 4;
+			    $source->bnet_source_id = $boss->bnet_id;
+			    $source->boss_id = $boss->id;
+			    $source->zone_id = $boss->zone_id;
+			    $source->import_source = 'custom';
+			    $source->save();
+		    }
 		}
-		
-		echo implode(',', $ids);
+		dd($bosses);
 	}
 	
     public function checkDeletedSources($id) {
