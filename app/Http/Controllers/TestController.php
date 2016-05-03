@@ -71,12 +71,12 @@ class TestController extends Controller
     public function listSourcelessItems() {
 	    $items = Item::whereNotIn('id', function ($query) {
 		    $query->select('item_id')->from('item_sources');
-	    })->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->paginate(500);
+	    })->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->get();
 	    $out = [];
 	    
 		foreach ($items as $item) {
 			$out[] = $item->bnet_id . ': <a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
-			
+			/*
 			$otherItemIDs = Item::where('bnet_id', '=', $item->bnet_id)->orWhere('name', '=', $item->name)->get()->lists('id')->toArray();
 			
 			$sources = ItemSource::whereIn('item_id', $otherItemIDs)->orderBy('item_id', 'ASC')->get();
@@ -90,9 +90,10 @@ class TestController extends Controller
 			}
 			
 			$out[] = '<br><br>';
+			*/
 		}
 		
-		return view('test')->with('out', $out)->with('newline', "\n")->with('pagination', $items);
+		return view('test')->with('out', $out)->with('newline', "<br>")->with('pagination', false);
     }
     
     public function listSources($id) {
