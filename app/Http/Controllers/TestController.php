@@ -24,6 +24,24 @@ use App\Boss;
 class TestController extends Controller
 {
 	public function index() {
+		$itemBnetIDs = [920,1218,1300,1458,1459,1460,1469,1489,1523,1602,1664,1680,1986,1992,2015,2018,2035,2058,2226,2235,3223,3227,3336,3571,3902,4303,4445,4446,5245,5752,5756,5819,6315,7728,7729,7730,7736,7752,7755,7757,7758,7759,7760,8225,9375,9422,9423,9424,9425,9427,9429,9431,9465,9491,9510,10581,17054,17055,17061,18736,18742,18743,18744,18745];
+		
+		$items = Item::whereIn('bnet_id', $itemBnetIDs)->whereNotIn('id', function ($query) {
+	    	$query->select('item_id')->from('item_sources');
+	    })->get();
+	    
+	    foreach ($items as $item) {
+		    if ($item->item_bind != 2) {
+			    die('invalid item bind for ' . $item->bnet_id);
+		    }
+		    
+		    $source = new ItemSource;
+		    $source->item_id = $item->id;
+		    $source->item_source_type_id = 17;
+		    $source->import_source = 'custom';
+		    $source->save();
+	    }
+		/*
 		$bosses = [
 			'1048|71543' => '110784,110785,112382,112383,112416,112417,112418,112419,112420,112421,112422,112423,112424,112425,112425,112425,112428,112429,112445,112447,112448',
 			'1057|71734' => '112702,112949,112950,112951,112952,112953'
@@ -51,6 +69,7 @@ class TestController extends Controller
 		    }
 		}
 		dd($bosses);
+		*/
 	}
 	
     public function checkDeletedSources($id) {
