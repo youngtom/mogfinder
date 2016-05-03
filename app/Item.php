@@ -466,7 +466,7 @@ class Item extends Model
 	        $bossIDArr = ($boss) ? [$npcID, $boss->id] : [$npcID];
 	        
 	        if (!$boss && ($zone->is_raid || $zone->is_dungeon)) {
-		        \Log::info('Boss (' . $zoneBnetID . ') not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+		        \Log::info('Boss (' . $npcID . ') not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
 		        return false;
 	        }
 	        
