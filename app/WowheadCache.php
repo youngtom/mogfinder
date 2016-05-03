@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class WowheadCache extends Model
 {
+	protected $table = 'wowhead_cache';
     private static $client = null;
     
     public static function getItemHtml($itemID) {
