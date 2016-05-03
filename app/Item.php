@@ -686,7 +686,7 @@ class Item extends Model
 		
 		$matches = [];
 		$json = false;
-		$arr = explode('new Listview', self::$itemDataCache[$itemID]);
+		$arr = explode('new Listview', $html);
 		
 		$out = [];
 		
