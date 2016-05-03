@@ -384,7 +384,6 @@ class Item extends Model
 		
 		if ($html) {
 			$sourceData = $this->_processWowheadHtml($html);
-			dd($sourceData);
 			
 			if (!$sourceData || !count($sourceData)) {
 				\Log::info('Source data not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
