@@ -24,19 +24,29 @@ use App\Boss;
 class TestController extends Controller
 {
 	public function index() {
-		$itemBnetIDs = [23709,38309,38310,38311,38312,38313,38314,39769,44924,45037];
-		
-		$items = Item::whereIn('bnet_id', $itemBnetIDs)->whereNotIn('id', function ($query) {
-	    	$query->select('item_id')->from('item_sources');
-	    })->get();
+		$sources = ItemSource::where('item_source_type_id', '=', 12)->orderBy('bnet_source_id', 'ASC')->get()->groupBy('bnet_source_id');
+	    $out = [];
 	    
-	    foreach ($items as $item) {
-		    $source = new ItemSource;
-		    $source->item_id = $item->id;
-		    $source->item_source_type_id = 19;
-		    $source->import_source = 'custom';
-		    $source->save();
+	    foreach ($sources as $bnetSourceID => $sourceArr) {
+		    $out[] = 'SourceID: ' . $bnetSourceID;
+		    foreach ($sourceArr as $source) {
+			    if ($source->item->transmoggable) {
+				    $otherSources = ItemSource::where('item_id', '=', $source->item_id)->where('item_source_type_id', '<>', 12)->get();
+				    
+				    $out[] = '<a href="' . $source->getWowheadLink($source->item) . '">' . $source->getSourceText() . '</a>: <a href="http://www.wowhead.com/item=' . $source->item->bnet_id . '" class="q' . $source->item->quality . '" rel="' . $source->item->getWowheadMarkup() . '">[' . $source->item->name . ']</a> (' . $otherSources->count() . ')<br>';
+				    
+				    if ($otherSources->count()) {
+					    $out[] = '<ul>';
+					    foreach ($otherSources as $otherSource) {
+						    $out[] = '<li><a href="' . $otherSource->getWowheadLink($otherSource->item) . '">' . $otherSource->getSourceText() . '</a></li>';
+					    }
+					    $out[] = '</ul>';
+				    }
+				}
+			}
 	    }
+	    
+	    return view('test')->with('out', $out)->with('newline', "\n");
 		/*
 		$bosses = [
 			'1048|71543' => '110784,110785,112382,112383,112416,112417,112418,112419,112420,112421,112422,112423,112424,112425,112425,112425,112428,112429,112445,112447,112448',
