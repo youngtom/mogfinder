@@ -717,17 +717,19 @@ class Item extends Model
 					$json = $matches['data'][0];
 					
 					$json = preg_replace('/(")?(count)(?(1)\1|)/', '"count"', $json);
+					$json = preg_replace('/(")?(stock)(?(1)\1|)/', '"stock"', $json);
+					$json = preg_replace('/(")?(cost)(?(1)\1|)/', '"cost"', $json);
 					$json = preg_replace('/(")?(outof)(?(1)\1|)/', '"outof"', $json);
 					$json = preg_replace('/(")?(personal_loot)(?(1)\1|)/', '"personal_loot"', $json);
 					$json = preg_replace('/(")?(undefined)(?(1)\1|)/', '"undefined"', $json);
 					
-					$json = json_decode($json, true);
+					$jsonArr = json_decode($json, true);
 					
-					if (!$json) {
-						die('Malformed json for item: ' . $this->bnet_id);
+					if (!$jsonArr) {
+						die('Malformed json for item: ' . $this->bnet_id . ': ' . $json);
 					}
 					
-					$out[$dropTypeStr] = $json;
+					$out[$dropTypeStr] = $jsonArr;
 					
 					break;
 				}
