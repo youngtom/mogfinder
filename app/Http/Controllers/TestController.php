@@ -28,7 +28,7 @@ class TestController extends Controller
 	    $out = [];
 	    
 	    foreach ($sources as $bnetSourceID => $sourceArr) {
-		    $out[] = 'SourceID: ' . $bnetSourceID;
+		    $out[] = '<h4>SourceID: ' . $bnetSourceID . '</h4>';
 		    foreach ($sourceArr as $source) {
 			    if ($source->item->transmoggable) {
 				    $otherSources = ItemSource::where('item_id', '=', $source->item_id)->where('item_source_type_id', '<>', 12)->get();
