@@ -377,6 +377,7 @@ class Item extends Model
 			return;
 		} elseif (stristr($html, '<b style="color: red">This item is not available to players.</b>')) {
 			$this->transmoggable = 0;
+			$this->save();
 			\Log::info('Setting unavailable item as untransmoggable: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
 			return;
 		}
