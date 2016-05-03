@@ -24,20 +24,16 @@ use App\Boss;
 class TestController extends Controller
 {
 	public function index() {
-		$itemBnetIDs = [920,1218,1300,1458,1459,1460,1469,1489,1523,1602,1664,1680,1986,1992,2015,2018,2035,2058,2226,2235,3223,3227,3336,3571,3902,4303,4445,4446,5245,5752,5756,5819,6315,7728,7729,7730,7736,7752,7755,7757,7758,7759,7760,8225,9375,9422,9423,9424,9425,9427,9429,9431,9465,9491,9510,10581,17054,17055,17061,18736,18742,18743,18744,18745];
+		$itemBnetIDs = [23709,38309,38310,38311,38312,38313,38314,39769,44924,45037];
 		
 		$items = Item::whereIn('bnet_id', $itemBnetIDs)->whereNotIn('id', function ($query) {
 	    	$query->select('item_id')->from('item_sources');
 	    })->get();
 	    
 	    foreach ($items as $item) {
-		    if ($item->item_bind != 2) {
-			    die('invalid item bind for ' . $item->bnet_id);
-		    }
-		    
 		    $source = new ItemSource;
 		    $source->item_id = $item->id;
-		    $source->item_source_type_id = 17;
+		    $source->item_source_type_id = 19;
 		    $source->import_source = 'custom';
 		    $source->save();
 	    }
@@ -106,7 +102,7 @@ class TestController extends Controller
 	    $out = [];
 	    
 		foreach ($items as $item) {
-			$out[] = $item->bnet_id . ': <a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
+			$out[] = $item->bnet_id . ': <a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a> (' . $item->id . ')';
 			/*
 			$otherItemIDs = Item::where('bnet_id', '=', $item->bnet_id)->orWhere('name', '=', $item->name)->get()->lists('id')->toArray();
 			
