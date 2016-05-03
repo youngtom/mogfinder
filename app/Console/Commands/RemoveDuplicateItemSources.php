@@ -47,7 +47,7 @@ class RemoveDuplicateItemSources extends Command
 	    $results = DB::table('item_sources')->groupBy('bnet_source_id', 'item_id', 'item_source_type_id')->havingRaw('count(*) > 1')->get();
 	    
 	    foreach ($results as $res) {
-			$sources = <ItemSource></ItemSource>::where('bnet_source_id', '=', $res->bnet_source_id)->where('item_id', '=', $res->item_id)->where('item_source_type_id', '=', $res->item_source_type_id)->get();
+			$sources = ItemSource::where('bnet_source_id', '=', $res->bnet_source_id)->where('item_id', '=', $res->item_id)->where('item_source_type_id', '=', $res->item_source_type_id)->get();
 			
 			$this->info('itemID: ' . $res->item_id . ' - bnetSourceID: ' . $res->bnet_source_id . ' - type: ' . $res->item_source_type_id);
 			$count = 0;
