@@ -423,23 +423,23 @@ class Item extends Model
 		
 		$_bossIDs = [];
 		foreach ($dataArr as $data) {
-			if ($data['count'] > 0) {
-				$npcID = $data['id'];
+			$npcID = $data['id'];
+			
+			$boss = Boss::where('bnet_id', '=', $npcID)->first();
+			
+			$include = true;
+			if ($boss) {
+				$_bossID = $boss->encounter()->id;
 				
-				$boss = Boss::where('bnet_id', '=', $npcID)->first();
-				
-				$include = true;
-				if ($boss) {
-					$_bossID = $boss->encounter()->id;
-					
-					if (in_array($_bossID, $_bossIDs)) {
-						$include = false;
-					}
+				if (in_array($_bossID, $_bossIDs)) {
+					$include = false;
+				} else {
+					$_bossIDs[] = $_bossID;
 				}
-				
-				if ($include) {
-					$filteredDataArr[] = $data;
-				}
+			}
+			
+			if ($include && ($boss || $data['count'] > 0)) {
+				$filteredDataArr[] = $data;
 			}
 		}
 		
