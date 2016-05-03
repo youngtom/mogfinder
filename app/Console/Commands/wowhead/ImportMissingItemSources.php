@@ -3,6 +3,7 @@
 namespace App\Console\Commands\wowhead;
 
 use Illuminate\Console\Command;
+use App\Item;
 
 class ImportMissingItemSources extends Command
 {
