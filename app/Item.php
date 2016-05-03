@@ -421,9 +421,25 @@ class Item extends Model
 	private function _processWowheadDropData($dataArr) {
 		$filteredDataArr = [];
 		
+		$_bossIDs = [];
 		foreach ($dataArr as $data) {
 			if ($data['count'] > 0) {
-				$filteredDataArr[] = $data;
+				$npcID = $data['id'];
+				
+				$boss = Boss::where('bnet_id', '=', $npcID)->first();
+				
+				$include = true;
+				if ($boss) {
+					$_bossID = $boss->encounter()->id;
+					
+					if (in_array($_bossID, $_bossIDs)) {
+						$include = false;
+					}
+				}
+				
+				if ($include) {
+					$filteredDataArr[] = $data;
+				}
 			}
 		}
 		
@@ -454,11 +470,11 @@ class Item extends Model
 		        return false;
 	        }
 	        
-	        $source = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=', 4)->whereIn('bnet_source_id', $bossIDArr)->first();
+	        $source = ItemSource::where('item_id', '=', $this->id)->where('item_source_type_id', '=', 4)->whereIn('bnet_source_id', $bossIDArr)->first();
 	        
 	        if (!$source) {
 		        $source = new ItemSource;
-		        $source->item_id = $item->id;
+		        $source->item_id = $this->id;
 		        $source->item_source_type_id = 4;
 		        $source->bnet_source_id = $npcID;
 		        $source->import_source = 'wowheadImport';
@@ -479,7 +495,7 @@ class Item extends Model
 				        
 				        if (!$this->itemSources->count()) {
 					        $source = new ItemSource;
-					        $source->item_id = $item->id;
+					        $source->item_id = $this->id;
 					        $source->item_source_type_id = 3;
 					        $source->import_source = 'wowheadImport';
 					        $source->save();
@@ -499,11 +515,11 @@ class Item extends Model
 			        return false;
 		        }
 		        
-		        $source = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=', 15)->where('bnet_source_id', '=', $zoneID)->first();
+		        $source = ItemSource::where('item_id', '=', $this->id)->where('item_source_type_id', '=', 15)->where('bnet_source_id', '=', $zoneID)->first();
 			        
 		        if (!$source) {
 			        $source = new ItemSource;
-			        $source->item_id = $item->id;
+			        $source->item_id = $this->id;
 			        $source->item_source_type_id = 15;
 				    $source->bnet_source_id = $zoneID;
 			        $source->zone_id = $zone->id;
@@ -528,11 +544,11 @@ class Item extends Model
 		        $zone = Zone::where('bnet_id', '=', $zoneBnetID)->first();
 		        
 		        if ($zone && $objectID) {
-			        $source = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=', 6)->first();
+			        $source = ItemSource::where('item_id', '=', $this->id)->where('item_source_type_id', '=', 6)->first();
 			        
 			        if (!$source) {
 				        $source = new ItemSource;
-				        $source->item_id = $item->id;
+				        $source->item_id = $this->id;
 				        $source->item_source_type_id = 6;
 				        $source->bnet_source_id = $objectID;
 				        $source->zone_id = $zone->id;
@@ -561,11 +577,11 @@ class Item extends Model
 		
 		$sourceTypeID = (@$data['skill']) ? 11 : 1;
 		
-		$source = ItemSource::where('item_id', '=', $item->id)->whereIn('item_source_type_id', [11, 1])->first();
+		$source = ItemSource::where('item_id', '=', $this->id)->whereIn('item_source_type_id', [11, 1])->first();
 			        
 	    if (!$source) {
 	        $source = new ItemSource;
-	        $source->item_id = $item->id;
+	        $source->item_id = $this->id;
 	        $source->import_source = 'wowheadImport';
 	    }
 	    
@@ -607,11 +623,11 @@ class Item extends Model
 				}
 			}
 			
-			$source = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=', 2)->where('bnet_source_id', '=', $vendorID)->first();
+			$source = ItemSource::where('item_id', '=', $this->id)->where('item_source_type_id', '=', 2)->where('bnet_source_id', '=', $vendorID)->first();
 			
 			if (!$source) {
 				$source = new ItemSource;
-		        $source->item_id = $item->id;
+		        $source->item_id = $this->id;
 		        $source->item_source_type_id = 2;
 		        $source->bnet_source_id = $vendorID;
 		        $source->import_source = 'wowheadImport';
@@ -627,11 +643,11 @@ class Item extends Model
 		foreach ($dataArr as $questArr) {
 			$questID = $questArr['id'];
 			
-			$itemSource = ItemSource::where('item_source_type_id', '=', 7)->where('bnet_source_id', '=', $questID)->where('item_id', '=', $item->id)->first();
+			$itemSource = ItemSource::where('item_source_type_id', '=', 7)->where('bnet_source_id', '=', $questID)->where('item_id', '=', $this->id)->first();
 	    
 		    if (!$itemSource) {
 			    $itemSource = new ItemSource;
-			    $itemSource->item_id = $item->id;
+			    $itemSource->item_id = $this->id;
 			    $itemSource->item_source_type_id = 7;
 			    $itemSource->bnet_source_id = $questID;
 			    $itemSource->import_source = 'wowheadImport';
@@ -648,11 +664,11 @@ class Item extends Model
 		foreach ($dataArr as $data) {
 			$itemBnetID = $data['id'];
 			
-			$itemSource = ItemSource::where('item_source_type_id', '=', 12)->where('bnet_source_id', '=', $itemBnetID)->where('item_id', '=', $item->id)->first();
+			$itemSource = ItemSource::where('item_source_type_id', '=', 12)->where('bnet_source_id', '=', $itemBnetID)->where('item_id', '=', $this->id)->first();
 	    
 		    if (!$itemSource) {
 			    $itemSource = new ItemSource;
-			    $itemSource->item_id = $item->id;
+			    $itemSource->item_id = $this->id;
 			    $itemSource->item_source_type_id = 12;
 			    $itemSource->bnet_source_id = $itemBnetID;
 			    $itemSource->import_source = 'wowheadImport';
@@ -667,11 +683,11 @@ class Item extends Model
 		foreach ($dataArr as $data) {
 			$itemBnetID = $data['id'];
 			
-			$itemSource = ItemSource::where('item_source_type_id', '=', 16)->where('bnet_source_id', '=', $itemBnetID)->where('item_id', '=', $item->id)->first();
+			$itemSource = ItemSource::where('item_source_type_id', '=', 16)->where('bnet_source_id', '=', $itemBnetID)->where('item_id', '=', $this->id)->first();
 	    
 		    if (!$itemSource) {
 			    $itemSource = new ItemSource;
-			    $itemSource->item_id = $item->id;
+			    $itemSource->item_id = $this->id;
 			    $itemSource->item_source_type_id = 16;
 			    $itemSource->bnet_source_id = $itemBnetID;
 			    $itemSource->import_source = 'wowheadImport';
@@ -696,8 +712,8 @@ class Item extends Model
 			
 			foreach ($arr as $str) {
 				$str = preg_replace('/[\n\r]/', '', $str);
-				preg_match_all('/\(\{template\: \'' . preg_quote($dropType) . '\', id\: \'' . preg_quote($dropSubtype) . '\', (.+), data\: (?P<data>\[(.+)\])\}\);/', $str, $matches);
 				
+				preg_match_all('/\(\{template\: \'' . preg_quote($dropType) . '\', id\: \'' . preg_quote($dropSubtype) . '\', (.+), data\: (?P<data>\[(.+)\])\}\);/', $str, $matches);
 				if (@$matches['data'][0]) {
 					$json = $matches['data'][0];
 					
@@ -709,8 +725,10 @@ class Item extends Model
 					$json = json_decode($json, true);
 					
 					if (!$json) {
-						die('Malformed json for item: ' . $item->bnet_id);
+						die('Malformed json for item: ' . $this->bnet_id);
 					}
+					
+					$out[$dropTypeStr] = $json;
 					
 					break;
 				}
