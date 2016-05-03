@@ -384,6 +384,7 @@ class Item extends Model
 		
 		if ($html) {
 			$sourceData = $this->_processWowheadHtml($html);
+			dd($sourceData);
 			
 			if (!$sourceData || !count($sourceData)) {
 				\Log::info('Source data not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
@@ -710,6 +711,7 @@ class Item extends Model
 			
 			foreach ($arr as $str) {
 				$str = preg_replace('/[\n\r]/', '', $str);
+				$str = preg_replace('!\s+!', ' ', $str);
 				
 				preg_match_all('/\(\{template\: \'' . preg_quote($dropType) . '\', id\: \'' . preg_quote($dropSubtype) . '\', (.+), data\: (?P<data>\[(.+)\])\}\);/', $str, $matches);
 				if (@$matches['data'][0]) {
