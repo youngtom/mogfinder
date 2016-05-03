@@ -24,14 +24,14 @@ use App\Boss;
 class TestController extends Controller
 {
 	public function index() {
-		$sources = ItemSource::where('item_source_type_id', '=', 12)->orderBy('bnet_source_id', 'ASC')->get()->groupBy('bnet_source_id');
+		$sources = ItemSource::where('item_source_type_id', '=', 6)->orderBy('bnet_source_id', 'ASC')->get()->groupBy('bnet_source_id');
 	    $out = [];
 	    
 	    foreach ($sources as $bnetSourceID => $sourceArr) {
 		    $out[] = '<h4>SourceID: ' . $bnetSourceID . '</h4>';
 		    foreach ($sourceArr as $source) {
 			    if ($source->item->transmoggable) {
-				    $otherSources = ItemSource::where('item_id', '=', $source->item_id)->where('item_source_type_id', '<>', 12)->get();
+				    $otherSources = ItemSource::where('item_id', '=', $source->item_id)->where('item_source_type_id', '<>', 6)->get();
 				    
 				    $out[] = '<a href="' . $source->getWowheadLink($source->item) . '">' . $source->getSourceText() . '</a>: <a href="http://www.wowhead.com/item=' . $source->item->bnet_id . '" class="q' . $source->item->quality . '" rel="' . $source->item->getWowheadMarkup() . '">[' . $source->item->name . ']</a> (' . $otherSources->count() . ')<br>';
 				    
