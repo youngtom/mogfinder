@@ -24,6 +24,7 @@ class Kernel extends ConsoleKernel
         Commands\ImportWowdbSources::class,
         Commands\ListDuplicateItems::class,
         Commands\RemoveDuplicateItemDisplays::class,
+        Commands\RemoveDuplicateItemSources::class,
         Commands\UpdateTransmoggableItemDisplays::class,
         Commands\UpdateItemDisplayRenders::class,
         Commands\CreateUser::class,
