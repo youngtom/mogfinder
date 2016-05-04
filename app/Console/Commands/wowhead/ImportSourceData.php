@@ -4,6 +4,7 @@ namespace App\Console\Commands\wowhead;
 
 use Illuminate\Console\Command;
 use App\Item;
+use App\ItemSource;
 
 class ImportSourceData extends Command
 {
