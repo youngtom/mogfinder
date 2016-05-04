@@ -226,7 +226,7 @@ class TestController extends Controller
 	    })->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->get();
 		
 		foreach ($items as $item) {
-			if ($items->itemSources->count() > 1) {
+			if ($item->itemSources->count() > 1) {
 				$out[] = '<a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
 				foreach ($items->itemSources as $source) {
 					$out[] = '-- <a href="' . $source->getWowheadLink($item) . '">' . $source->getSourceText() . '</a>';
