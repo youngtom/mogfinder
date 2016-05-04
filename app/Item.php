@@ -739,7 +739,7 @@ class Item extends Model
 					$json = preg_replace('/,(")?(cost)(?(1)\1|)/', ',"cost"', $json);
 					$json = preg_replace('/,(")?(outof)(?(1)\1|)/', ',"outof"', $json);
 					$json = preg_replace('/,(")?(personal_loot)(?(1)\1|)/', ',"personal_loot"', $json);
-					$json = preg_replace('/,(")?(undefined)(?(1)\1|)/', ',"undefined"', $json);
+					$json = preg_replace('/(")?(undefined)(?(1)\1|)/', '"undefined"', $json);
 					
 					$jsonArr = json_decode($json, true);
 					
