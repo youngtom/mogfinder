@@ -38,14 +38,18 @@ class ImportSourceData extends Command
      */
     public function handle()
     {
-        $items = Item::whereNotIn('id', function ($query) {
-		    $query->select('item_id')->from('item_sources')->where('item_source_type', '=', 3);
-	    })->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->get();
+        $items = Item::where('transmoggable', '=', 1)->get();
         
         $bar = $this->output->createProgressBar(count($items));
 	    
 	    foreach ($items as $item) {
-		    $item->importWowheadSources();
+		    $worldDropSources = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=', 3)->get();
+		    
+		    if ($worldDropSources->count()) {
+			    $item->importWowheadSources(['npc|dropped-by']);
+		    } else {
+			    $item->importWowheadSources();
+		    }
 		    $bar->advance();
 	    }
 	    
