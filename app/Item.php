@@ -482,7 +482,7 @@ class Item extends Model
 	        if (!$boss && ($zone->is_raid || $zone->is_dungeon)) {
 		        \Log::info('Boss (' . $npcID . ') not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
 		        
-		        $item->itemSources->where('item_source_type_id', 15)->delete();
+		        $this->itemSources->where('item_source_type_id', 15)->delete();
 	        }
 	        
 	        $source = ItemSource::where('item_id', '=', $this->id)->where('item_source_type_id', '=', 4)->whereIn('bnet_source_id', $bossIDArr)->first();
@@ -607,53 +607,53 @@ class Item extends Model
 		foreach ($dataArr as $data) {
 			$vendorID = $data['id'];
 			
-			if (@$data['location']) {
-				if (count($data['location']) == 1) {
-					$zoneBnetID = $data['location'][0];
-					
-					$zone = Zone::where('bnet_id', '=', $zoneBnetID)->first();
-		        
-			        if (!$zone) {
-				        \Log::info('Zone (' . $zoneBnetID . ') not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
-			        }
-				} else {
-					$zone = false;
-				}
-				
-				$factionID = false;
-				if (@$data['react']) {
-					$alliance = $horde = false;
-					if ($data['react'][0] == 1) {
-						$alliance = true;
-					}
-					
-					if ($data['react'][1] == 1) {
-						$horde = true;
-					}
-					
-					if ($alliance && !$horde) {
-						$factionID = 1;
-					} elseif (!$alliance && $horde) {
-						$factionID = 2;
-					}
-				}
-				
-				$source = ItemSource::where('item_id', '=', $this->id)->where('item_source_type_id', '=', 2)->where('bnet_source_id', '=', $vendorID)->first();
-				
-				if (!$source) {
-					$source = new ItemSource;
-			        $source->item_id = $this->id;
-			        $source->item_source_type_id = 2;
-			        $source->bnet_source_id = $vendorID;
-			        $source->import_source = 'wowheadImport';
-				}
-				
-				$source->zone_id = ($zone) ? $zone->id : $source->zone_id;
-				$source->faction_id = ($factionID) ?: null;
-				$source->save();
-			} else {
+			if (!@$data['location']) {
 				\Log::info('NPC (' . $vendorID . ') location not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
 			}
+			
+			if (@$data['location'] && count($data['location']) == 1) {
+				$zoneBnetID = $data['location'][0];
+				
+				$zone = Zone::where('bnet_id', '=', $zoneBnetID)->first();
+	        
+		        if (!$zone) {
+			        \Log::info('Zone (' . $zoneBnetID . ') not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+		        }
+			} else {
+				$zone = false;
+			}
+			
+			$factionID = false;
+			if (@$data['react']) {
+				$alliance = $horde = false;
+				if ($data['react'][0] == 1) {
+					$alliance = true;
+				}
+				
+				if ($data['react'][1] == 1) {
+					$horde = true;
+				}
+				
+				if ($alliance && !$horde) {
+					$factionID = 1;
+				} elseif (!$alliance && $horde) {
+					$factionID = 2;
+				}
+			}
+			
+			$source = ItemSource::where('item_id', '=', $this->id)->where('item_source_type_id', '=', 2)->where('bnet_source_id', '=', $vendorID)->first();
+			
+			if (!$source) {
+				$source = new ItemSource;
+		        $source->item_id = $this->id;
+		        $source->item_source_type_id = 2;
+		        $source->bnet_source_id = $vendorID;
+		        $source->import_source = 'wowheadImport';
+			}
+			
+			$source->zone_id = ($zone) ? $zone->id : $source->zone_id;
+			$source->faction_id = ($factionID) ?: null;
+			$source->save();
 		}
 	}
 	
