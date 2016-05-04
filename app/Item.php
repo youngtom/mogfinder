@@ -482,7 +482,7 @@ class Item extends Model
 	        if (!$boss && ($zone->is_raid || $zone->is_dungeon)) {
 		        \Log::info('Boss (' . $npcID . ') not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
 		        
-		        $this->itemSources->where('item_source_type_id', 15)->delete();
+		        ItemSource::where('item_id', '=', $this->id)->where('item_source_type_id', '=', 15)->delete();
 	        }
 	        
 	        $source = ItemSource::where('item_id', '=', $this->id)->where('item_source_type_id', '=', 4)->whereIn('bnet_source_id', $bossIDArr)->first();
