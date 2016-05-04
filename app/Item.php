@@ -521,7 +521,6 @@ class Item extends Model
 			        $zoneID = $zoneBnetID;
 			    }
 	        }
-	        dd($zoneID);
 	        
 	        if ($zoneID) {
 				$zone = Zone::where('bnet_id', '=', $zoneID)->first();
