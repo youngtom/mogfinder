@@ -734,12 +734,12 @@ class Item extends Model
 				if (@$matches['data'][0]) {
 					$json = $matches['data'][0];
 					
-					$json = preg_replace('/(")?(count)(?(1)\1|)/', '"count"', $json);
-					$json = preg_replace('/(")?(stock)(?(1)\1|)/', '"stock"', $json);
-					$json = preg_replace('/(")?(cost)(?(1)\1|)/', '"cost"', $json);
-					$json = preg_replace('/(")?(outof)(?(1)\1|)/', '"outof"', $json);
-					$json = preg_replace('/(")?(personal_loot)(?(1)\1|)/', '"personal_loot"', $json);
-					$json = preg_replace('/(")?(undefined)(?(1)\1|)/', '"undefined"', $json);
+					$json = preg_replace('/,(")?(count)(?(1)\1|)/', ',"count"', $json);
+					$json = preg_replace('/,(")?(stock)(?(1)\1|)/', ',"stock"', $json);
+					$json = preg_replace('/,(")?(cost)(?(1)\1|)/', ',"cost"', $json);
+					$json = preg_replace('/,(")?(outof)(?(1)\1|)/', ',"outof"', $json);
+					$json = preg_replace('/,(")?(personal_loot)(?(1)\1|)/', ',"personal_loot"', $json);
+					$json = preg_replace('/,(")?(undefined)(?(1)\1|)/', ',"undefined"', $json);
 					
 					$jsonArr = json_decode($json, true);
 					
