@@ -92,8 +92,8 @@ class TestController extends Controller
 						$_out['no-vendor-loc'][$bossID][] = $bnetID;
 					}
 				} elseif ($typeStr == 'Item created by multiple spells') {
-					if (!in_array($bnetID, $_out['mutliple-spells'])) {
-						$_out['no-location'][] = $bnetID;
+					if (!in_array($bnetID, $_out['multiple-spells'])) {
+						$_out['multiple-spells'][] = $bnetID;
 					}
 				}
 			}
@@ -232,6 +232,10 @@ class TestController extends Controller
 				$out[] = '<a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
 				foreach ($item->itemSources as $source) {
 					$out[] = '-- <a href="' . $source->getWowheadLink($item) . '">' . $source->getSourceText() . '</a>';
+					
+					if ($source->item_source_type_id == 3) {
+						$source->delete();
+					}
 				}
 			}
 		}
