@@ -356,7 +356,7 @@ class Item extends Model
     
     // wowhead source import functions
     
-	public function importWowheadSources() {
+	public function importWowheadSources($types = false) {
 		$html = WowheadCache::getItemHtml($this->bnet_id);
 		
 		if (stristr($html, '<b style="color: red">This item\'s source is no longer available/removed.</b>')) {
@@ -383,7 +383,7 @@ class Item extends Model
 		}
 		
 		if ($html) {
-			$sourceData = $this->_processWowheadHtml($html);
+			$sourceData = $this->_processWowheadHtml($html, $types);
 			
 			if (!$sourceData || !count($sourceData)) {
 				\Log::info('Source data not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
@@ -514,13 +514,14 @@ class Item extends Model
 					        $source->item_source_type_id = 3;
 					        $source->import_source = 'wowheadImport';
 					        $source->save();
-					        return true;
 				        }
+				        return true;
 			        }
 			        
 			        $zoneID = $zoneBnetID;
 			    }
 	        }
+	        dd($zoneID);
 	        
 	        if ($zoneID) {
 				$zone = Zone::where('bnet_id', '=', $zoneID)->first();
@@ -719,8 +720,8 @@ class Item extends Model
 		}
 	}
 	
-	private function _processWowheadHtml($html) {
-		$types = ['npc|dropped-by', 'object|contained-in-object', 'quest|reward-from-q', 'npc|sold-by', 'item|contained-in-item', 'spell|created-by-spell', 'item|created-by-item'];
+	private function _processWowheadHtml($html, $types = false) {
+		$types = ($types) ?: ['npc|dropped-by', 'object|contained-in-object', 'quest|reward-from-q', 'npc|sold-by', 'item|contained-in-item', 'spell|created-by-spell', 'item|created-by-item'];
 		
 		$matches = [];
 		$json = false;
