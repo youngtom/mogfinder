@@ -451,8 +451,13 @@ class Item extends Model
 		
 		if (count($dataArr) == 1) {
 	        $data = $dataArr[0];
-	        $zoneBnetID = $data['location'][0];
+	        $zoneBnetID = @$data['location'][0];
 	        $npcID = $data['id'];
+	        
+	        if (!$zoneBnetID) {
+		        \Log::info('Location info not available for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+		        return false;
+	        }
 	        
 	        $zone = Zone::where('bnet_id', '=', $zoneBnetID)->first();
 	        
