@@ -474,7 +474,7 @@ class Item extends Model
 	        $boss = Boss::where('bnet_id', '=', $npcID)->first();
 	        $boss = ($boss) ? $boss->encounter() : false;
 	        if ($boss) {
-		        $bossIDArr = array_unique(array_merge([$npcID], Boss:where('id', '=', $boss->id)->orWhere('parent_boss_id', '=', $boss->id)->get()->lists('bnet_id')->toArray()));
+		        $bossIDArr = array_unique(array_merge([$npcID], Boss::where('id', '=', $boss->id)->orWhere('parent_boss_id', '=', $boss->id)->get()->lists('bnet_id')->toArray()));
 	        } else {
 		        $bossIDArr = [$npcID];
 	        }
