@@ -38,7 +38,7 @@ class ImportSourceData extends Command
      */
     public function handle()
     {
-        $items = Items::where('transmoggable', '=', 1)->get();
+        $items = Item::where('transmoggable', '=', 1)->get();
         
         $bar = $this->output->createProgressBar(count($items));
 	    
