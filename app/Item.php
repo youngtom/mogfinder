@@ -455,7 +455,7 @@ class Item extends Model
 	        $npcID = $data['id'];
 	        
 	        if (!$zoneBnetID) {
-		        \Log::info('Location info not available for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+		        \Log::info('Location info not available for item drop: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
 		        return false;
 	        }
 	        
@@ -551,6 +551,11 @@ class Item extends Model
 	private function _processWowheadObjectData($dataArr) {
 		if (count($dataArr) == 1) {
 	        $data = $dataArr[0];
+	        
+	        if (!@$data['location']) {
+		        \Log::info('Location info not available for item in object: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+		        return false;
+	        }
 	        
 	        if (count($data['location']) == 1) {
 		        $zoneBnetID = $data['location'][0];
