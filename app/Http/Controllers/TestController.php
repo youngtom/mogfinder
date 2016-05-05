@@ -261,7 +261,7 @@ class TestController extends Controller
 		
 		foreach ($items as $item) {
 			if ($item->itemSources->count() > 1) {
-				$out[] = '<a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
+				$out[] = '<a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a> - ' . $item->id;
 				foreach ($item->itemSources as $source) {
 					$out[] = '-- <a href="' . $source->getWowheadLink($item) . '">' . $source->getSourceText() . '</a>';
 					
