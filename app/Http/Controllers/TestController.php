@@ -263,7 +263,7 @@ class TestController extends Controller
 			if ($item->itemSources->count() > 1) {
 				$out[] = '<a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
 				foreach ($item->itemSources as $source) {
-					$out[] = '-- <a href="' . $source->getWowheadLink($item) . '">' . $source->getSourceText() . '</a>';
+					$out[] = '-- <a href="' . $source->getWowheadLink($item) . '">' . $source->getSourceText() . '</a> - ' . $item->itemSources->where('item_source_type_id', 4)->count();
 					
 					if ($source->item_source_type_id == 6) {
 						//$source->delete();
