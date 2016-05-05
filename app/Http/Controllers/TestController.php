@@ -20,10 +20,14 @@ use App\FileUpload;
 use App\Zone;
 use App\Difficulty;
 use App\Boss;
+use DB;
 
 class TestController extends Controller
 {
 	public function index() {
+		DB::disableQueryLog();
+	    ini_set('memory_limit','1024M');
+	    ini_set('max_exeuction_time',0);
 		
 		$file = file(storage_path() . '/logs/PROD.laravel6.log');
 		
