@@ -331,11 +331,11 @@ class TestController extends Controller
     }
     
     public function listSources($id) {
-	    $sources = ItemSource::where('created_at', '>=', '2016-05-05')->orderBy('bnet_source_id', 'ASC')->get()->groupBy('item_source_type_id');
+	    $sources = ItemSource::where('item_source_type_id', '=', $id)->where('created_at', '>=', '2016-05-04')->orderBy('bnet_source_id', 'ASC')->get()->groupBy('bnet_source_id');
 	    $out = [];
 	    
 	    foreach ($sources as $sourceTypeID => $sourceArr) {
-		    $out[] = 'SourceTypeID: ' . $sourceTypeID;
+		    $out[] = 'BnetSourceID: ' . $sourceTypeID;
 		    foreach ($sourceArr as $source) {
 			    if ($source->item->transmoggable) {
 				    $out[] = '<a href="' . $source->getWowheadLink($source->item) . '">' . $source->getSourceText() . '</a>: <a href="http://www.wowhead.com/item=' . $source->item->bnet_id . '" class="q' . $source->item->quality . '" rel="' . $source->item->getWowheadMarkup() . '">[' . $source->item->name . ']</a> - ' . $source->item->id;
