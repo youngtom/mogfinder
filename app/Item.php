@@ -422,7 +422,7 @@ class Item extends Model
 		$filteredDataArr = [];
 		
 		$_bossIDs = [];
-		$allBosses = false;
+		$allBosses = true;
 		foreach ($dataArr as $data) {
 			$npcID = $data['id'];
 			
@@ -441,11 +441,10 @@ class Item extends Model
 				$allBosses = false;
 			}
 			
-			if ($include && ($boss || $data['count'] > 0)) {
+			if ($include && @$data['location'] && ($boss || $data['count'] > 0)) {
 				$filteredDataArr[] = $data;
 			}
 		}
-		
 		$dataArr = $filteredDataArr;
 		
 		if (!count($dataArr)) {
