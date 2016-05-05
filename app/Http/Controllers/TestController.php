@@ -331,7 +331,7 @@ class TestController extends Controller
     }
     
     public function listSources($id) {
-	    $sources = ItemSource::where('created', '>=', '2016-05-05')->orderBy('item_source_type_id', 'ASC')->get()->groupBy('item_source_type_id');
+	    $sources = ItemSource::where('created_by', '>=', '2016-05-05')->orderBy('item_source_type_id', 'ASC')->get()->groupBy('item_source_type_id');
 	    $out = [];
 	    
 	    foreach ($sources as $sourceTypeID => $sourceArr) {
