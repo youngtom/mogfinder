@@ -25,7 +25,7 @@ class TestController extends Controller
 {
 	public function index() {
 		
-		$file = file(storage_path() . '/logs/PROD.laravel7.log');
+		$file = file(storage_path() . '/logs/PROD.laravel6.log');
 		
 		$_out = [
 			'boss' => [],
@@ -35,7 +35,8 @@ class TestController extends Controller
 			'multiple-locs' => [],
 			'no-vendor-loc' => [],
 			'multiple-spells' => [],
-			'multiple-boss-drops' => []
+			'multiple-boss-drops' => [],
+			'no-source-data' => []
 		];
 		
 		foreach ($file as $line) {
@@ -98,6 +99,10 @@ class TestController extends Controller
 				} elseif ($typeStr == 'Item created by multiple spells') {
 					if (!in_array($bnetID, $_out['multiple-spells'])) {
 						$_out['multiple-spells'][] = $bnetID;
+					}
+				} elseif ($typeStr == 'Source data not found for item') {
+					if (!in_array($bnetID, $_out['no-source-data'])) {
+						$_out['no-source-data'][] = $bnetID;
 					}
 				}
 			}
@@ -167,6 +172,12 @@ class TestController extends Controller
 					$out[] = '<h4>Multiple Spells - not added</h4>';
 					foreach ($dataArr as $itemID) {
 						$out[] = '<a href="http://www.wowhead.com/item=' . $itemID . '">' . $itemID . '</a><br>';
+					}
+				} elseif ($label == 'no-source-data') {
+					$out[] = '<h4>No source data</h4>';
+					foreach ($dataArr as $itemID) {
+						$item = Item::where('bnet_id', '=', $itemID)->first();
+						$out[] = '<a href="http://www.wowhead.com/item=' . $itemID . '">' . $itemID . '</a> - ' . $item->itemSources()->where('item_source_type_id', '<>', 17)->get()->count() . '<br>';
 					}
 				}
 			}
