@@ -24,18 +24,8 @@ use App\Boss;
 class TestController extends Controller
 {
 	public function index() {
-		$bnetIDs = [];
 		
-		$items = Item::whereIn('id', function ($query) {
-			$query->select('item_id')->from('item_sources')->whereIn('bnet_source_id', [114119, 114120])->where('created_at', '>=', '2016-05-04');
-		})->get()->lists('id')->toArray();
-		echo count(array_unique($items)) . '<Br>';
-		echo implode(',', array_unique($items));
-		die;
-		
-		//$sources = ItemSource::where('item_source_type_id', '=', 3)->get();
-		
-		$file = file(storage_path() . '/logs/PROD.laravel6.log');
+		$file = file(storage_path() . '/logs/PROD.laravel7.log');
 		
 		$_out = [
 			'boss' => [],
@@ -44,7 +34,8 @@ class TestController extends Controller
 			'no-location-object' => [],
 			'multiple-locs' => [],
 			'no-vendor-loc' => [],
-			'multiple-spells' => []
+			'multiple-spells' => [],
+			'multiple-boss-drops' => []
 		];
 		
 		foreach ($file as $line) {
@@ -79,6 +70,10 @@ class TestController extends Controller
 				} elseif ($typeStr == 'Location info not available for item in object') {
 					if (!in_array($bnetID, $_out['no-location-object'])) {
 						$_out['no-location-object'][] = $bnetID;
+					}
+				} elseif ($typeStr == 'Creating multiple boss drops for item') {
+					if (!in_array($bnetID, $_out['multiple-boss-drops'])) {
+						$_out['multiple-boss-drops'][] = $bnetID;
 					}
 				} elseif (preg_match_all('/Multiple locations for NPC \((\d+)\) for item/', $typeStr, $matches)) {
 					$bossID = $matches[1][0];
@@ -140,6 +135,11 @@ class TestController extends Controller
 					}
 				} elseif ($label == 'no-location-object') {
 					$out[] = '<h4>No location (object) - not added</h4>';
+					foreach ($dataArr as $itemID) {
+						$out[] = '<a href="http://www.wowhead.com/item=' . $itemID . '">' . $itemID . '</a><br>';
+					}
+				} elseif ($label == 'multiple-boss-drops') {
+					$out[] = '<h4>Multiple boss drops - added</h4>';
 					foreach ($dataArr as $itemID) {
 						$out[] = '<a href="http://www.wowhead.com/item=' . $itemID . '">' . $itemID . '</a><br>';
 					}
@@ -338,7 +338,7 @@ class TestController extends Controller
 		    $out[] = 'SourceTypeID: ' . $sourceTypeID;
 		    foreach ($sourceArr as $source) {
 			    if ($source->item->transmoggable) {
-				    $out[] = '<a href="' . $source->getWowheadLink($source->item) . '">' . $source->getSourceText() . '</a>: <a href="http://www.wowhead.com/item=' . $source->item->bnet_id . '" class="q' . $source->item->quality . '" rel="' . $source->item->getWowheadMarkup() . '">[' . $source->item->name . ']</a>';
+				    $out[] = '<a href="' . $source->getWowheadLink($source->item) . '">' . $source->getSourceText() . '</a>: <a href="http://www.wowhead.com/item=' . $source->item->bnet_id . '" class="q' . $source->item->quality . '" rel="' . $source->item->getWowheadMarkup() . '">[' . $source->item->name . ']</a> - ' . $source->item->id;
 				}
 			}
 	    }
