@@ -422,6 +422,7 @@ class Item extends Model
 		$filteredDataArr = [];
 		
 		$_bossIDs = [];
+		$allBosses = false;
 		foreach ($dataArr as $data) {
 			$npcID = $data['id'];
 			
@@ -436,6 +437,8 @@ class Item extends Model
 				} else {
 					$_bossIDs[] = $_bossID;
 				}
+			} else {
+				$allBosses = false;
 			}
 			
 			if ($include && ($boss || $data['count'] > 0)) {
@@ -449,55 +452,60 @@ class Item extends Model
 			return false;
 		}
 		
-		if (count($dataArr) == 1) {
-	        $data = $dataArr[0];
-	        $zoneBnetID = @$data['location'][0];
-	        $npcID = $data['id'];
-	        
-	        if (!$zoneBnetID) {
-		        \Log::info('Location info not available for item drop: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
-		        return false;
-	        }
-	        
-	        if (count($data['location']) != 1) {
-		        \Log::info('Multiple locations for NPC (' . $npcID . ') for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
-		        return false;
-	        }
-	        
-	        $zone = Zone::where('bnet_id', '=', $zoneBnetID)->first();
-	        
-	        if (!$zone) {
-		        \Log::info('Zone (' . $zoneBnetID . ') not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
-		        return false;
-	        }
-	        
-	        $boss = Boss::where('bnet_id', '=', $npcID)->first();
-	        $boss = ($boss) ? $boss->encounter() : false;
-	        if ($boss) {
-		        $bossIDArr = array_unique(array_merge([$npcID], Boss::where('id', '=', $boss->id)->orWhere('parent_boss_id', '=', $boss->id)->get()->lists('bnet_id')->toArray()));
-	        } else {
-		        $bossIDArr = [$npcID];
-	        }
-	        
-	        if (!$boss && ($zone->is_raid || $zone->is_dungeon)) {
-		        \Log::info('Boss (' . $npcID . ') not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+		if (count($dataArr) == 1 || $allBosses) {
+			$valid = 0;
 		        
-		        ItemSource::where('item_id', '=', $this->id)->where('item_source_type_id', '=', 15)->delete();
+	        if (count($dataArr) > 1) {
+		        \Log::info('Creating multiple boss drops for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
 	        }
 	        
-	        $source = ItemSource::where('item_id', '=', $this->id)->where('item_source_type_id', '=', 4)->whereIn('bnet_source_id', $bossIDArr)->first();
-	        
-	        if (!$source) {
-		        $source = new ItemSource;
-		        $source->item_id = $this->id;
-		        $source->item_source_type_id = 4;
-		        $source->bnet_source_id = $npcID;
-		        $source->import_source = 'wowheadImport';
-	        }
-	        
-	        $source->boss_id = ($boss) ? $boss->id : null;
-	        $source->zone_id = $zone->id;
-	        $source->save();
+			foreach ($dataArr as $data) {
+		        $zoneBnetID = @$data['location'][0];
+		        $npcID = $data['id'];
+		        
+		        if (!$zoneBnetID) {
+			        \Log::info('Location info not available for item drop: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+		        } elseif (count($data['location']) != 1) {
+			        \Log::info('Multiple locations for NPC (' . $npcID . ') for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+		        } else {
+			        $zone = Zone::where('bnet_id', '=', $zoneBnetID)->first();
+			        
+			        if (!$zone) {
+				        \Log::info('Zone (' . $zoneBnetID . ') not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+			        } else {
+				        $boss = Boss::where('bnet_id', '=', $npcID)->first();
+				        $boss = ($boss) ? $boss->encounter() : false;
+				        if ($boss) {
+					        $bossIDArr = array_unique(array_merge([$npcID], Boss::where('id', '=', $boss->id)->orWhere('parent_boss_id', '=', $boss->id)->get()->lists('bnet_id')->toArray()));
+				        } else {
+					        $bossIDArr = [$npcID];
+				        }
+				        
+				        if (!$boss && ($zone->is_raid || $zone->is_dungeon)) {
+					        \Log::info('Boss (' . $npcID . ') not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
+				        }
+				        
+				        $source = ItemSource::where('item_id', '=', $this->id)->where('item_source_type_id', '=', 4)->whereIn('bnet_source_id', $bossIDArr)->first();
+				        
+				        if (!$source) {
+					        $source = new ItemSource;
+					        $source->item_id = $this->id;
+					        $source->item_source_type_id = 4;
+					        $source->bnet_source_id = $npcID;
+					        $source->import_source = 'wowheadImport';
+				        }
+				        
+				        $source->boss_id = ($boss) ? $boss->id : null;
+				        $source->zone_id = $zone->id;
+				        $source->save();
+				        $valid++;
+				    }
+				    
+				    if ($valid) {
+					    ItemSource::where('item_id', '=', $this->id)->where('item_source_type_id', '=', 15)->delete();
+				    }
+			    }
+		    }
 	        return true;
         } else { //verify that item drops from a single zone
 	        $zoneID = false;

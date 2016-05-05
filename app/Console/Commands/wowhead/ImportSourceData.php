@@ -13,7 +13,7 @@ class ImportSourceData extends Command
      *
      * @var string
      */
-    protected $signature = 'wowhead:items:import-sources';
+    protected $signature = 'wowhead:items:import-sources {type}';
 
     /**
      * The console command description.
@@ -40,16 +40,15 @@ class ImportSourceData extends Command
     public function handle()
     {
         $items = Item::where('transmoggable', '=', 1)->get();
+        $type = $this->argument('type');
         
         $bar = $this->output->createProgressBar(count($items));
 	    
 	    foreach ($items as $item) {
 		    $worldDropSources = ItemSource::where('item_id', '=', $item->id)->where('item_source_type_id', '=', 3)->get();
 		    
-		    if ($worldDropSources->count()) {
-			    $item->importWowheadSources(['npc|dropped-by']);
-		    } else {
-			    $item->importWowheadSources();
+		    if (!$worldDropSources->count()) {
+			    $item->importWowheadSources([$type]);
 		    }
 		    $bar->advance();
 	    }
