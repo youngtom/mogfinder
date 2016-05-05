@@ -14,7 +14,7 @@ class RemoveDuplicateItemSources extends Command
      *
      * @var string
      */
-    protected $signature = 'items:sources:remove-duplicates';
+    protected $signature = 'items:sources:remove-duplicates {action}';
 
     /**
      * The console command description.
@@ -49,14 +49,18 @@ class RemoveDuplicateItemSources extends Command
 	    foreach ($results as $res) {
 			$sources = ItemSource::where('bnet_source_id', '=', $res->bnet_source_id)->where('item_id', '=', $res->item_id)->where('item_source_type_id', '=', $res->item_source_type_id)->get();
 			
-			$this->info('itemID: ' . $res->item_id . ' - bnetSourceID: ' . $res->bnet_source_id . ' - type: ' . $res->item_source_type_id);
-			$count = 0;
-
-			foreach ($sources as $source) {
-				if ($count > 0) {
-					$source->delete();
+			if ($this->argument('action') == 'list') {
+				$this->info('itemID: ' . $res->item_id . ' - bnetSourceID: ' . $res->bnet_source_id . ' - type: ' . $res->item_source_type_id);
+			}
+			
+			if ($this->argument('action') == 'delete') {
+				$count = 0;
+				foreach ($sources as $source) {
+					if ($count > 0) {
+						$source->delete();
+					}
+					$count++;
 				}
-				$count++;
 			}
 	    }
     }
