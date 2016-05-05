@@ -50,6 +50,7 @@ Route::group(['middleware' => 'web'], function () {
 	Route::get('/test', 'TestController@index');
 	Route::get('/test/world-drop-info', 'TestController@worldDropInfo');
 	Route::get('/test/zone-drop-info', 'TestController@zoneDropInfo');
+	Route::get('/test/object-drop-info', 'TestController@objectDropInfo');
 	Route::get('/test/check-deleted-sources/{id}', 'TestController@checkDeletedSources');
 	Route::get('/test/list-sources/{id}', 'TestController@listSources');
 	Route::get('/test/list-sourceless-items', 'TestController@listSourcelessItems');

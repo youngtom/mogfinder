@@ -252,6 +252,29 @@ class TestController extends Controller
 		return view('test')->with('out', $out)->with('newline', "<br>");
 	}
 	
+	public function objectDropInfo() {
+		$items = Item::whereIn('id', function ($query) {
+		    $query->select('item_id')->from('item_sources')->where('item_source_type_id', '=', 6);
+	    })->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->get();
+		
+		$out = [];
+		
+		foreach ($items as $item) {
+			if ($item->itemSources->count() > 1) {
+				$out[] = '<a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
+				foreach ($item->itemSources as $source) {
+					$out[] = '-- <a href="' . $source->getWowheadLink($item) . '">' . $source->getSourceText() . '</a>';
+					
+					if ($source->item_source_type_id == 6) {
+						//$source->delete();
+					}
+				}
+			}
+		}
+		
+		return view('test')->with('out', $out)->with('newline', "<br>");
+	}
+	
 	public function zoneDropInfo() {
 		$items = Item::whereIn('id', function ($query) {
 		    $query->select('item_id')->from('item_sources')->where('item_source_type_id', '=', 15);
