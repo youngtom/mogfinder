@@ -24,6 +24,15 @@ use App\Boss;
 class TestController extends Controller
 {
 	public function index() {
+		$bnetIDs = [];
+		
+		$items = Item::whereIn('id', function ($query) {
+			$query->select('item_id')->from('item_sources')->whereIn('bnet_source_id', [114119, 114120])->where('created_at', '>=', '2016-05-04');
+		})->get()->lists('id')->toArray();
+		echo count(array_unique($items)) . '<Br>';
+		echo implode(',', array_unique($items));
+		die;
+		
 		//$sources = ItemSource::where('item_source_type_id', '=', 3)->get();
 		
 		$file = file(storage_path() . '/logs/PROD.laravel6.log');
@@ -235,6 +244,29 @@ class TestController extends Controller
 					
 					if ($source->item_source_type_id == 3) {
 						$source->delete();
+					}
+				}
+			}
+		}
+		
+		return view('test')->with('out', $out)->with('newline', "<br>");
+	}
+	
+	public function zoneDropInfo() {
+		$items = Item::whereIn('id', function ($query) {
+		    $query->select('item_id')->from('item_sources')->where('item_source_type_id', '=', 15);
+	    })->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->get();
+		
+		$out = [];
+		
+		foreach ($items as $item) {
+			if ($item->itemSources->count() > 1) {
+				$out[] = '<a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
+				foreach ($item->itemSources as $source) {
+					$out[] = '-- <a href="' . $source->getWowheadLink($item) . '">' . $source->getSourceText() . '</a>';
+					
+					if ($source->item_source_type_id != 15) {
+						//$source->delete();
 					}
 				}
 			}
