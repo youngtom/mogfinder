@@ -36,7 +36,7 @@ class ItemsController extends Controller
 		    $character = Character::where('user_id', '=', $user->id)->where('url_token', '=', $characterURL)->first();
 		    
 		    if (!$character) {
-			    return App::abort(404);
+			    return \App\abort(404);
 		    }
 		    
 		    $classmask = pow(2, $character->class_id);
@@ -82,7 +82,7 @@ class ItemsController extends Controller
     }
     
     public function setMogslotIcons($mogslotID = null, $iconID = null) {
-	    return App::abort(404);
+	    return \App\abort(404);
 	    
 	    if ($mogslotID) {
 		    $_mogslot = Mogslot::find($mogslotID);
@@ -141,7 +141,7 @@ class ItemsController extends Controller
 	    $zone = Zone::where('url_token', '=', $zoneURL)->first();
 	    
 	    if (!$zone) {
-		    return App::abort(404);
+		    return \App\abort(404);
 	    }
 	    
 	    $itemIDs = array_unique(ItemSource::where('zone_id', '=', $zone->id)->get()->lists('item_id')->toArray());
@@ -155,13 +155,13 @@ class ItemsController extends Controller
 	    $zone = Zone::where('url_token', '=', $zoneURL)->first();
 	    
 	    if (!$zone) {
-		    return App::abort(404);
+		    return \App\abort(404);
 	    }
 	    
 	    $boss = Boss::whereNull('parent_boss_id')->where('zone_id', '=', $zone->id)->where('url_token', '=', $bossURL)->first();
 	    
 	    if (!$boss) {
-		    return App::abort(404);
+		    return \App\abort(404);
 	    }
 	    
 	    $itemIDs = array_unique(ItemSource::where('boss_id', '=', $boss->id)->get()->lists('item_id')->toArray());
@@ -175,13 +175,13 @@ class ItemsController extends Controller
 	    $category = MogslotCategory::where('group', '=', $group)->where('url_token', '=', $categoryURL)->first();
 	    
 	    if (!$category) {
-		    return App::abort(404);
+		    return \App\abort(404);
 	    }
 	    
 	    $mogslot = Mogslot::where('simple_url_token', '=', $mogslotURL)->where('mogslot_category_id', '=', $category->id)->first();
 	    
 	    if (!$mogslot) {
-		    return App::abort(404);
+		    return \App\abort(404);
 	    }
 	    
 	    $displays = ItemDisplay::where('transmoggable', '=', 1)->where('mogslot_id', '=', $mogslot->id)->orderBy('bnet_display_id', 'ASC')->get();
@@ -430,7 +430,7 @@ class ItemsController extends Controller
 	    $display = ItemDisplay::find($displayID);
 	    
 	    if (!$display || !$display->mogslot || !$display->mogslot->mogslotCategory || $display->mogslot->mogslotCategory->url_token != $categoryURL || $display->mogslot->simple_url_token != $mogslotURL || $display->mogslot->mogslotCategory->group != $group) {
-		    return App::abort(404);
+		    return \App\abort(404);
 	    }
 	    
 	    $user = Auth::user();
