@@ -19,6 +19,8 @@ use App\ItemSource;
 use App\ItemSourceType;
 use App\Auction;
 use DB;
+use App\Zone;
+use App\Boss;
 
 class ItemsController extends Controller
 {
@@ -133,6 +135,40 @@ class ItemsController extends Controller
         }
                 
         return view('items.duplicates')->with('duplicates', $dupeItems)->with('characters', $characters)->with('selectedCharacter', $selectedCharacter);
+    }
+    
+    public function showZoneDisplays($zoneURL) {
+	    $zone = Zone::where('url_token', '=', $zoneURL)->first();
+	    
+	    if (!$zone) {
+		    return App::abort(404);
+	    }
+	    
+	    $itemIDs = array_unique(ItemSource::where('zone_id', '=', $zone->id)->get()->lists('item_id')->toArray());
+	    $displayIDs = array_unique(Item::whereIn('id', $itemIDs)->get()->lists('item_display_id')->toArray());
+	    $displays = ItemDisplay::whereIn('id', $displayIDs)->get();
+	    
+	    return $this->showItemDisplays($displays, false, $itemIDs);
+    }
+    
+    public function showBossDisplays($zoneURL, $bossURL) {
+	    $zone = Zone::where('url_token', '=', $zoneURL)->first();
+	    
+	    if (!$zone) {
+		    return App::abort(404);
+	    }
+	    
+	    $boss = Boss::whereNull('parent_boss_id')->where('zone_id', '=', $zone->id)->where('url_token', '=', $bossURL)->first();
+	    
+	    if (!$boss) {
+		    return App::abort(404);
+	    }
+	    
+	    $itemIDs = array_unique(ItemSource::where('boss_id', '=', $boss->id)->get()->lists('item_id')->toArray());
+	    $displayIDs = array_unique(Item::whereIn('id', $itemIDs)->get()->lists('item_display_id')->toArray());
+	    $displays = ItemDisplay::whereIn('id', $displayIDs)->get();
+	    
+	    return $this->showItemDisplays($displays, false, $itemIDs);
     }
     
     public function showSlot(Request $request, $group, $categoryURL, $mogslotURL) {

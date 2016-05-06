@@ -25,9 +25,12 @@ use DB;
 class TestController extends Controller
 {
 	public function index() {
-		DB::disableQueryLog();
-	    ini_set('memory_limit','1024M');
-	    ini_set('max_exeuction_time',0);
+		$results = DB::table('bosses')->whereNull('parent_boss_id')->groupBy('url_token')->havingRaw('count(*) > 1')->get();
+		
+		foreach ($results as $res) {
+			echo $res->name . '<br>';
+		}
+		die;
 		
 		$file = file(storage_path() . '/logs/PROD.laravel6.log');
 		

@@ -3,10 +3,14 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Sofa\Eloquence\Eloquence;
 
 class Boss extends Model
 {
+	use Eloquence;
+	
 	protected $fillable = ['bnet_id', 'parent_boss_id'];
+	protected $searchableColumns = ['name', 'bnet_id'];
 	
 	public function parentBoss() {
 		return $this->belongsTo('App\Boss', 'parent_boss_id');

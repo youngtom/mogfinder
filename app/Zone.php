@@ -5,11 +5,15 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\Boss;
 use Config;
+use Sofa\Eloquence\Eloquence;
 
 class Zone extends Model
 {
+	use Eloquence;
+	
 	private static $apiClient = null;
 	protected $fillable = ['bnet_id'];
+	protected $searchableColumns = ['name', 'bnet_id'];
 	
 	public function bosses() {
 		return $this->hasMany('App\Boss');
