@@ -144,8 +144,9 @@ class ItemsController extends Controller
 		    return \App::abort(404);
 	    }
 	    
-	    $itemIDs = array_unique(ItemSource::where('zone_id', '=', $zone->id)->get()->lists('item_id')->toArray());
-	    $displayIDs = array_unique(Item::whereIn('id', $itemIDs)->get()->lists('item_display_id')->toArray());
+	    $zoneSourceTypeIDs = ItemSourceType::where('zone_relevant', '=', 1)->get()->lists('id')->toArray();
+	    $itemIDs = array_unique(ItemSource::where('zone_id', '=', $zone->id)->whereIn('item_source_type_id', $zoneSourceTypeIDs)->get()->lists('item_id')->toArray());
+	    $displayIDs = array_unique(Item::whereIn('id', $itemIDs)->where('transmoggable', '=', 1)->get()->lists('item_display_id')->toArray());
 	    $displays = ItemDisplay::whereIn('id', $displayIDs)->get();
 	    
 	    return $this->showItemDisplays($displays, false, $itemIDs);
@@ -165,7 +166,7 @@ class ItemsController extends Controller
 	    }
 	    
 	    $itemIDs = array_unique(ItemSource::where('boss_id', '=', $boss->id)->get()->lists('item_id')->toArray());
-	    $displayIDs = array_unique(Item::whereIn('id', $itemIDs)->get()->lists('item_display_id')->toArray());
+	    $displayIDs = array_unique(Item::whereIn('id', $itemIDs)->where('transmoggable', '=', 1)->get()->lists('item_display_id')->toArray());
 	    $displays = ItemDisplay::whereIn('id', $displayIDs)->get();
 	    
 	    return $this->showItemDisplays($displays, false, $itemIDs);
