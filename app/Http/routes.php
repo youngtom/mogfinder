@@ -62,7 +62,7 @@ Route::group(['middleware' => 'web'], function () {
     //wardrobe routes
     Route::get('/wardrobe', 'ItemsController@index');
     Route::get('/wardrobe/zone/{zoneURL}', 'ItemsController@showZoneDisplays');
-    Route::get('/wardrobe/zone/{zoneURL}/{bossURL}', 'ItemsController@showBossDisplays');
+    Route::get('/wardrobe/boss/{zoneURL}/{bossURL}', 'ItemsController@showBossDisplays');
     Route::get('/wardrobe/auctions', 'ItemsController@showAuctions');
     Route::get('/wardrobe/duplicates', 'ItemsController@duplicates');
     Route::get('/wardrobe/{characterURL}', 'ItemsController@index');
