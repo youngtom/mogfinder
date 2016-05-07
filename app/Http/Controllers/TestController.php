@@ -240,6 +240,32 @@ class TestController extends Controller
 		*/
 	}
 	
+	public function legacyItemInfo() {
+		$items = Item::whereIn('id', function ($query) {
+		    $query->select('item_id')->from('item_sources')->where('item_source_type_id', '=', 17);
+	    })->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->get();
+		
+		$out = [];
+		$ids = [];
+		foreach ($items as $item) {
+			if ($item->itemSources->count() > 1) {
+				$ids[] = $item->id;
+				$out[] = '<a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
+				foreach ($item->itemSources as $source) {
+					$out[] = '-- <a href="' . $source->getWowheadLink($item) . '">' . $source->getSourceText() . '</a>';
+					
+					if ($source->item_source_type_id != 17) {
+						//$source->delete();
+					}
+				}
+			}
+		}
+		
+		echo implode(',', $ids); die;
+		
+		return view('test')->with('out', $out)->with('newline', "<br>");
+	}
+	
 	public function worldDropInfo() {
 		$items = Item::whereIn('id', function ($query) {
 		    $query->select('item_id')->from('item_sources')->where('item_source_type_id', '=', 3);

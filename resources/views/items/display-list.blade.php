@@ -133,9 +133,9 @@
 		                
 		                <span class="pull-right">
 		                	<?php if ($restrictedClassMask && count($restrictedClasses)) { ?>
-		                	<i class="fa fa-btn fa-star-o partiallly-collected-star" title="Unlocked on:<br><?=implode('<br>', $restrictedClasses)?>" data-toggle="tooltip" data-placement="left"></i>
+		                	<i class="fa fa-btn fa-circle-o partiallly-collected-star" title="Unlocked on:<br><?=implode('<br>', $restrictedClasses)?>" data-toggle="tooltip" data-placement="left"></i>
 		                	<?php } ?>
-		                	<i class="fa fa-btn fa-star collected-star" title="Collected" data-toggle="tooltip" data-placement="left"></i>
+		                	<i class="fa fa-btn fa-check collected-star" title="Collected" data-toggle="tooltip" data-placement="left"></i>
 		                </span>
 		            </div>		            
 		            <div id="display-<?=$display->id?>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="display-heading-<?=$display->id?>">
@@ -188,9 +188,9 @@
 											<?php 
 												if (in_array($item->id, $userItemIDs)) {
 													if ($item->allowable_classes || $item->allowable_races) {
-														echo '<i class="fa fa-btn fa-star-o"></i>';
+														echo '<i class="fa fa-btn fa-circle-o"></i>';
 													} else {
-														echo '<i class="fa fa-btn fa-star"></i>';
+														echo '<i class="fa fa-btn fa-check"></i>';
 													}
 												} else {
 													echo '&nbsp;';
