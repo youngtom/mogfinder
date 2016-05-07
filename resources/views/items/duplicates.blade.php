@@ -125,13 +125,13 @@
 							<?php
 								switch ($item->bound) {
 									case 1:
-										echo '<i class="fa fa-btn fa-circle" title="Soulbound"></i>';
+										echo '<i class="fa fa-btn fa-circle" title="Soulbound" data-toggle="tooltip" data-placement="left"></i>';
 										break;
 									case 2:
-										echo '<i class="fa fa-btn fa-circle-o" title="Account Bound"></i>';
+										echo '<i class="fa fa-btn fa-circle-o" title="Account Bound" data-toggle="tooltip" data-placement="left"></i>';
 										break;
 									case 0;
-										echo '<i class="fa fa-btn fa-circle-thin" title="Not Bound"></i>';
+										echo '<i class="fa fa-btn fa-circle-thin" title="Not Bound" data-toggle="tooltip" data-placement="left"></i>';
 										break;
 									default:
 										echo '&nbsp;';
