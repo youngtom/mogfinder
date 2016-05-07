@@ -133,7 +133,7 @@
 		                
 		                <span class="pull-right">
 		                	<?php if ($restrictedClassMask && count($restrictedClasses)) { ?>
-		                	<i class="fa fa-btn fa-circle-o partiallly-collected-star" title="Unlocked on:<br><?=implode('<br>', $restrictedClasses)?>" data-toggle="tooltip" data-placement="left"></i>
+		                	<i class="fa fa-btn fa-check partiallly-collected-star" title="Unlocked on:<br><?=implode('<br>', $restrictedClasses)?>" data-toggle="tooltip" data-placement="left"></i>
 		                	<?php } ?>
 		                	<i class="fa fa-btn fa-check collected-star" title="Collected" data-toggle="tooltip" data-placement="left"></i>
 		                </span>
@@ -188,7 +188,7 @@
 											<?php 
 												if (in_array($item->id, $userItemIDs)) {
 													if ($item->allowable_classes || $item->allowable_races) {
-														echo '<i class="fa fa-btn fa-circle-o"></i>';
+														echo '<i class="fa fa-btn fa-check partiallly-collected-star"></i>';
 													} else {
 														echo '<i class="fa fa-btn fa-check"></i>';
 													}

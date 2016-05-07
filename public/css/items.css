@@ -100,6 +100,8 @@ a.expand-collapse { color: #ccc; }
 .item-display-panel[data-display-collected="1"] .panel-heading .uncollected-star { display: none; }
 .item-display-panel[data-display-collected="0"] .panel-heading .collected-star { display: none; }
 
+.partiallly-collected-star { opacity: .4; }
+
 .item-display-panel[data-display-collected-partial="1"] .panel-heading .collected-star { display: none; }
 .panel-group.class-filtered .partiallly-collected-star,
 .panel-group.faction-filtered .partiallly-collected-star { display: none; }
