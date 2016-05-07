@@ -5,6 +5,7 @@ namespace App\Console\Commands\wowhead;
 use Illuminate\Console\Command;
 use App\Item;
 use App\Faction;
+use App\WowheadCache;
 
 class UpdateItemsLockedRaces extends Command
 {
