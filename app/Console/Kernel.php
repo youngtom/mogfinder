@@ -48,6 +48,7 @@ class Kernel extends ConsoleKernel
         Commands\wowhead\ImportMissingItemSources::class,
         Commands\wowhead\ImportMissingSourceData::class,
         Commands\wowhead\ImportSourceData::class,
+        Commands\wowhead\UpdateItemsLockedRaces::class,
         Commands\RefreshItemDisplayZones::class
     ];
 
