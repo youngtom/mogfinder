@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Boss;
 use Config;
 use Sofa\Eloquence\Eloquence;
+use App\ItemDisplay;
 
 class Zone extends Model
 {
@@ -17,6 +18,21 @@ class Zone extends Model
 	
 	public function bosses() {
 		return $this->hasMany('App\Boss');
+	}
+	
+	public function itemDisplays() {
+		return $this->belongsToMany('App\ItemDisplay');
+	}
+	
+	public function category() {
+		return $this->belongsTo('App\ZoneCategory');
+	}
+	
+	public function updateDisplays() {
+		$zoneSourceTypeIDs = ItemSourceType::where('zone_relevant', '=', 1)->get()->lists('id')->toArray();
+		$itemIDs = ItemSource::whereIn('item_source_type_id', $zoneSourceTypeIDs)->where('zone_id', '=', $this->id)->groupBy('item_id')->get()->lists('item_id')->toArray();
+		$displayIDs = Item::whereIn('id', $itemIDs)->where('transmoggable', '=', 1)->groupBy('item_display_id')->get()->lists('item_display_id')->toArray();
+		$this->itemDisplays()->sync($displayIDs);
 	}
 	
 	public static function importBnetZoneData() {

@@ -4,9 +4,42 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Item;
+use App\Zone;
 
 class ItemSource extends Model
 {
+	public static function boot() {
+		parent::boot();
+		
+		self::saved(function ($source) {
+			if ($source->item && $source->item->itemDisplay && $source->isDirty('zone_id')) {
+				$source->item->itemDisplay->updateZones();
+			}
+			
+			if ($source->zone && $source->isDirty('item_id')) {
+				$source->zone->updateDisplays();
+			}
+		});
+		
+		self::deleted(function ($source) {
+			$item = Item::find($source->item_id);
+			
+			if ($item) {
+				$display = ItemDisplay::find($item->item_display_id);
+				
+				if ($display) {
+					$display->updateZones();
+				}
+			}
+			
+			$zone = Zone::find($source->zone_id);
+			
+			if ($zone) {
+				$zone->updateDisplays();
+			}
+		});
+	}
+	
     public function item() {
         return $this->belongsTo('App\Item');
 	}

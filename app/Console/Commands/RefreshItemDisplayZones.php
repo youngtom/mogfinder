@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Console\Commands\wowhead;
+namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Item;
+use App\Zone;
 
-class ImportMissingSourceData extends Command
+class RefreshItemDisplayZones extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'wowhead:items:import-missing-data';
+    protected $signature = 'items:display:refresh-zones';
 
     /**
      * The console command description.
@@ -38,15 +38,12 @@ class ImportMissingSourceData extends Command
      */
     public function handle()
     {
-        $items = Item::whereIn('id', function ($query) {
-		    $query->select('item_id')->from('item_sources')->whereIn('item_source_type_id', [2,4,6,7,15])->whereNull('zone_id');
-	    })->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->get();
+        $zones = Zone::all();
+	    $bar = $this->output->createProgressBar(count($zones));
 	    
-	    $bar = $this->output->createProgressBar(count($items));
-	    
-	    foreach ($items as $item) {
-		    $item->importWowheadSources();
-		    $bar->advance();
+	    foreach ($zones as $zone) {
+			$zone->updateDisplays();			
+			$bar->advance();
 	    }
 	    
 	    $bar->finish();

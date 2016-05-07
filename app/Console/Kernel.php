@@ -47,7 +47,8 @@ class Kernel extends ConsoleKernel
         Commands\wowhead\UpdateZoneDropSources::class,
         Commands\wowhead\ImportMissingItemSources::class,
         Commands\wowhead\ImportMissingSourceData::class,
-        Commands\wowhead\ImportSourceData::class
+        Commands\wowhead\ImportSourceData::class,
+        Commands\RefreshItemDisplayZones::class
     ];
 
     /**

@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateWowheadCacheTable extends Migration
+class CreateZoneCategoriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,13 +12,12 @@ class CreateWowheadCacheTable extends Migration
      */
     public function up()
     {
-        Schema::create('wowhead_cache', function (Blueprint $table) {
+        Schema::create('zone_categories', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('endpoint');
-            $table->string('request_uri');
-			$table->longText('data');
-			$table->integer('expiration');
-			$table->timestamps();
+            $table->enum('group', ['zones', 'dungeons', 'raids']);
+            $table->string('name');
+            $table->string('url_token');
+            $table->timestamps();
         });
     }
 
@@ -29,6 +28,6 @@ class CreateWowheadCacheTable extends Migration
      */
     public function down()
     {
-        Schema::drop('wowhead_cache');
+        Schema::drop('zone_categories');
     }
 }

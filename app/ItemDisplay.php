@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\FileUpload;
 use Config;
 use Sofa\Eloquence\Eloquence;
+use App\Zone;
+use App\ItemSource;
 
 class ItemDisplay extends Model
 {
@@ -53,6 +55,13 @@ class ItemDisplay extends Model
 		}
 	}
 	
+	public function updateZones() {
+		$zoneSourceTypeIDs = ItemSourceType::where('zone_relevant', '=', 1)->get()->lists('id')->toArray();
+		$itemIDs = Item::where('item_display_id', '=', $this->id)->where('transmoggable', '=', 1)->get()->lists('id')->toArray();
+		$zoneIDs = ItemSource::whereNotNull('zone_id')->whereIn('item_source_type_id', $zoneSourceTypeIDs)->whereIn('item_id', $itemIDs)->groupBy('zone_id')->get()->lists('zone_id')->toArray();
+		$this->zones()->sync($zoneIDs);
+	}
+	
 	public function items() {
 		return $this->hasMany('App\Item');
 	}
@@ -67,6 +76,10 @@ class ItemDisplay extends Model
 	
 	public function mogslot() {
 		return $this->belongsTo('App\Mogslot');
+	}
+	
+	public function zones() {
+		return $this->belongsToMany('App\Zone');
 	}
 	
 	public function getURL($base) {
