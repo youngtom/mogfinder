@@ -14,7 +14,7 @@ class CreateZoneCategoriesTable extends Migration
     {
         Schema::create('zone_categories', function (Blueprint $table) {
             $table->increments('id');
-            $table->enum('group', ['zones', 'dungeons', 'raids']);
+            $table->enum('group', ['zones', 'dungeons', 'raids', 'misc']);
             $table->string('name');
             $table->string('url_token');
             $table->timestamps();

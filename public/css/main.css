@@ -90,21 +90,22 @@ a.warrior { color: #C79C6E !important; }
 .btn[data-faction="alliance"] { background-color: #114587; }
 .btn[data-faction="horde"] { background-color: #650c0e; }
 
-.mogslot-summary h3 { margin-top: 0px; }
+.mogslot-summary h3, .zone-summary h3 { margin-top: 0px; }
 
-.mogslot-progress-wrapper { 
+.mogslot-progress-wrapper, .zone-progress-wrapper { 
 	margin-bottom: 10px;
 	display: block;
 }
-.mogslot-progress-wrapper .progress {
+.mogslot-progress-wrapper .progress, .zone-progress-wrapper .progress {
 	margin-bottom: 0px;
-	width: calc(100% - 25px);
 	display: inline-block;
 	vertical-align: middle;
 	position: relative;
 }
+.mogslot-progress-wrapper .progress { width: calc(100% - 25px); }
+.zone-progress-wrapper .progress { width: 100%; }
 
-.mogslot-progress-wrapper .progress .progress-label {
+.mogslot-progress-wrapper .progress .progress-label, .zone-progress-wrapper .progress .progress-label {
 	position: absolute;
 	top: 0px;
 	left: 0px;
@@ -118,8 +119,8 @@ a.warrior { color: #C79C6E !important; }
 	transition: all 0.2s ease;
 }
 
-.mogslot-progress-wrapper:hover .progress .progress-label.summary { opacity: 0; }
-.mogslot-progress-wrapper .progress .progress-label.mogslot-info { opacity: 0; }
-.mogslot-progress-wrapper:hover .progress .progress-label.mogslot-info { opacity: 1; }
+.mogslot-progress-wrapper:hover .progress .progress-label.summary, .zone-progress-wrapper:hover .progress .progress-label.summary { opacity: 0; }
+.mogslot-progress-wrapper .progress .progress-label.mogslot-info, .zone-progress-wrapper .progress .progress-label.zone-info { opacity: 0; }
+.mogslot-progress-wrapper:hover .progress .progress-label.mogslot-info, .zone-progress-wrapper:hover .progress .progress-label.zone-info { opacity: 1; }
 
 .panel-default > .panel-heading a.display-link { color: #ccc; }

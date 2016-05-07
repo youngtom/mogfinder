@@ -48,6 +48,7 @@ Route::group(['middleware' => 'web'], function () {
 	
 	//test routes
 	Route::get('/test', 'TestController@index');
+	Route::get('/test/legacy-item-info', 'TestController@legacyItemInfo');
 	Route::get('/test/world-drop-info', 'TestController@worldDropInfo');
 	Route::get('/test/zone-drop-info', 'TestController@zoneDropInfo');
 	Route::get('/test/object-drop-info', 'TestController@objectDropInfo');
@@ -61,11 +62,13 @@ Route::group(['middleware' => 'web'], function () {
     
     //wardrobe routes
     Route::get('/wardrobe', 'ItemsController@index');
+    Route::get('/wardrobe/zones/', 'ItemsController@zoneOverview');
     Route::get('/wardrobe/zone/{zoneURL}', 'ItemsController@showZoneDisplays');
     Route::get('/wardrobe/boss/{zoneURL}/{bossURL}', 'ItemsController@showBossDisplays');
     Route::get('/wardrobe/auctions', 'ItemsController@showAuctions');
     Route::get('/wardrobe/duplicates', 'ItemsController@duplicates');
     Route::get('/wardrobe/{characterURL}', 'ItemsController@index');
+    Route::get('/wardrobe/zones/{characterURL}', 'ItemsController@zoneOverview');
     Route::get('/wardrobe/duplicates/{selectedCharacterURL}', 'ItemsController@duplicates');
     Route::get('/wardrobe/{group}/{category}/{mogslotURL}', 'ItemsController@showSlot')->where('group', '(armor|weapons)');
     Route::get('/wardrobe/{group}/{category}/{mogslotURL}/{displayID}', 'ItemsController@showDisplay')->where('group', '(armor|weapons)');

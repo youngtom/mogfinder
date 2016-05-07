@@ -74,10 +74,16 @@
                                 <a href="{{ url('/wardrobe') }}">Overview</a>
                             </li>
                             <li>
+                                <a href="{{ url('/wardrobe') }}">Zone Overview</a>
+                            </li>
+                            <li>
                                 <a href="{{ url('/wardrobe/auctions') }}">Auction Search</a>
                             </li>
                             <li>
                                 <a href="{{ url('/wardrobe/duplicates') }}">Duplicates</a>
+                            </li>
+                            <li>
+                            	<a href="{{ url('/user/upload-data') }}">Upload Data</a>
                             </li>
                         </ul>
                     </li>

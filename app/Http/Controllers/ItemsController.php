@@ -20,6 +20,7 @@ use App\ItemSourceType;
 use App\Auction;
 use DB;
 use App\Zone;
+use App\ZoneCategory;
 use App\Boss;
 
 class ItemsController extends Controller
@@ -79,6 +80,62 @@ class ItemsController extends Controller
 	    }
 	    
 	    return view('items.overview')->with('categories', $mogslotCategories)->with('mogslotsByCategory', $mogslotsByCategory)->with('userMogslotCounts', $userMogslotCounts)->with('totalMogslotCounts', $totalMogslotCounts)->with('selectedCharacter', $character)->with('characters', $characters);
+    }
+    
+    public function zoneOverview($characterURL = false) {
+	    $user = Auth::user();
+	    
+	    if ($characterURL) {
+		    $character = Character::where('user_id', '=', $user->id)->where('url_token', '=', $characterURL)->first();
+		    
+		    if (!$character) {
+			    return \App::abort(404);
+		    }
+		    
+		    $classmask = pow(2, $character->class_id);
+		    $racemask = pow(2, $character->race_id);
+	    } else {
+		    $character = false;
+	    }
+	    
+	    $zones = Zone::orderBy('name', 'ASC')->get();
+	    
+	    $zones = $zones->filter(function ($zone) {
+		    return $zone->itemDisplays->count() >= 1;
+	    });
+	    
+	    $zoneCategories = ZoneCategory::whereIn('id', $zones->lists('zone_category_id')->toArray())->get()->groupBy('group');
+	    $zonesByCategory = $zones->groupBy('zone_category_id');
+	    $userZoneCounts = $totalZoneCounts = [];
+	    
+	    foreach ($zones as $zone) {
+		    if ($character) { 
+			    $zoneItemDisplayIDs = array_unique($zone->itemDisplays->filter(function ($display) use ($classmask, $racemask) {
+				    return (($display->restricted_races === null || ($display->restricted_races & $racemask) != 0) && ($display->restricted_classes === null || ($display->restricted_classes & $classmask) != 0));
+				})->lists('id')->toArray());
+		    } else {
+			    $zoneItemDisplayIDs = array_unique($zone->itemDisplays->lists('id')->toArray());
+		    }
+		    
+		    $totalZoneCounts[$zone->id] = count($zoneItemDisplayIDs);
+		    
+		    $zoneUserDisplays = $user->userItemDisplays()->whereIn('item_display_id', $zoneItemDisplayIDs)->get();
+		    if ($character) {
+			    $userZoneCounts[$zone->id] = $zoneUserDisplays->filter(function ($display) use ($classmask, $racemask) {
+				    return (($display->restricted_races === null || ($display->restricted_races & $racemask) != 0) && ($display->restricted_classes === null || ($display->restricted_classes & $classmask) != 0));
+			    })->count();
+		    } else {
+			    $userZoneCounts[$zone->id] = $zoneUserDisplays->count();
+		    }
+	    }
+	    
+	    if ($character) {
+		    $characters = Character::where('id', '<>', $character->id)->where('user_id', '=', $user->id)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');
+	    } else {
+		    $characters = Character::where('user_id', '=', $user->id)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');
+	    }
+	    
+	    return view('items.zone-overview')->with('categories', $zoneCategories)->with('zonesByCategory', $zonesByCategory)->with('userZoneCounts', $userZoneCounts)->with('totalZoneCounts', $totalZoneCounts)->with('selectedCharacter', $character)->with('characters', $characters);
     }
     
     public function setMogslotIcons($mogslotID = null, $iconID = null) {
