@@ -43,16 +43,19 @@ class UpdateItemsLockedRaces extends Command
         
         $bar = $this->output->createProgressBar(count($items));
         
-        $factionMasks = Faction::where('race_bitmask', '>', 0)->get()->lists('id', 'race_bitmask')->toArray();
-        dd($factionMasks);
+        $factionMasks = Faction::where('race_bitmask', '>', 0)->get()->lists('race_bitmask', 'id')->toArray();
 	    
 	    foreach ($items as $item) {
 		    $html = WowheadCache::getItemHtml($item->bnet_id);
 		    
-		    preg_match_all('/This item will be converted to \<a href\="\/item\=(?P<itemid>\d+)" (.+)\>(.+)\<\/a\> if you transfer to \<span class\="icon\-(?P<faction>alliance|horde)"\>(Alliance|Horde)\<\/span\>\./', $html, $matches, PREG_SET_ORDER);
+		    preg_match_all('/This item will be converted to \<a href\="\/item\=(?P<itemid>\d+)" (.+)\>(.+)\<\/a\> if you transfer to \<span class\="icon\-(alliance|horde)"\>(?P<faction>Alliance|Horde)\<\/span\>\./', $html, $matches, PREG_SET_ORDER);
 		    
 		    if ($matches && $matches[0]['faction']) {
+			    $factionID = ($matches[0]['faction'] == 'Alliance') ? 2 : 1;
+			    $mask = $factionMasks[$factionID];
 			    
+			    $item->locked_races = $mask;
+			    $item->save();
 		    }
 		    
 		    $bar->advance();
