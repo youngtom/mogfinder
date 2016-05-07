@@ -94,8 +94,10 @@ class ItemsController extends Controller
 		    
 		    $classmask = pow(2, $character->class_id);
 		    $racemask = pow(2, $character->race_id);
+		    $mogslotIDs = Mogslot::whereRaw('allowed_class_bitmask IS NULL OR allowed_class_bitmask & ? <> 0', [$classmask])->orderBy('inventory_type_id', 'ASC')->get()->lists('id')->toArray();
 	    } else {
 		    $character = false;
+		    $mogslots = Mogslot::orderBy('inventory_type_id', 'ASC')->get();
 	    }
 	    
 	    $zones = Zone::orderBy('name', 'ASC')->get();
@@ -110,8 +112,8 @@ class ItemsController extends Controller
 	    
 	    foreach ($zones as $zone) {
 		    if ($character) { 
-			    $zoneItemDisplayIDs = array_unique($zone->itemDisplays->filter(function ($display) use ($classmask, $racemask) {
-				    return (($display->restricted_races === null || ($display->restricted_races & $racemask) != 0) && ($display->restricted_classes === null || ($display->restricted_classes & $classmask) != 0));
+			    $zoneItemDisplayIDs = array_unique($zone->itemDisplays->filter(function ($display) use ($classmask, $racemask, $mogslotIDs) {
+				    return (in_array($display->mogslot_id, $mogslotIDs) && (($display->restricted_races === null || ($display->restricted_races & $racemask) != 0) && ($display->restricted_classes === null || ($display->restricted_classes & $classmask) != 0)));
 				})->lists('id')->toArray());
 		    } else {
 			    $zoneItemDisplayIDs = array_unique($zone->itemDisplays->lists('id')->toArray());
