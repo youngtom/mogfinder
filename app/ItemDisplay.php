@@ -22,11 +22,13 @@ class ItemDisplay extends Model
 	public function updateRestrictions($save = true) {
 		$classmask = $racemask = 0;
 		foreach ($this->items as $item) {
-			$classmask = ($item->allowable_classes && $classmask !== null) ? $classmask | $item->allowable_classes : null;
-			$racemask = ($item->allowable_races && $racemask !== null) ? $racemask | $item->allowable_races : null;
+			if ($item->isTransmoggable()) {
+				$classmask = ($item->allowable_classes && $classmask !== null) ? $classmask | $item->allowable_classes : null;
+				$racemask = ($item->allowable_races && $racemask !== null) ? $racemask | $item->allowable_races : null;
 			
-			if ($classmask === null && $racemask === null) {
-				break;
+				if ($classmask === null && $racemask === null) {
+					break;
+				}
 			}
 		}
 		

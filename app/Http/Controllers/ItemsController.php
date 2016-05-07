@@ -94,16 +94,16 @@ class ItemsController extends Controller
 		    
 		    $classmask = pow(2, $character->class_id);
 		    $racemask = pow(2, $character->race_id);
-		    $mogslotIDs = Mogslot::whereRaw('allowed_class_bitmask IS NULL OR allowed_class_bitmask & ? <> 0', [$classmask])->orderBy('inventory_type_id', 'ASC')->get()->lists('id')->toArray();
+		    $mogslotIDs = Mogslot::whereRaw('allowed_class_bitmask IS NULL OR allowed_class_bitmask & ? <> 0', [$classmask])->get()->lists('id')->toArray();
 	    } else {
 		    $character = false;
-		    $mogslots = Mogslot::orderBy('inventory_type_id', 'ASC')->get();
+		    $mogslotIDs = Mogslot::all()->lists('id')->toArray();
 	    }
 	    
 	    $zones = Zone::orderBy('name', 'ASC')->get();
 	    
-	    $zones = $zones->filter(function ($zone) {
-		    return $zone->itemDisplays->count() >= 1;
+	    $zones = $zones->filter(function ($zone) use ($mogslotIDs) {
+		    return $zone->itemDisplays->whereIn('mogslot_id', $mogslotIDs)->count() >= 1;
 	    });
 	    
 	    $zoneCategories = ZoneCategory::whereIn('id', $zones->lists('zone_category_id')->toArray())->get()->groupBy('group');
