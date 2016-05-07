@@ -89,9 +89,9 @@ Route::group(['middleware' => 'web'], function () {
     
     //user routes
     Route::get('/dashboard', 'UserController@getDashboard');
-    Route::get('/user/upload-data', 'UserController@dataUpload');
-    Route::post('/user/upload-data', 'UserController@dataUploadHandler');
-    Route::get('/user/upload-data/report/{token}', 'UserController@dataResponse');
+    Route::get('/upload-data', 'UserController@dataUpload');
+    Route::post('/upload-data', 'UserController@dataUploadHandler');
+    Route::get('/upload-data/report/{token}', 'UserController@dataResponse');
 	
 	/* uploaded file routes */
 	

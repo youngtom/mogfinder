@@ -82,10 +82,10 @@
                             <li>
                                 <a href="{{ url('/wardrobe/duplicates') }}">Duplicates</a>
                             </li>
-                            <li>
-                            	<a href="{{ url('/user/upload-data') }}">Upload Data</a>
-                            </li>
                         </ul>
+                    </li>
+                    <li class="{{ set_active('upload-data') }}">
+                        <a href="{{ url('/upload-data') }}"><i class="fa fa-fw fa-upload"></i> Upload Data</a>
                     </li>
                 </ul>
             </div>
