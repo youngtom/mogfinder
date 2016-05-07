@@ -130,7 +130,7 @@ class ItemDisplay extends Model
 				return null;
 			}
 			
-			$bitmask = ($bitmask) ? $bitmask | $dispBitmask : $dispBitmask;
+			$bitmask = ($bitmask) ? $bitmask | $display->restricted_classes : $display->restricted_classes;
 		}
 		
 		return $bitmask;
@@ -144,7 +144,7 @@ class ItemDisplay extends Model
 				return null;
 			}
 			
-			$bitmask = ($bitmask) ? $bitmask | $dispBitmask : $dispBitmask;
+			$bitmask = ($bitmask) ? $bitmask | $display->restricted_races : $display->restricted_races;
 		}
 		
 		return $bitmask;
