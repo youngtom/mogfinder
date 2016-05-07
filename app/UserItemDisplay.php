@@ -18,7 +18,7 @@ class UserItemDisplay extends Model
 		
 		foreach ($items as $userItem) {
 			$classmask = ($userItem->item->allowable_classes && $classmask !== null) ? $classmask | $userItem->item->allowable_classes : null;
-			$racemask = ($userItem->item->allowable_races && $racemask !== null) ? $racemask | $userItem->item->allowable_races : null;
+			$racemask = ($userItem->item->getAllowedRaceMask() && $racemask !== null) ? $racemask | $userItem->item->getAllowedRaceMask() : null;
 			
 			if ($classmask === null && $racemask === null) {
 				break;

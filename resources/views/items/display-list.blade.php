@@ -181,7 +181,7 @@
 												$itemClassMask = 0;
 											}
 									?>
-										<tr class="item-row <?=$priority?>" data-classmask="<?=$itemClassMask?>" data-racemask="<?=($item->allowable_races) ?: 0?>" data-sources="<?=($sourceTypeIDs) ?: -1?>" data-item-collected="<?=(in_array($item->id, $userItemIDs)) ? 1 : 0?>">
+										<tr class="item-row <?=$priority?>" data-classmask="<?=$itemClassMask?>" data-racemask="<?=($item->getAllowedRaceMask()) ?: 0?>" data-sources="<?=($sourceTypeIDs) ?: -1?>" data-item-collected="<?=(in_array($item->id, $userItemIDs)) ? 1 : 0?>">
 											<td class="itemname"><a href="http://www.wowhead.com/item=<?=$item->bnet_id?>" target="_blank" rel="<?=$item->getWowheadMarkup()?>" class="item-link q<?=$item->quality?>">[<?=$item->name?>]</a></td>
 											<td class="source"><?=$sources?></td>
 											<td class="center collected">

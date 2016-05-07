@@ -18,9 +18,9 @@ class UserItem extends Model
 				$userDisplay->user_id = $userItem->user_id;
 				$userDisplay->item_display_id = $userItem->item_display_id;
 				$userDisplay->restricted_classes = ($userItem->item) ? $userItem->item->allowable_classes : null;
-				$userDisplay->restricted_races = ($userItem->item) ? $userItem->item->allowable_races : null;
+				$userDisplay->restricted_races = ($userItem->item) ? $userItem->item->getAllowedRaceMask() : null;
 				$userDisplay->save();
-			} elseif ($userItem->isDirty('item_display_id') || $userItem->isDirty('allowable_classes') || $userItem->isDirty('allowable_races')) {
+			} elseif ($userItem->isDirty('item_display_id')) {
 				$userDisplay->updateRestrictions();
 			}
 		});

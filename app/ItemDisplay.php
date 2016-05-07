@@ -24,7 +24,7 @@ class ItemDisplay extends Model
 		foreach ($this->items as $item) {
 			if ($item->isTransmoggable()) {
 				$classmask = ($item->allowable_classes && $classmask !== null) ? $classmask | $item->allowable_classes : null;
-				$racemask = ($item->allowable_races && $racemask !== null) ? $racemask | $item->allowable_races : null;
+				$racemask = ($item->getAllowedRaceMask() && $racemask !== null) ? $racemask | $item->getAllowedRaceMask() : null;
 			
 				if ($classmask === null && $racemask === null) {
 					break;

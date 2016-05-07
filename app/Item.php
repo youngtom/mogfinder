@@ -22,7 +22,7 @@ class Item extends Model
 		parent::boot();
 		
 		self::saved(function ($item) {
-			if ($item->itemDisplay && ($item->isDirty('item_display_id') || $item->isDirty('allowable_classes') || $item->isDirty('allowable_races'))) {
+			if ($item->itemDisplay && ($item->isDirty('item_display_id') || $item->isDirty('allowable_classes') || $item->isDirty('allowable_races') || $item->isDirty('locked_races'))) {
 				$item->itemDisplay->updateRestrictions();
 			}
 			
@@ -261,7 +261,7 @@ class Item extends Model
 		    return false;
 	    }
 	    
-	    return !($this->allowable_races && (pow(2, $race->id) & $this->allowable_races) == 0);
+	    return !($this->getAllowedRaceMask() && (pow(2, $race->id) & $this->getAllowedRaceMask()) == 0);
     }
     
     public function getWowheadMarkup() {
@@ -284,11 +284,11 @@ class Item extends Model
 	}
 	
 	public function getRestrictedFactions() {
-		if (!$this->allowable_races) {
+		if (!$this->getAllowedRaceMask()) {
 			return false;
 		}
 		
-		$mask = $this->allowable_races;
+		$mask = $this->getAllowedRaceMask();
 		$factions = Faction::where('race_bitmask', '>', 0)->orderBy('name', 'ASC')->get();
 		
 		$restrictedFactions = $factions->filter(function ($faction) use ($mask) {
@@ -296,6 +296,18 @@ class Item extends Model
 		});
 		
 		return $restrictedFactions;
+	}
+	
+	public function getAllowedRaceMask() {
+		if ($this->allowable_races && $this->locked_races) {
+			return $this->allowable_races && $this->locked_races;
+		} elseif ($this->allowable_races) { 
+			return $this->allowable_races);
+		} elseif ($this->locked_races) {
+			return $this->locked_races;
+		} else {
+			return null;
+		}
 	}
     
     public static function getBitmaskFromIDArray($arr) {

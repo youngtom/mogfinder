@@ -343,7 +343,12 @@ class ItemsController extends Controller
 			$classes = false;
 		}
 		
-		if (Item::where('allowable_races', '>', 0)->whereIn('id', $itemIDs)->get()->count()) {
+		$factionRestrictedItemCount = Item::where(function ($query) {
+			$query->where('allowable_races', '>', 0);
+			$query->orWhere('locked_races', '>', 0);
+		})->whereIn('id', $itemIDs)->get()->count()
+		
+		if ($factionRestrictedItemCount) {
 		    $factions = Faction::where('race_bitmask', '>', 0)->orderBy('name', 'ASC')->get();
 		    
 		    if ($allowedRaceBitmask) {

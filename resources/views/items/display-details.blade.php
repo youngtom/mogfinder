@@ -63,9 +63,9 @@
 							<?php 
 								if (in_array($item->id, $userItems->lists('item_id')->toArray())) {
 									if ($item->allowable_classes || $item->allowable_races) {
-										echo '<i class="fa fa-btn fa-star-o"></i>';
+										echo '<i class="fa fa-btn fa-check partially-collected-star"></i>';
 									} else {
-										echo '<i class="fa fa-btn fa-star"></i>';
+										echo '<i class="fa fa-btn fa-check"></i>';
 									}
 								} else {
 									echo '&nbsp;';
