@@ -148,7 +148,7 @@
 						} elseif (count($restrictedClasses)) {
 							$restrictedUnits = $restrictedClasses;
 						} elseif (count($restrictedFactions)) {
-							$retrictedUnits = $restrictedFactions;
+							$restrictedUnits = $restrictedFactions;
 						}
 						
 						$partiallyCollected = (count($restrictedUnits)) ? 1 : 0;
