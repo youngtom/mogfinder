@@ -126,7 +126,7 @@
 									break;
 								}
 								
-								$restrictedRaceMask = $restrictedRaceMask | $item->getAllowableRaceMask();
+								$restrictedRaceMask = $restrictedRaceMask | $item->getAllowedRaceMask();
 							}
 						}
 						
