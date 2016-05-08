@@ -114,12 +114,49 @@
 								$classMask = pow(2, $class->id);
 								return (($restrictedClassMask & $classMask) !== 0);
 							})->lists('name')->toArray();
+						} else {
+							$restrictedClasses = [];
 						}
+						
+						$restrictedRaceMask = 0;
+						foreach ($displayItems as $item) {
+							if (in_array($item->id, $userItemIDs)) {
+								if (!$item->getAllowedRaceMask()) {
+									$restrictedRaceMask = false;
+									break;
+								}
+								
+								$restrictedRaceMask = $restrictedRaceMask | $item->getAllowableRaceMask();
+							}
+						}
+						
+						if ($restrictedRaceMask) {
+							$restrictedFactions = $factions->filter(function ($faction) use ($restrictedRaceMask) {
+								return (($restrictedRaceMask & $faction->race_bitmask) !== 0);
+							})->lists('name')->toArray();
+						} else {
+							$restrictedFactions = [];
+						}
+						
+						$restrictedUnits = [];
+						if (count($restrictedClasses) && count($restrictedFactions)) {
+							foreach ($restrictedFactions as $_faction) {
+								foreach ($restrictedClasses as $_class) {
+									$restrictedUnits[] = $_faction . ' ' . $_class;
+								}
+							}
+						} elseif (count($restrictedClasses)) {
+							$restrictedUnits = $restrictedClasses;
+						} elseif (count($restrictedFactions)) {
+							$retrictedUnits = $restrictedFactions;
+						}
+						
+						$partiallyCollected = (count($restrictedUnits)) ? 1 : 0;
 					} else {
 						$restrictedClassMask = false;
 					}
 		    ?>
-	            <div class="collected-togglable panel panel-default item-display-panel" data-display-collected="<?=($collected) ? 1 : 0?>" data-display-collected-partial="<?=($restrictedClassMask && count($restrictedClasses)) ? 1 : 0?>">
+	            <div class="collected-togglable panel panel-default item-display-panel" data-display-collected="<?=($collected) ? 1 : 0?>" data-display-collected-partial="<?=$partiallyCollected?>">
 	                <div class="panel-heading collapsed" id="display-heading-<?=$display->id?>" role="button" data-toggle="collapse" data-parent="#display-accordion" href="#display-<?=$display->id?>" aria-expanded="false" aria-controls="display-<?=$display->id?>">
 		                <i class="fa fa-btn fa-plus expand-icon" title="expand"></i>
 		                <i class="fa fa-btn fa-minus collapse-icon" title="collapse"></i> Display <?=$display->id?>
@@ -132,8 +169,8 @@
 		                </span>
 		                
 		                <span class="pull-right">
-		                	<?php if ($restrictedClassMask && count($restrictedClasses)) { ?>
-		                	<i class="fa fa-btn fa-check partiallly-collected-star" title="Unlocked on:<br><?=implode('<br>', $restrictedClasses)?>" data-toggle="tooltip" data-placement="left"></i>
+		                	<?php if ($partiallyCollected) { ?>
+		                	<i class="fa fa-btn fa-check partiallly-collected-star" title="Unlocked on:<br><?=implode('<br>', $restrictedUnits)?>" data-toggle="tooltip" data-placement="left"></i>
 		                	<?php } ?>
 		                	<i class="fa fa-btn fa-check collected-star" title="Collected" data-toggle="tooltip" data-placement="left"></i>
 		                </span>
@@ -187,7 +224,7 @@
 											<td class="center collected">
 											<?php 
 												if (in_array($item->id, $userItemIDs)) {
-													if ($item->allowable_classes || $item->allowable_races) {
+													if ($item->allowable_classes || ($item->allowable_races && ($item->allowable_races == $display->restricted_races))) {
 														echo '<i class="fa fa-btn fa-check partiallly-collected-star"></i>';
 													} else {
 														echo '<i class="fa fa-btn fa-check"></i>';
