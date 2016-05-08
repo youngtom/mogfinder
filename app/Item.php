@@ -301,8 +301,8 @@ class Item extends Model
 	public function getAllowedRaceMask() {
 		if ($this->allowable_races && $this->locked_races) {
 			return $this->allowable_races && $this->locked_races;
-		} elseif ($this->allowable_races) { 
-			return $this->allowable_races);
+		} elseif ($this->allowable_races) {
+			return $this->allowable_races;
 		} elseif ($this->locked_races) {
 			return $this->locked_races;
 		} else {
