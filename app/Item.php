@@ -685,12 +685,15 @@ class Item extends Model
 			$source->label = (@$data['name']) ?: null;
 			
 			if (@$data['cost']) {
+				if (count($data['cost']) > 3) {
+					die('Item: ' . $this->bnet_id . ' has mismatched currencies - ' . $data['cost']);
+				}
 				$source->gold_cost = (@$data['cost'][0]) ?: $source->gold_cost;
 				
 				$currencyInfo = @$data['cost'][1];
 				if ($currencyInfo) {
 					if (count($currencyInfo) > 1) {
-						die('Item: ' . $this->id . ' has multiple currencies - ' . $data['cost']);
+						die('Item: ' . $this->bnet_id . ' has multiple currencies - ' . $data['cost']);
 					}
 					
 					$currencyID = ($currencyInfo[0][0]) ?: false;
@@ -709,7 +712,7 @@ class Item extends Model
 					}
 				}
 				
-				$source->item_currency_info = $data['cost'][2] ? json_encode($data['cost'][2]) : null;
+				$source->item_currency_info = (@$data['cost'][2]) ? json_encode($data['cost'][2]) : null;
 			}
 			
 			$source->save();
