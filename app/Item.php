@@ -9,6 +9,7 @@ use App\Faction;
 use Sofa\Eloquence\Eloquence;
 use App\ItemDisplay;
 use App\WowheadCache;
+use App\Currency;
 
 class Item extends Model
 {
@@ -366,6 +367,10 @@ class Item extends Model
 	    }
     }
     
+    public function isItemToken() {
+	    return (!$this->equippable && $this->item_type_id == 16 && $this->item_subtype_id == 108);
+    }
+    
     // wowhead source import functions
     
 	public function importWowheadSources($types = false) {
@@ -677,6 +682,36 @@ class Item extends Model
 			
 			$source->zone_id = ($zone) ? $zone->id : $source->zone_id;
 			$source->faction_id = ($factionID) ?: null;
+			$source->label = (@$data['name']) ?: null;
+			
+			if (@$data['cost']) {
+				$source->gold_cost = (@$data['cost'][0]) ?: $source->gold_cost;
+				
+				$currencyInfo = @$data['cost'][1];
+				if ($currencyInfo) {
+					if (count($currencyInfo) > 1) {
+						die('Item: ' . $this->id . ' has multiple currencies - ' . $data['cost']);
+					}
+					
+					$currencyID = ($currencyInfo[0][0]) ?: false;
+					
+					if ($currencyID) {
+						$currency = Currency::where('bnet_id', '=', $currencyID)->get();
+						
+						if (!$currency) {
+							$currency = new Currency;
+							$currency->bnet_id = $currencyID;
+							$currency->save();
+						}
+						
+						$source->currency_id = $currency->id;
+						$source->currency_amount = $currencyInfo[0][1];
+					}
+				}
+				
+				$source->item_currency_info = $data['cost'][2] ? json_encode($data['cost'][2]) : null;
+			}
+			
 			$source->save();
 		}
 	}
