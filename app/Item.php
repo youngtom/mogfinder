@@ -699,7 +699,7 @@ class Item extends Model
 					$currencyID = ($currencyInfo[0][0]) ?: false;
 					
 					if ($currencyID) {
-						$currency = Currency::where('bnet_id', '=', $currencyID)->get();
+						$currency = Currency::where('bnet_id', '=', $currencyID)->first();
 						
 						if (!$currency) {
 							$currency = new Currency;
