@@ -153,7 +153,7 @@
 						
 						$partiallyCollected = (count($restrictedUnits)) ? 1 : 0;
 					} else {
-						$restrictedClassMask = false;
+						$partiallyCollected = $restrictedClassMask = false;
 					}
 		    ?>
 	            <div class="collected-togglable panel panel-default item-display-panel" data-display-collected="<?=($collected) ? 1 : 0?>" data-display-collected-partial="<?=$partiallyCollected?>">
