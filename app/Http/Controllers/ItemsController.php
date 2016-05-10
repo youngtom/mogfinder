@@ -208,7 +208,7 @@ class ItemsController extends Controller
 	    $displayIDs = array_unique(Item::whereIn('id', $itemIDs)->where('transmoggable', '=', 1)->get()->lists('item_display_id')->toArray());
 	    $displays = ItemDisplay::whereIn('id', $displayIDs)->get();
 	    
-	    return $this->showItemDisplays($displays, false, $itemIDs);
+	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Zone: <em>' . $zone->name . '</em>');
     }
     
     public function showBossDisplays($zoneURL, $bossURL) {
@@ -228,7 +228,7 @@ class ItemsController extends Controller
 	    $displayIDs = array_unique(Item::whereIn('id', $itemIDs)->where('transmoggable', '=', 1)->get()->lists('item_display_id')->toArray());
 	    $displays = ItemDisplay::whereIn('id', $displayIDs)->get();
 	    
-	    return $this->showItemDisplays($displays, false, $itemIDs);
+	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Boss: <em>' . $boss->name . '</em>');
     }
     
     public function showSlot(Request $request, $group, $categoryURL, $mogslotURL) {
@@ -246,10 +246,11 @@ class ItemsController extends Controller
 	    
 	    $displays = ItemDisplay::where('transmoggable', '=', 1)->where('mogslot_id', '=', $mogslot->id)->orderBy('bnet_display_id', 'ASC')->get();
 	    
-	    return $this->showItemDisplays($displays, $mogslot);
+	    return $this->showItemDisplays($displays, $mogslot)->with('headerText', ucwords($mogslot->mogslotCategory->group) . ': <em>' . $mogslot->label . '</em>');
     }
     
     public function search($query) {
+	    $queryUnaltered = $query;
 	    $query = str_replace('+', ' ', $query);
 	    
 	    if (is_numeric($query)) {
@@ -304,7 +305,7 @@ class ItemsController extends Controller
 		    $display->setTempPrimaryItem($itemsByDisplay[$display->id][0]);
 	    });
 	    
-	    return $this->showItemDisplays($displays, false, $itemIDs);
+	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Search results for: <em>' . $queryUnaltered . '</em>')->with('search', true);
     }
     
     protected function showItemDisplays($displays, $mogslot = false, $priorityItemIDs = []) {

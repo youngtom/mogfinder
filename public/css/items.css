@@ -1,3 +1,8 @@
+.display-title h2 { text-indent: 5px; }
+.display-title h2 em { font-weight: 200; }
+
+.item-filter-nav .btn-sm, .btn-group-sm > .btn { line-height: 20px; }
+
 .item-list-table .charname { width: 15% }
 .item-list-table .charrealm { width: 10% }
 .item-list-table .itemloc { width: 15% }
@@ -111,4 +116,4 @@ a.expand-collapse { color: #ccc; }
 .character-filter-group .dropdown-menu .realm-name { display: none; }
 
 .navbar-form .control-label { margin-right: 10px; }
-.navbar-form .form-group { margin-right: 20px; }
+.navbar-form .form-group { margin-right: 10px; }

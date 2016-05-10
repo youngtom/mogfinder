@@ -11,18 +11,19 @@
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-10 col-md-offset-1 item-scroll-with-nav">
-	        <div class="navbar subnav" role="navigation">
+        <div class="col-md-10 col-md-offset-1 <?=(count($itemDisplays)) ? 'item-scroll-with-nav' : ''?>">
+	        <?php if (count($itemDisplays)) { ?>
+	        <div class="item-filter-nav navbar subnav" role="navigation">
 			    <div class="navbar-inner">
 			        <div class="container">
 				        <form class="navbar-form">
 					        <div class="form-group">
 						        <p class="navbar-text">Filter: </p>
 						        <div class="btn-group navbar-btn" role="group">
-							        <div type="button" class="btn btn-primary collected-toggle-btn" data-collected="1">
+							        <div type="button" class="btn btn-sm btn-primary collected-toggle-btn" data-collected="1">
 							        	<i class="fa fa-btn fa-check-square-o"></i><i class="fa fa-btn fa-square-o"></i> &nbsp;Collected&nbsp; <span class="badge collected-count"><?=count($userDisplayIDs)?></span>
 							        </div>
-							        <div type="button" class="btn btn-primary collected-toggle-btn" data-collected="0">
+							        <div type="button" class="btn btn-sm btn-primary collected-toggle-btn" data-collected="0">
 							        	<i class="fa fa-btn fa-check-square-o"></i><i class="fa fa-btn fa-square-o"></i> &nbsp;Not Collected&nbsp; <span class="badge uncollected-count"><?=count($itemDisplays) - count($userDisplayIDs)?></span>
 							        </div>
 						        </div>
@@ -32,11 +33,11 @@
 					        <div class="form-group class-filter-group">
 						        <p class="navbar-text">Class:</p>
 						        <div class="btn-group navbar-btn class-filter selectable-filter all-selected" role="group">
-									<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 										<span class="selected-value">All</span> <span class="caret"></span>
 									</button>
 									<ul class="dropdown-menu">
-										<li class="all-select"><a href="#" data-class-id="0" class="show-all">Show all</a></li>
+										<li class="all-select"><a href="javascript:;" data-class-id="0" class="show-all">Show all</a></li>
 										<li class="all-select divider" roll="separator"></li>
 									<?php foreach ($classes as $class) { ?>
 										<li><a href="#class:<?=$class->url_token?>" data-class-id="<?=$class->id?>" data-class-code="<?=$class->url_token?>" class="<?=$class->url_token?>">
@@ -52,11 +53,11 @@
 					        <div class="form-group faction-filter-group">
 						        <p class="navbar-text">Faction:</p>
 						        <div class="btn-group navbar-btn faction-filter selectable-filter all-selected" role="group">
-									<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 										<span class="selected-value">All</span> <span class="caret"></span>
 									</button>
 									<ul class="dropdown-menu">
-										<li class="all-select"><a href="#" data-faction-mask="0" class="show-all">Show all</a></li>
+										<li class="all-select"><a href="javascript:;" data-faction-mask="0" class="show-all">Show all</a></li>
 										<li class="all-select divider" roll="separator"></li>
 									<?php foreach ($factions as $faction) { ?>
 										<li><a href="#faction:<?=strtolower($faction->name)?>" data-faction-mask="<?=$faction->race_bitmask?>" data-faction-code="<?=strtolower($faction->name)?>" class="<?=strtolower($faction->name)?>">
@@ -72,11 +73,11 @@
 					        <div class="form-group source-filter-group">
 						        <p class="navbar-text">Source:</p>
 						        <div class="btn-group navbar-btn source-filter selectable-filter all-selected" role="group">
-									<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 										<span class="selected-value">All</span> <span class="caret"></span>
 									</button>
 									<ul class="dropdown-menu">
-										<li class="all-select"><a href="#" data-source-id="0" class="show-all">Show all</a></li>
+										<li class="all-select"><a href="javascript:;" data-source-id="0" class="show-all">Show all</a></li>
 										<li class="all-select divider" roll="separator"></li>
 									<?php foreach ($itemSourceTypes as $itemSourceType) { ?>
 										<li><a href="#source:<?=$itemSourceType->url_token?>" data-source-id="<?=$itemSourceType->id?>" data-source-code="<?=$itemSourceType->url_token?>"><?=$itemSourceType->simple_label?></a></li>
@@ -89,6 +90,15 @@
 					</div>
 				</div>
 			</div>
+			<?php } ?>
+			
+	        <?php if (@$headerText) { ?>
+	        <div class="display-title">
+		        <h2><?=$headerText?></h2>
+	        </div>
+	        <?php } ?>
+			
+			<div id="no-displays-alert" class="alert alert-info <?=(count($itemDisplays)) ? 'hidden' : ''?>" role="alert">No displays found matching that <?=(@$search && !count($itemDisplays)) ? 'search. Please try again' : 'filter'?>.</div>
 			
 	        <div class="panel-group item-display-group" id="display-accordion" role="tablist" aria-multiselectable="true">
 	        <?php
