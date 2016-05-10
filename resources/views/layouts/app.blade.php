@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>MogFinder</title>
+    <title>MogCollector</title>
 
     <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">
     <link href="{{ asset('css/sb-admin.css') }}" rel="stylesheet">
