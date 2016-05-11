@@ -49,7 +49,7 @@
                         </a>
 
                         <ul class="dropdown-menu" role="menu">
-	                        <li><a href="{{ url('/user/upload-data') }}"><i class="fa fa-btn fa-upload"></i> Upload Data</a></li>
+	                        <li><a href="{{ url('/upload-data') }}"><i class="fa fa-btn fa-upload"></i> Upload Data</a></li>
                             <li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i> Logout</a></li>
                         </ul>
                     </li>
