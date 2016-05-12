@@ -21,6 +21,12 @@ class ItemSource extends Model
 			}
 		});
 		
+		self::saving(function ($source) {
+			if ($source->isDirty('item_currency_info')) {
+				$source->updateSourceItem(false);
+			}
+		});
+		
 		self::deleted(function ($source) {
 			$item = Item::find($source->item_id);
 			
@@ -50,6 +56,41 @@ class ItemSource extends Model
 	
 	public function zone() {
         return $this->belongsTo('App\Zone');
+	}
+	
+	public function updateSourceItem($save = true) {
+		if (!$this->itemSourceType) {
+			return false;
+		}
+		
+		if ($this->itemSourceType->label == 'CREATED_BY_ITEM' || $this->itemSourceType->label == 'CONTAINED_IN_ITEM') {
+			$sourceItem = Item::where('bnet_id', '=', $this->bnet_source_id)->first();
+			
+			if ($sourceItem) {
+				$this->source_item_id = $sourceItem->id;
+			}
+		} elseif ($this->itemSourceType->label == 'VENDOR' && $this->item_currency_info) {
+			$currArr = json_decode($this->item_currency_info, true);
+			
+			foreach ($currArr as $itemArr) {
+				list($bnetID, $amt) = $itemArr;
+				
+				if ($amt == 1) {
+					$item = Item::where('bnet_id', '=', $bnetID)->first();
+					
+					if ($item->isItemToken()) {
+						$this->source_item_id = $item->id;
+						break;
+					}
+				}
+			}
+		} else {
+			$this->source_item_id = null;
+		}
+				
+		if ($save) {
+			$this->save();
+		}
 	}
 	
 	public function getWowheadLink(Item $item) {

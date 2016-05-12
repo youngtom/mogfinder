@@ -368,7 +368,7 @@ class Item extends Model
     }
     
     public function isItemToken() {
-	    return (!$this->equippable && $this->item_type_id == 16 && $this->item_subtype_id == 108);
+	    return ((!$this->equippable && $this->item_type_id == 16 && $this->item_subtype_id == 108 && $this->quality == 4) || $this->bnet_id == 47242);
     }
     
     // wowhead source import functions
@@ -749,10 +749,13 @@ class Item extends Model
 			$itemSource = ItemSource::where('item_source_type_id', '=', 12)->where('bnet_source_id', '=', $itemBnetID)->where('item_id', '=', $this->id)->first();
 	    
 		    if (!$itemSource && !in_array($itemBnetID, $ignoreItems)) {
+			    $sourceItem = Item::where('bnet_id', '=', $itemBnetID)->first();
+			    
 			    $itemSource = new ItemSource;
 			    $itemSource->item_id = $this->id;
 			    $itemSource->item_source_type_id = 12;
 			    $itemSource->bnet_source_id = $itemBnetID;
+			    $itemSource->source_item_id = ($sourceItem) ? $sourceItem->id : null;
 			    $itemSource->import_source = 'wowheadImport';
 			    $itemSource->save();
 		    }
@@ -766,10 +769,13 @@ class Item extends Model
 			$itemSource = ItemSource::where('item_source_type_id', '=', 16)->where('bnet_source_id', '=', $itemBnetID)->where('item_id', '=', $this->id)->first();
 	    
 		    if (!$itemSource) {
+			    $sourceItem = Item::where('bnet_id', '=', $itemBnetID)->first();
+			    
 			    $itemSource = new ItemSource;
 			    $itemSource->item_id = $this->id;
 			    $itemSource->item_source_type_id = 16;
 			    $itemSource->bnet_source_id = $itemBnetID;
+			    $itemSource->source_item_id = ($sourceItem) ? $sourceItem->id : null;
 			    $itemSource->import_source = 'wowheadImport';
 			    $itemSource->save();
 		    }

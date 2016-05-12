@@ -294,19 +294,14 @@ class ItemsController extends Controller
 				}
 			}
 			
-			//search for items from created items
-			$createdItemSourceTypeIDs = ItemSourceType::whereIn('label', ['CONTAINED_IN_ITEM', 'CREATED_BY_ITEM'])->get()->lists('id')->toArray();
-			$createdFromItemBnetIDs = ItemSource::whereIn('item_source_type_id', $createdItemSourceTypeIDs)->groupBy('bnet_source_id')->get()->lists('bnet_source_id')->toArray();
-			$createdFromItemBnetIDs = array_unique($createdFromItemBnetIDs);
+			//search for items from related items
+			$allRelatedItemIDs = ItemSource::whereNotNull('source_item_id')->get(['source_item_id'])->lists('source_item_id')->toArray();
+			$relatedItemsIDs = Item::whereIn('id', $allRelatedItemIDs)->search($q)->get()->lists('id')->toArray();
 			
-			$createdItemBnetIDs = Item::whereIn('bnet_id', $createdFromItemBnetIDs)->search($q)->get()->lists('bnet_id')->toArray();
-			
-			if (count($createdItemBnetIDs)) {
-				$createdItems = Item::where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->whereHas('itemSources', function ($query) use ($createdItemBnetIDs, $createdItemSourceTypeIDs) {
-				    $query->whereIn('bnet_source_id', $createdItemBnetIDs)->whereIn('item_source_type_id', $createdItemSourceTypeIDs);
-			    })->get();
-			    
-			    $items = $items->merge($createdItems);
+			if (count($relatedItemsIDs)) {
+				$itemIDs = ItemSource::whereIn('source_item_id', $relatedItemIDs)->get()->lists('item_id')->toArray();
+				$itemsFromItems = Item::whereIn('id', $itemIDs)->where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->get();
+				$items = $items->merge($itemsFromItems);
 			}
 		}
 		
