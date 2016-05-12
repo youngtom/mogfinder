@@ -43,7 +43,7 @@ class TestController extends Controller
 					
 					if ($sItem) {
 						$token = ($sItem->isItemToken()) ? 1 : 0;
-						$out[] = $token . ': <a href="http://www.wowhead.com/item=' . $sItem->bnet_id . '" class="q' . $sItem->quality . '" rel="' . $sItem->getWowheadMarkup() . '">[' . $item->name . ']</a> x' . $count;
+						$out[] = $token . ': <a href="http://www.wowhead.com/item=' . $sItem->bnet_id . '" class="q' . $sItem->quality . '" rel="' . $sItem->getWowheadMarkup() . '">[' . $sItem->name . ']</a> x' . $count;
 					} else {
 						die('BnetID not found: ' . $bnetID);
 					}
