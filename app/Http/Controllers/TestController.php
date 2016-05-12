@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 
 use App\User;
 use App\Item;
+use App\ItemDisplay;
 use App\Character;
+use App\Faction;
 use App\Realm;
 use App\Race;
 use App\Libraries\LuaParser;
@@ -25,6 +27,32 @@ use DB;
 class TestController extends Controller
 {
 	public function index() {
+		$sources = ItemSource::whereNotNull('item_currency_info')->get()->groupBy('item_id');
+		
+		foreach ($sources as $itemID => $sourceArr) {
+			$item = Item::find($itemID);
+			$out[] = 'Item: <a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
+			
+			foreach ($sourceArr as $source) {
+				$itemArr = json_decode($source->item_currency_info, true);
+				
+				foreach ($itemArr as $_arr) {
+					list($bnetID, $count) = $_arr;
+					
+					$sItem = Item::where('bnet_id', '=', $bnetID)->first();
+					
+					if ($sItem) {
+						$token = ($sItem->isItemToken()) ? 1 : 0;
+						$out[] = $token . ': <a href="http://www.wowhead.com/item=' . $sItem->bnet_id . '" class="q' . $sItem->quality . '" rel="' . $sItem->getWowheadMarkup() . '">[' . $item->name . ']</a> x' . $count;
+					} else {
+						die('BnetID not found: ' . $bnetID);
+					}
+				}
+			}
+		}
+		
+		return view('test')->with('out', $out)->with('newline', "<br>");
+		
 		$file = file(storage_path() . '/logs/PROD.laravel6.log');
 		
 		$_out = [
