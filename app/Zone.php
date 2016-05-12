@@ -14,7 +14,7 @@ class Zone extends Model
 	
 	private static $apiClient = null;
 	protected $fillable = ['bnet_id'];
-	protected $searchableColumns = ['name', 'bnet_id'];
+	protected $searchableColumns = ['name'];
 	
 	public function bosses() {
 		return $this->hasMany('App\Boss');

@@ -10,7 +10,7 @@ class Boss extends Model
 	use Eloquence;
 	
 	protected $fillable = ['bnet_id', 'parent_boss_id'];
-	protected $searchableColumns = ['name', 'bnet_id'];
+	protected $searchableColumns = ['name'];
 	
 	public function parentBoss() {
 		return $this->belongsTo('App\Boss', 'parent_boss_id');

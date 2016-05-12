@@ -77,4 +77,19 @@ class ItemSource extends Model
 			return $this->itemSourceType->context_label;
 		}
 	}
+	
+	public static function getCurrencyBnetIDs() {
+		$sources = ItemSource::whereNotNull('item_currency_info')->get(['item_currency_info'])->groupBy('item_currency_info');
+		
+		$bnetIDs = [];
+		foreach ($sources as $currencyInfo => $sourceArr) {
+			$currencyArr = json_decode($currencyInfo, true);
+			foreach ($currencyArr as $arr) {
+				list($bnetID, $amt) = $arr;
+				$bnetIDs[] = $bnetID;
+			}
+		}
+		
+		return array_unique($bnetIDs);
+	}
 }
