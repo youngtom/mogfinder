@@ -296,9 +296,9 @@ class ItemsController extends Controller
 			
 			//search for items from related items
 			$allRelatedItemIDs = ItemSource::whereNotNull('source_item_id')->get(['source_item_id'])->lists('source_item_id')->toArray();
-			$relatedItemsIDs = Item::whereIn('id', $allRelatedItemIDs)->search($q)->get()->lists('id')->toArray();
+			$relatedItemIDs = Item::whereIn('id', $allRelatedItemIDs)->search($q)->get()->lists('id')->toArray();
 			
-			if (count($relatedItemsIDs)) {
+			if (count($relatedItemIDs)) {
 				$itemIDs = ItemSource::whereIn('source_item_id', $relatedItemIDs)->get()->lists('item_id')->toArray();
 				$itemsFromItems = Item::whereIn('id', $itemIDs)->where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->get();
 				$items = $items->merge($itemsFromItems);
