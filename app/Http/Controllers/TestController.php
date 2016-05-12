@@ -27,10 +27,11 @@ use DB;
 class TestController extends Controller
 {
 	public function index() {
-		$sources = ItemSource::whereNotNull('item_currency_info')->get()->groupBy('item_id')->groupBy('item_currency_info');
+		$sources = ItemSource::whereNotNull('item_currency_info')->get()->groupBy('item_id');
 		
 		foreach ($sources as $itemID => $sourceArr) {
-			$item = Item::find($itemID);
+			$item = Item::find($itemID);			
+			
 			$out[] = 'Item: <a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
 			
 			foreach ($sourceArr as $source) {
