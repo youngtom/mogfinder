@@ -39,6 +39,10 @@ $(document).ready(function () {
 			return true;
 		}
 	});
+	
+	$('#search-form').on('submit') {
+		$('#search-form .typeahead').typeahead('destroy');
+	}
 });
 
 function affixWidth(){
