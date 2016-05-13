@@ -13,6 +13,10 @@ class Realm extends Model
     protected $fillable = ['name', 'region'];
     protected $connectedRealms = null;
     
+    public function characters() {
+	    return $this->hasMany('App\Character');
+    }
+    
     public function parentRealm() {
 	    return $this->hasOne('App\Realm');
     }

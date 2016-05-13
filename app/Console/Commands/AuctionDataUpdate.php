@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Realm;
+use App\Character;
 use DB;
 use App\Jobs\UpdateRealmAuctionData;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -44,13 +45,16 @@ class AuctionDataUpdate extends Command
     public function handle()
     {   
         $timestamp = time() - 30*60;
-        $realms = Realm::whereNull('parent_realm_id')->where('auction_import_queued', '=', 0)->where('auction_data_timestamp', '<=', $timestamp)->orWhere('auction_data_timestamp', '=', null)->get();
+        $realms = Realm::whereNull('parent_realm_id')->where('auction_data_timestamp', '<=', $timestamp)->orWhere('auction_data_timestamp', '=', null)->get();
         
         foreach ($realms as $realm) {
-	        $this->line('Queuing auction data import for ' . $realm->name . ' ' . $realm->region);
+	        $realmIDs = Realm::where('parent_realm_id', '=', $realm->id)->orWhere('id', '=', $realm->id)->get()->lists('id')->toArray();
+	        $characters = Character::whereIn('realm_id', $realmIDs)->get();
 	        
-	        $job = (new UpdateRealmAuctionData($realm))->onQueue('low');
-		    $this->dispatch($job);
+	        if ($characters->count()) {
+		        $this->line('Updating auction data for realm: ' . $realm->name . ' - ' . $realm->region);
+		        $realm->updateAuctionData();
+		    }
         }
     }
 }

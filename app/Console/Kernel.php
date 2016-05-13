@@ -61,6 +61,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('auctions:update')->everyTenMinutes();
+        $schedule->command('auctions:update')->everyTenMinutes()->withoutOverlapping();
     }
 }
