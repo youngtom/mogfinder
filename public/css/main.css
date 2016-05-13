@@ -124,3 +124,61 @@ a.warrior { color: #C79C6E !important; }
 .mogslot-progress-wrapper:hover .progress .progress-label.mogslot-info, .zone-progress-wrapper:hover .progress .progress-label.zone-info { opacity: 1; }
 
 .panel-default > .panel-heading a.display-link { color: #ccc; }
+
+#search-form input { width: 300px; }
+
+/* typeahead classes */
+.twitter-typeahead .tt-query,
+.twitter-typeahead .tt-hint {
+	margin-bottom: 0;
+}
+
+.tt-menu {
+	font-size: 12px;
+	min-width: 160px;
+	width: 100%;
+	margin-top: 2px;
+	padding: 5px 0;
+	background-color: #080808;
+	border: 1px solid #cccccc;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	border-radius: 4px;
+	-webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+	      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+	background-clip: padding-box;
+
+}
+.tt-suggestion {
+	display: block;
+	padding: 0px 5px;
+	height: 25px;
+	line-height: 25px;
+	position: relative;
+	white-space: nowrap;
+	text-decoration: none;
+}
+
+.tt-hint { color: #888; }
+
+.tt-suggestion.tt-cursor,
+.tt-suggestion:hover,
+.tt-suggestion.tt-cursor .result-type,
+.tt-suggestion:hover .result-type { 
+	background-color: #333;
+	text-decoration: none;
+	color: white;
+}
+
+.tt-suggestion .result-type {
+	font-size: smaller;
+	text-transform: uppercase;
+	color: #ccc;
+	width: auto;
+	display: inline-block;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	bottom: 0px;
+	padding: 0 5px;
+	background: #080808;
+}

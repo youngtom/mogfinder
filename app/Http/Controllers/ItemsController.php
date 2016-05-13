@@ -196,6 +196,58 @@ class ItemsController extends Controller
         return view('items.duplicates')->with('duplicates', $dupeItems)->with('characters', $characters)->with('selectedCharacter', $selectedCharacter);
     }
     
+    public function showItem($bnetID) {
+	    $items = Item::where('bnet_id', '=', $bnetID)->get();
+	    
+	    if (!$items->count()) {
+		    return \App::abort(404);
+	    }
+	    
+	    $itemName = $items->first()->name;
+	    $itemIDs = $items->lists('id')->toArray();
+	    
+	    if ($items->where('transmoggable', 1)->count()) {
+		    $displayIDs = array_unique($items->lists('item_display_id')->toArray());
+	    } else {
+		    $sources = ItemSource::whereIn('source_item_id', $itemIDs)->get();
+		    
+		    if ($sources->count()) {
+			    $itemIDs = array_unique($sources->lists('item_id')->toArray());
+			    $displayIDs = array_unique(Item::whereIn('id', $itemIDs)->where('transmoggable', '=', 1)->get()->lists('item_display_id')->toArray());
+		    } else {
+			    $displayIDs = [];
+		    }
+	    }
+	    	    
+	    $displays = ItemDisplay::whereIn('id', $displayIDs)->get();
+	    
+	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Item: <em>' . $itemName . '</em>');
+    }
+    
+    public function showVendorDisplays($bnetID) {
+	    $vendorSourceType = ItemSourceType::where('label', '=', 'VENDOR')->first();
+	    $sourceItemIDs = ItemSource::where('item_source_type_id', '=', $vendorSourceType->id)->where('bnet_source_id', '=', $bnetID)->get()->lists('item_id')->toArray();
+	    
+	    if (!count($sourceItemIDs)) {
+		    return \App::abort(404);
+	    }
+	    
+	    $source = ItemSource::where('item_source_type_id', '=', $vendorSourceType->id)->where('bnet_source_id', '=', $bnetID)->first();
+	    
+	    if ($source) {
+		    $sourceLabel = $source->label;
+		    
+		    if ($source->zone) {
+			    $sourceLabel .= ' (' . $source->zone->name . ')';
+		    }
+	    }
+	    
+	    $displayIDs = array_unique(Item::whereIn('id', $sourceItemIDs)->where('transmoggable', '=', 1)->get()->lists('item_display_id')->toArray());
+	    $displays = ItemDisplay::whereIn('id', $displayIDs)->get();
+	    
+	    return $this->showItemDisplays($displays, false, $sourceItemIDs)->with('headerText', 'Vendor: <em>' . $sourceLabel . '</em>');
+    }
+    
     public function showZoneDisplays($zoneURL) {
 	    $zone = Zone::where('url_token', '=', $zoneURL)->first();
 	    
@@ -228,7 +280,7 @@ class ItemsController extends Controller
 	    $displayIDs = array_unique(Item::whereIn('id', $itemIDs)->where('transmoggable', '=', 1)->get()->lists('item_display_id')->toArray());
 	    $displays = ItemDisplay::whereIn('id', $displayIDs)->get();
 	    
-	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Boss: <em>' . $boss->name . '</em>');
+	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Boss: <em>' . $boss->name . ' (' . $zone->name . ')</em>');
     }
     
     public function showSlot(Request $request, $group, $categoryURL, $mogslotURL) {
@@ -249,15 +301,147 @@ class ItemsController extends Controller
 	    return $this->showItemDisplays($displays, $mogslot)->with('headerText', ucwords($mogslot->mogslotCategory->group) . ': <em>' . $mogslot->label . '</em>');
     }
     
+    public function searchHints($query) {
+	    $q = '"' . $query . '"';
+	    $results = [];
+	    $resultPriority = ['item', 'boss', 'zone', 'vendor'];
+	    
+	    //search items
+	    $items = Item::search($q)->get();
+	    
+	    $items = $items->filter(function ($item) {
+		    if ($item->transmoggable == 0 || !$item->item_display_id) {
+			    $sources = ItemSource::where('source_item_id', '=', $item->id)->get();
+			    return ($sources->count()) ? true : false;
+		    } else {
+			    return true;
+		    }
+	    });
+	    
+	    if ($items->count()) {
+		    $itemBnetIDs = [];
+		    $results['item'] = [];
+		    
+		    foreach ($items as $item) {
+			    if (!in_array($item->bnet_id, $itemBnetIDs)) {
+				    $itemBnetIDs[] = $item->bnet_id;
+				    
+				    $results['item'][] = [
+					    'type' => 'item',
+					    'value' => $item->name,
+					    'id' => $item->id,
+					    'link' => route('item', [$item->bnet_id]),
+					    'linkClass' => 'q' . $item->quality
+				    ];
+			    }
+		    }
+	    }
+	    
+	    //search zones
+	    $zones = Zone::search($q)->get();
+	    
+	    if ($zones->count()) {
+		    $results['zone'] = [];	
+		    foreach ($zones as $zone) {
+			    $results['zone'][] = [
+				    'type' => 'zone',
+				    'value' => $zone->name,
+				    'id' => $zone->id,
+				    'link' => route('zone', [$zone->url_token]),
+				    'linkClass' => 'zone'
+			    ];
+		    }
+		}
+	    
+	    //search bosses
+	    $bosses = Boss::search($q)->whereNull('parent_boss_id')->get();
+	    $encounterIDs = [];
+	    
+	    if ($bosses->count()) {
+		    $results['boss'] = [];		    
+		    foreach ($bosses as $boss) {				    
+			    $results['boss'][] = [
+				    'type' => 'boss',
+				    'value' => $boss->name,
+				    'id' => $boss->id,
+				    'link' => route('boss', [$boss->zone->url_token, $boss->url_token]),
+				    'linkClass' => 'boss'
+			    ];
+		    }
+	    }
+	    
+	    //search source labels
+	    $sources = ItemSource::search($q)->get();
+	    
+	    if ($sources->count()) {
+		    foreach ($sources as $source) {
+			    if ($source->itemSourceType->label == 'VENDOR') {
+				    if (!array_key_exists('vendor', $results)) {
+					    $results['vendor'] = [];
+				    }
+				    
+				    $results['vendor'][] = [
+					    'type' => 'vendor',
+					    'value' => $source->label,
+					    'id' => $source->id,
+					    'link' => route('vendor', [$source->bnet_source_id]),
+					    'linkClass' => 'vendor'
+				    ];
+			    }
+		    }
+	    }
+	    
+	    $out = [];
+	    $maxResults = 10;
+	    
+	    while (count($out) < $maxResults && count($results)) {
+		    foreach ($results as $type => &$resultArr) {
+			    if (count($results[$type])) {
+				    $out[] = array_pop($resultArr);
+			    } else {
+				    unset($results[$type]);
+			    }
+			    
+			    if (count($out) >= $maxResults) {
+				    break;
+			    }
+		    }
+	    }
+	    
+	    usort($out, function ($a1, $a2) use ($resultPriority) {
+		    return array_search($a1['type'], $resultPriority) > array_search($a2['type'], $resultPriority);
+	    });
+	    
+	    //workaround for typeahead choking on results = maxresults
+	    if (count($out) == $maxResults) {
+		    $out[] = ['value' => null];
+	    }
+	    
+	    return \Response::json($out);
+    }
+    
     public function search($query) {
 	    $query = str_replace('+', ' ', $query);
 	    $q = '"' . $query . '"';
+	    $items = collect();
 	    
 	    if (is_numeric($query)) {
-		    $items = Item::where('bnet_id', '=', $query)->where('transmoggable', '=', 1)->where('item_display_id', '>', 0)->get();
+		    $bnetIDItems = Item::where('bnet_id', '=', $query)->get();
+		    
+		    foreach ($bnetIDItems as $item) {
+			    if ($item->transmoggable == 1 && $item->item_display_id) {
+				    $items->push($item);
+			    } else {
+				    $sourceItemIDs = ItemSource::where('source_item_id', '=', $item->id)->get()->lists('item_id')->toArray();
+				    
+				    if (count($sourceItemIDs)) {
+					    $sourceItems = Item::whereIn('id', $sourceItemIDs)->where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->get();
+					    
+					    $items = $items->merge($sourceItems);
+				    }
+			    }
+		    }
 	    } else {
-		    $items = collect();
-			
 			//search for items
 			$itemsByName = Item::where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->search($q)->get();
 			$items = $items->merge($itemsByName);
@@ -294,6 +478,14 @@ class ItemsController extends Controller
 				}
 			}
 			
+			//search source labels
+			$sourceItemIDs = ItemSource::search($q)->get()->lists('item_id')->toArray();
+			
+			if (count($sourceItemIDs)) {
+				$sourceItems = Item::whereIn('id', $sourceItemIDs)->where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->get();
+				$items = $items->merge($sourceItems);
+			}
+			
 			//search for items from related items
 			$allRelatedItemIDs = ItemSource::whereNotNull('source_item_id')->get(['source_item_id'])->lists('source_item_id')->toArray();
 			$relatedItemIDs = Item::whereIn('id', $allRelatedItemIDs)->search($q)->get()->lists('id')->toArray();
@@ -312,13 +504,14 @@ class ItemsController extends Controller
 	    
 	    $displays = ItemDisplay::whereIn('id', $displayIDs)->where('transmoggable', '=', 1)->get();
 	    
+	    if ($displays->count() == 1) {
+		    $display = $displays->first();
+		    return redirect()->route('display', [$display->mogslot->mogslotCategory->group, $display->mogslot->mogslotCategory->url_token, $display->mogslot->simple_url_token, $display->id]);
+	    }
+	    
 	    // restore search relevance
 	    $displays = $displays->sortBy(function ($display) use ($displayIDs) {
 		    return array_search($display->id, $displayIDs);
-	    });
-	    
-	    $displays->each(function ($display) use ($itemsByDisplay) {
-		    $display->setTempPrimaryItem($itemsByDisplay[$display->id][0]);
 	    });
 	    
 	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Search results for: <em>' . $query . '</em>')->with('search', true);

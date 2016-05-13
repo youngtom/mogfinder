@@ -56,10 +56,11 @@
                 @endif
             </ul>
             
-            <form class="navbar-form navbar-right" action="{{ url('/search') }}">
+            <form id="search-form" class="navbar-form navbar-right" action="{{ url('/search') }}">
                 <div class="form-group">
-	                <input type="text" class="form-control" name="q" placeholder="Item Search" />
+	                <input type="text" class="form-control typeahead" name="q" placeholder="Search" />
                 </div>
+                <button type="submit" class="btn btn-default hidden">Submit</button>
             </form>
             
             <div class="collapse navbar-collapse navbar-ex1-collapse">
@@ -102,6 +103,7 @@
 
     <script src="{{ asset('js/jquery.js') }}"></script>
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>
+	<script src="{{ asset('js/typeahead/typeahead.bundle.min.js') }}"></script>
 	<script src="{{ asset('js/main.js') }}"></script>
 	@yield('js')
     

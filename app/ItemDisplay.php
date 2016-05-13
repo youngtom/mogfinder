@@ -88,16 +88,21 @@ class ItemDisplay extends Model
 		return url('/' . $base . '/' . $this->mogslot->mogslotCategory->group . '/' . $this->mogslot->mogslotCategory->url_token . '/' . $this->mogslot->simple_url_token . '/' . $this->id);
 	}
 	
-	public function getPrimaryItem($search = null) {
+	public function getPrimaryItem($priorityIDs = null) {
+		if ($priorityIDs) {
+			$item = $this->items()->where('transmoggable', '=', 1)->whereIn('id', $priorityIDs)->orderBy('bnet_id', 'ASC')->first();
+			
+			if ($item) {
+				return $item;
+			}
+		}
+		
 		if ($this->primaryItemOverride) {
 			return $this->primaryItemOverride;
 		} elseif ($this->primaryItem) {
 			return $this->primaryItem;
 		} else {
-			if ($search) {
-				$item = $this->items()->where('transmoggable', '=', 1)->search($search)->orderBy('bnet_id', 'ASC')->first();
-			}
-			return ($search && $item) ? $item : $this->items()->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->first();
+			return $this->items()->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->first();
 		}
 	}
 	

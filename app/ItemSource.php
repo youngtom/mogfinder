@@ -5,9 +5,13 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\Item;
 use App\Zone;
+use Sofa\Eloquence\Eloquence;
 
 class ItemSource extends Model
 {
+	use Eloquence;
+	protected $searchableColumns = ['label'];
+	
 	public static function boot() {
 		parent::boot();
 		

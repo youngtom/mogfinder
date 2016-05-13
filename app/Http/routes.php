@@ -63,23 +63,30 @@ Route::group(['middleware' => 'web'], function () {
     //wardrobe routes
     Route::get('/wardrobe', 'ItemsController@index');
     Route::get('/wardrobe/zones/', 'ItemsController@zoneOverview');
-    Route::get('/wardrobe/zone/{zoneURL}', 'ItemsController@showZoneDisplays');
-    Route::get('/wardrobe/boss/{zoneURL}/{bossURL}', 'ItemsController@showBossDisplays');
+    Route::get('/wardrobe/zone/{zoneURL}', ['as' => 'zone', 'uses' => 'ItemsController@showZoneDisplays']);
+    Route::get('/wardrobe/boss/{zoneURL}/{bossURL}', ['as' => 'boss', 'uses' => 'ItemsController@showBossDisplays']);
+    Route::get('/wardrobe/vendor/{bnetID}', ['as' => 'vendor', 'uses' => 'ItemsController@showVendorDisplays']);
+    Route::get('/wardrobe/item/{bnetID}', ['as' => 'item', 'uses' => 'ItemsController@showItem']);
     Route::get('/wardrobe/auctions', 'ItemsController@showAuctions');
     Route::get('/wardrobe/duplicates', 'ItemsController@duplicates');
     Route::get('/wardrobe/{characterURL}', 'ItemsController@index');
     Route::get('/wardrobe/zones/{characterURL}', 'ItemsController@zoneOverview');
     Route::get('/wardrobe/duplicates/{selectedCharacterURL}', 'ItemsController@duplicates');
     Route::get('/wardrobe/{group}/{category}/{mogslotURL}', 'ItemsController@showSlot')->where('group', '(armor|weapons)');
-    Route::get('/wardrobe/{group}/{category}/{mogslotURL}/{displayID}', 'ItemsController@showDisplay')->where('group', '(armor|weapons)');
+    Route::get('/wardrobe/{group}/{category}/{mogslotURL}/{displayID}', ['as' => 'display', 'uses' => 'ItemsController@showDisplay'])->where('group', '(armor|weapons)');
     
     //Search routes
     Route::get('/search', function () {
 	    $query = \Request::input('q');
+	    $json = \Request::input('json');
 	    
 	    if ($query) {
-		    $query = preg_replace('/\s+/', '+', $query);
-		    return redirect()->route('search', [$query]);
+		    if ($json) {
+			    return app()->make('App\Http\Controllers\ItemsController')->callAction('searchHints', [$query]);
+		    } else {
+			    $query = preg_replace('/\s+/', '+', $query);
+			    return redirect()->route('search', [$query]);
+		    }
 	    } else {
 		    return view('items.search');
 	    }
