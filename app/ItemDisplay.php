@@ -90,7 +90,7 @@ class ItemDisplay extends Model
 	
 	public function getPrimaryItem($priorityIDs = null) {
 		if ($priorityIDs) {
-			$item = $this->items->where('transmoggable', 1)->whereIn('id', $priorityIDs)->orderBy('bnet_id', 'ASC')->first();
+			$item = $this->items->where('transmoggable', 1)->whereIn('id', $priorityIDs)->sortBy('bnet_id')->first();
 			
 			if ($item) {
 				return $item;
@@ -102,7 +102,7 @@ class ItemDisplay extends Model
 		} elseif ($this->primaryItem) {
 			return $this->primaryItem;
 		} else {
-			return $this->items()->where('transmoggable', '=', 1)->sortBy('bnet_id', 'ASC')->first();
+			return $this->items->where('transmoggable', 1)->sortBy('bnet_id')->first();
 		}
 	}
 	
