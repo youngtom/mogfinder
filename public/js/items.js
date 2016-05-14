@@ -178,6 +178,10 @@ $(document).ready(function () {
 	}
 	
 	$.getScript('//wow.zamimg.com/widgets/power.js');
+	
+	$('.no-tooltip').on('mouseover', function () {
+		return false;
+	});
 });
 
 function filterClassItems(classID) {

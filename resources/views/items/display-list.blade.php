@@ -208,17 +208,7 @@
 				                    <tbody>
 									<?php
 										foreach ($displayItems as $item) {
-											$sources = $sourceTypeIDs = [];
-											foreach ($item->itemSources as $itemSource) {
-												if ($itemSource->itemSourceType->url_token) {
-													$sourceText = ($itemSource->getWowheadLink($item) && $itemSource->itemSourceType->context_label) ? '<a href="' . $itemSource->getWowheadLink($item) . '" target="_blank">' . $itemSource->getSourceText() . '</a>' : $itemSource->itemSourceType->simple_label;
-													
-													$sources[] = $sourceText;
-													$sourceTypeIDs[] = $itemSource->itemSourceType->id;
-												}
-											}
-											$sources = implode(', ', $sources);
-											$sourceTypeIDs = implode('|', $sourceTypeIDs);
+											$sourceTypeIDs = implode('|', $item->itemSources->lists('item_source_type_id')->toArray());
 											$priority = (is_array($priorityItemIDs) && in_array($item->id, $priorityItemIDs)) ? 'priority' : '';
 											
 											if ($mogslot || $item->allowable_classes) {
@@ -231,7 +221,7 @@
 									?>
 										<tr class="item-row <?=$priority?>" data-classmask="<?=$itemClassMask?>" data-racemask="<?=($item->getAllowedRaceMask()) ?: 0?>" data-sources="<?=($sourceTypeIDs) ?: -1?>" data-item-collected="<?=(in_array($item->id, $userItemIDs)) ? 1 : 0?>">
 											<td class="itemname"><a href="http://www.wowhead.com/item=<?=$item->bnet_id?>" target="_blank" rel="<?=$item->getWowheadMarkup()?>" class="item-link q<?=$item->quality?>">[<?=$item->name?>]</a></td>
-											<td class="source"><?=$sources?></td>
+											<td class="source"><?=$item->getSourceDataHTML()?></td>
 											<td class="center collected">
 											<?php 
 												if (in_array($item->id, $userItemIDs)) {

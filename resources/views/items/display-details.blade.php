@@ -44,21 +44,10 @@
 		            <tbody>
 					<?php
 						foreach ($displayItems as $item) {
-							$sources = $sourceTypeIDs = [];
-							foreach ($item->itemSources as $itemSource) {
-								if ($itemSource->itemSourceType->url_token) {
-									$sourceText = ($itemSource->getWowheadLink($item) && $itemSource->itemSourceType->context_label) ? '<a href="' . $itemSource->getWowheadLink($item) . '" target="_blank">' . $itemSource->getSourceText() . '</a>' : $itemSource->itemSourceType->simple_label;
-									
-									$sources[] = $sourceText;
-									$sourceTypeIDs[] = $itemSource->itemSourceType->id;
-								}
-							}
-							$sources = implode(', ', $sources);
-							$sourceTypeIDs = implode('|', $sourceTypeIDs);
 					?>
 						<tr class="item-row">
 							<td class="itemname"><a href="http://www.wowhead.com/item=<?=$item->bnet_id?>" target="_blank" rel="<?=$item->getWowheadMarkup()?>" class="item-link q<?=$item->quality?>">[<?=$item->name?>]</a></td>
-							<td class="source"><?=$sources?></td>
+							<td class="source"><?=<?=$item->getSourceDataHTML()?>?></td>
 							<td class="center collected">
 							<?php 
 								if (in_array($item->id, $userItems->lists('item_id')->toArray())) {

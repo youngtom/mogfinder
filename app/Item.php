@@ -269,6 +269,20 @@ class Item extends Model
 		return ($this->bonus) ? 'bonus=' . $this->bonus : '';
 	}
 	
+	public function getSourceDataHTML() {
+		$_sources = collect();
+		$itemSourcesByType = $this->itemSources->groupBy('item_source_type_id');
+		$extraSourceSlots = max(4 - $itemSourcesByType->count(), 0);
+		
+		foreach ($itemSourcesByType as $itemSourceTypeID => $sources) {
+			$sourceType = $sources->first()->itemSourceType;
+			$sourceTypeSources = $sourceType->getSourceDataHTML($this, $sources, $extraSourceSlots + 1);
+			$_sources = $_sources->merge($sourceTypeSources);
+			$extraSourceSlots = max($extraSourceSlots - $sourceTypeSources->count() + 1, 0);
+		}
+		return implode(', ', $_sources->toArray());
+	}
+	
 	public function getRestrictedClasses() {
 		if (!$this->allowable_classes) {
 			return false;

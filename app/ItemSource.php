@@ -62,6 +62,14 @@ class ItemSource extends Model
         return $this->belongsTo('App\Zone');
 	}
 	
+	public function boss() {
+        return $this->belongsTo('App\Boss');
+	}
+	
+	public function faction() {
+        return $this->belongsTo('App\Faction');
+	}
+	
 	public function updateSourceItem($save = true) {
 		if (!$this->itemSourceType) {
 			return false;
@@ -97,17 +105,34 @@ class ItemSource extends Model
 		}
 	}
 	
-	public function getWowheadLink(Item $item) {
-		if (!$this->itemSourceType->wowhead_link_format) {
+	public function getLocalLink() {
+		switch ($this->itemSourceType->label) {
+			case 'VENDOR':
+				return route('vendor', [$this->bnet_source_id]);
+			case 'BOSS_DROP':
+				return ($this->zone && $this->boss) ? route('boss', [$this->zone->url_token, $this->boss->url_token]) : false;
+			case 'CUSTOM_ZONE_DROP':
+				return ($this->zone) ? route('zone', [$this->zone->url_token]) : false;
+			case 'CREATED_BY_ITEM':
+			case 'CONTAINED_IN_ITEM':
+				return route('item', [$this->bnet_source_id]);
+			default:
+				return false;
+		}
+	}
+	
+	public function getWowheadMarkup(Item $item, $format) {
+		if (!$format) {
 			return false;
 		}
 		
 		$replace = [
 			'{$bnet_id}' => $this->bnet_source_id,
-			'{$item_faction_id}' => $item->bnet_faction_id
+			'{$item_faction_id}' => $item->bnet_faction_id,
+			'{$item_id}' => $item->bnet_id
 		];
 		
-		return 'http://www.wowhead.com/' . strtr($this->itemSourceType->wowhead_link_format, $replace);
+		return strtr($format, $replace);
 	}
 	
 	public function getSourceText() {
@@ -119,7 +144,8 @@ class ItemSource extends Model
 			
 			return strtr($this->itemSourceType->context_label, $replace);	
 		} else {
-			return $this->itemSourceType->context_label;
+			$icon = ($this->faction) ? '<i class="game-icon-tiny icon-' . strtolower($this->faction->name) . '"></i> ' : '';
+			return $icon . $this->itemSourceType->context_label;
 		}
 	}
 	
