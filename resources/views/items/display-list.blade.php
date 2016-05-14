@@ -11,8 +11,8 @@
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-10 col-md-offset-1 <?=(count($itemDisplays)) ? 'item-scroll-with-nav' : ''?>">
-	        <?php if (count($itemDisplays)) { ?>
+        <div class="col-md-10 col-md-offset-1 <?=(count($itemDisplays) > 1) ? 'item-scroll-with-nav' : ''?>">
+	        <?php if (count($itemDisplays) > 1) { ?>
 	        <div class="item-filter-nav navbar subnav" role="navigation">
 			    <div class="navbar-inner">
 			        <div class="container">
