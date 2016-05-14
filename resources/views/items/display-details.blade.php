@@ -16,9 +16,9 @@
 				Display <?=$display->id?> - <?=ucwords($display->mogslot->singular_label)?>
 				<span class="pull-right">
 		        	<?php if ($unlockedClasses && count($unlockedClasses)) { ?>
-		        	<i class="fa fa-btn fa-star-o partiallly-collected-star" title="Unlocked on:<br><?=implode('<br>', $unlockedClasses)?>" data-toggle="tooltip" data-placement="left"></i>
+		        	<i class="fa fa-btn fa-check partiallly-collected-star" title="Unlocked on:<br><?=implode('<br>', $unlockedClasses)?>" data-toggle="tooltip" data-placement="left"></i>
 		        	<?php } elseif (count($userItems)) { ?>
-		        	<i class="fa fa-btn fa-star collected-star" title="Collected" data-toggle="tooltip" data-placement="left"></i>
+		        	<i class="fa fa-btn fa-check collected-star" title="Collected" data-toggle="tooltip" data-placement="left"></i>
 		        	<?php } ?>
 		        </span>
 	        </h1>
