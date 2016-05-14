@@ -421,6 +421,8 @@ class ItemsController extends Controller
     }
     
     public function search($query) {
+	    $_startTime = microtime(true);
+	    $_timeProfiles = [];
 	    $query = str_replace('+', ' ', $query);
 	    $q = '"' . $query . '"';
 	    $items = collect();
@@ -445,6 +447,8 @@ class ItemsController extends Controller
 			//search for items
 			$itemsByName = Item::where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->search($q)->get();
 			$items = $items->merge($itemsByName);
+			
+			$_timeProfiles['items'] = microtime(true);
 		    
 		    //search for bosses
 			$bosses = Boss::search($q)->get();
@@ -460,6 +464,8 @@ class ItemsController extends Controller
 					$items = $items->merge($bossItems);
 				}
 			}
+			
+			$_timeProfiles['bosses'] = microtime(true);
 			
 			//search for zones
 			$zones = Zone::search($q)->get();
@@ -478,6 +484,8 @@ class ItemsController extends Controller
 				}
 			}
 			
+			$_timeProfiles['zones'] = microtime(true);
+			
 			//search source labels
 			$sourceItemIDs = ItemSource::search($q)->get()->lists('item_id')->toArray();
 			
@@ -485,6 +493,8 @@ class ItemsController extends Controller
 				$sourceItems = Item::whereIn('id', $sourceItemIDs)->where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->get();
 				$items = $items->merge($sourceItems);
 			}
+			
+			$_timeProfiles['sources'] = microtime(true);
 			
 			//search for items from related items
 			$allRelatedItemIDs = ItemSource::whereNotNull('source_item_id')->get(['source_item_id'])->lists('source_item_id')->toArray();
@@ -495,7 +505,11 @@ class ItemsController extends Controller
 				$itemsFromItems = Item::whereIn('id', $itemIDs)->where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->get();
 				$items = $items->merge($itemsFromItems);
 			}
+			
+			$_timeProfiles['related_items'] = microtime(true);
 		}
+		
+		$_timeProfiles['item_gather_end'] = microtime(true);
 		
 	    $itemIDs = $items->lists('id')->toArray();
 	    
@@ -509,10 +523,22 @@ class ItemsController extends Controller
 		    return redirect()->route('display', [$display->mogslot->mogslotCategory->group, $display->mogslot->mogslotCategory->url_token, $display->mogslot->simple_url_token, $display->id]);
 	    }
 	    
+	    $_timeProfiles['displays'] = microtime(true);
+	    
 	    // restore search relevance
 	    $displays = $displays->sortBy(function ($display) use ($displayIDs) {
 		    return array_search($display->id, $displayIDs);
 	    });
+	    
+	    $_timeProfiles['display_sort'] = microtime(true);
+	    
+	    if (\Request::input('profile')) {
+		    foreach ($_timeProfiles as $_label => $_time) {
+			    echo $_label . ': ' . ($_time - $_startTime) . 's<br>';
+			    $_startTime = $_time;
+		    }
+		    die;
+	    }
 	    
 	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Search results for: <em>' . $query . '</em>')->with('search', true);
     }
