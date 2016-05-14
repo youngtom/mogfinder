@@ -173,7 +173,7 @@
 		                <i class="fa fa-btn fa-minus collapse-icon" title="collapse"></i> Display <?=$display->id?>
 		                <span class="display-item-info">
 			                -
-			                <span class="display-item-link"><a href="http://www.wowhead.com/item=<?=$displayPrimaryItem->bnet_id?>" target="_blank" rel="<?=$displayPrimaryItem->getWowheadMarkup()?>" class="item-link q<?=$displayPrimaryItem->quality?>">[<?=$displayPrimaryItem->name?>]</a></span>
+			                <span class="display-item-link"><a href="http://www.wowhead.com/item=<?=$displayPrimaryItem->bnet_id?>" target="_blank" rel="<?=$displayPrimaryItem->getWowheadMarkup()?>" class="item-link q<?=$displayPrimaryItem->quality?>" style="">[<?=$displayPrimaryItem->name?>]</a></span>
 			                <?php if (count($displayItems) > 1) { ?>
 			                <small class="num-addl-items">(and <?=count($displayItems) - 1?> other<?=(count($displayItems) > 2) ? 's' : ''?>)</small>
 			                <?php } ?>
@@ -211,7 +211,7 @@
 											$sources = $sourceTypeIDs = [];
 											foreach ($item->itemSources as $itemSource) {
 												if ($itemSource->itemSourceType->url_token) {
-													$sourceText = ($itemSource->getWowheadLink($item) && $itemSource->itemSourceType->context_label) ? '<a href="' . $itemSource->getWowheadLink($item) . '" target="_blank">' . $itemSource->getSourceText() . '</a>' : $itemSource->itemSourceType->simple_label;
+													$sourceText = ($itemSource->getWowheadLink($item) && $itemSource->itemSourceType->context_label) ? '<a href="' . $itemSource->getWowheadLink($item) . '" target="_blank" style="">' . $itemSource->getSourceText() . '</a>' : $itemSource->itemSourceType->simple_label;
 													
 													$sources[] = $sourceText;
 													$sourceTypeIDs[] = $itemSource->itemSourceType->id;
@@ -230,7 +230,7 @@
 											}
 									?>
 										<tr class="item-row <?=$priority?>" data-classmask="<?=$itemClassMask?>" data-racemask="<?=($item->getAllowedRaceMask()) ?: 0?>" data-sources="<?=($sourceTypeIDs) ?: -1?>" data-item-collected="<?=(in_array($item->id, $userItemIDs)) ? 1 : 0?>">
-											<td class="itemname"><a href="http://www.wowhead.com/item=<?=$item->bnet_id?>" target="_blank" rel="<?=$item->getWowheadMarkup()?>" class="item-link q<?=$item->quality?>">[<?=$item->name?>]</a></td>
+											<td class="itemname"><a href="http://www.wowhead.com/item=<?=$item->bnet_id?>" target="_blank" rel="<?=$item->getWowheadMarkup()?>" class="item-link q<?=$item->quality?>" style="">[<?=$item->name?>]</a></td>
 											<td class="source"><?=$sources?></td>
 											<td class="center collected">
 											<?php 
