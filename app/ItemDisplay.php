@@ -102,7 +102,7 @@ class ItemDisplay extends Model
 		} elseif ($this->primaryItem) {
 			return $this->primaryItem;
 		} else {
-			return $this->items()->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->first();
+			return $this->items()->where('transmoggable', '=', 1)->sortBy('bnet_id', 'ASC')->first();
 		}
 	}
 	
