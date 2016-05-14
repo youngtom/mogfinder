@@ -105,7 +105,7 @@
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>
 	<script src="{{ asset('js/typeahead/typeahead.bundle.min.js') }}"></script>
 	<script src="{{ asset('js/main.js') }}"></script>
-	<script>var wowhead_tooltips = { "colorlinks": false, "iconizelinks": true, "renamelinks": false }</script>
+	<script>var wowhead_tooltips = { "colorlinks": false, "iconizelinks": false, "renamelinks": false }</script>
 	@yield('js')
     
 	
