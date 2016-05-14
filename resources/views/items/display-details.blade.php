@@ -47,7 +47,7 @@
 					?>
 						<tr class="item-row">
 							<td class="itemname"><a href="http://www.wowhead.com/item=<?=$item->bnet_id?>" target="_blank" rel="<?=$item->getWowheadMarkup()?>" class="item-link q<?=$item->quality?>">[<?=$item->name?>]</a></td>
-							<td class="source"><?=<?=$item->getSourceDataHTML()?>?></td>
+							<td class="source"><?=$item->getSourceDataHTML()?></td>
 							<td class="center collected">
 							<?php 
 								if (in_array($item->id, $userItems->lists('item_id')->toArray())) {
