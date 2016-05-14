@@ -40,9 +40,9 @@ $(document).ready(function () {
 		}
 	});
 	
-	$('#search-form').on('submit') {
+	$('#search-form').on('submit', function () {
 		$('#search-form .typeahead').typeahead('destroy');
-	}
+	});
 });
 
 function affixWidth(){
