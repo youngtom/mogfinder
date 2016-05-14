@@ -445,9 +445,19 @@ class ItemsController extends Controller
 			//search for items
 			$itemsByName = Item::where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->search($q)->get();
 			$items = $items->merge($itemsByName);
+			
+			//search for items from related items
+			$allRelatedItemIDs = ItemSource::whereNotNull('source_item_id')->get(['source_item_id'])->lists('source_item_id')->toArray();
+			$relatedItemIDs = Item::whereIn('id', $allRelatedItemIDs)->search($q)->get()->lists('id')->toArray();
+			
+			if (count($relatedItemIDs)) {
+				$itemIDs = ItemSource::whereIn('source_item_id', $relatedItemIDs)->get()->lists('item_id')->toArray();
+				$itemsFromItems = Item::whereIn('id', $itemIDs)->where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->get();
+				$items = $items->merge($itemsFromItems);
+			}
 		    
 		    //search for bosses
-			$bosses = Boss::search($q)->get();
+			$bosses = ($items->count()) ? Boss::where('name', '=', $query)->get() : Boss::search($q)->get();
 			
 			if ($bosses->count()) {
 				$itemIDs = [];
@@ -462,7 +472,7 @@ class ItemsController extends Controller
 			}
 			
 			//search for zones
-			$zones = Zone::search($q)->get();
+			$zones = ($items->count()) ? Zone::where('name', '=', $query)->get() : Zone::search($q)->get();
 			
 			if ($zones->count()) {
 				$itemIDs = [];
@@ -479,21 +489,11 @@ class ItemsController extends Controller
 			}
 			
 			//search source labels
-			$sourceItemIDs = ItemSource::where('label', '=', $query)->get()->lists('item_id')->toArray();
+			$sourceItemIDs = ($items->count()) ? ItemSource::where('label', '=', $query)->get()->lists('item_id')->toArray() : ItemSource::search($q)->get()->lists('item_id')->toArray();;
 			
 			if (count($sourceItemIDs)) {
 				$sourceItems = Item::whereIn('id', $sourceItemIDs)->where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->get();
 				$items = $items->merge($sourceItems);
-			}
-			
-			//search for items from related items
-			$allRelatedItemIDs = ItemSource::whereNotNull('source_item_id')->get(['source_item_id'])->lists('source_item_id')->toArray();
-			$relatedItemIDs = Item::whereIn('id', $allRelatedItemIDs)->search($q)->get()->lists('id')->toArray();
-			
-			if (count($relatedItemIDs)) {
-				$itemIDs = ItemSource::whereIn('source_item_id', $relatedItemIDs)->get()->lists('item_id')->toArray();
-				$itemsFromItems = Item::whereIn('id', $itemIDs)->where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->get();
-				$items = $items->merge($itemsFromItems);
 			}
 		}
 		
