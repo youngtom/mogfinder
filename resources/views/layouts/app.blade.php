@@ -105,9 +105,9 @@
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>
 	<script src="{{ asset('js/typeahead/typeahead.bundle.min.js') }}"></script>
 	<script src="{{ asset('js/main.js') }}"></script>
+	<script>var wowhead_tooltips = { "colorlinks": false, "iconizelinks": true, "renamelinks": false }</script>
 	@yield('js')
     
-    <script>var wowhead_tooltips = { "colorlinks": false, "iconizelinks": true, "renamelinks": false }</script>
 	
 	<script>
 	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
