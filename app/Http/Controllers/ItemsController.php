@@ -537,6 +537,7 @@ class ItemsController extends Controller
 			    echo $_label . ': ' . ($_time - $_startTime) . 's<br>';
 			    $_startTime = $_time;
 		    }
+		    echo 'Total displays: ' . $displays->count();
 		    die;
 	    }
 	    
