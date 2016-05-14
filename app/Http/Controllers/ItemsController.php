@@ -526,7 +526,7 @@ class ItemsController extends Controller
 	    $userItemIDs = $userItems->lists('item_id')->toArray();
 	    
 	    //get item source types
-	    $itemIDs = Item::whereIn('item_display_id', $dispIds)->get()->lists('id')->toArray();
+	    $itemIDs = Item::whereIn('item_display_id', $dispIds)->where('transmoggable', '=', 1)->get()->lists('id')->toArray();
 		$itemSourceTypeIDs = ItemSource::whereIn('item_id', $itemIDs)->groupBy('item_source_type_id')->get()->lists('item_source_type_id');
 		$itemSourceTypes = ItemSourceType::where('url_token', '<>', '')->whereIn('id', $itemSourceTypeIDs)->get();
 		
