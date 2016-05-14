@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddSourceItemIdFieldToItemSourcesTable extends Migration
+class AddIndecesToItemSourcesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddSourceItemIdFieldToItemSourcesTable extends Migration
     public function up()
     {
         Schema::table('item_sources', function (Blueprint $table) {
-            $table->integer('source_item_id')->nullable()->unsigned()->after('item_source_type_id');
-			$table->foreign('source_item_id')->references('id')->on('items')->onDelete('cascade');
+            $table->index('bnet_source_id');
+            $table->index('label');
         });
     }
 
@@ -26,7 +26,7 @@ class AddSourceItemIdFieldToItemSourcesTable extends Migration
     public function down()
     {
         Schema::table('item_sources', function (Blueprint $table) {
-            $table->dropColumn('source_item_id');
+            
         });
     }
 }
