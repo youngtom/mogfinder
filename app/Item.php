@@ -501,12 +501,13 @@ class Item extends Model
 					        \Log::info('Boss (' . $npcID . ') not found for item: ' . $this->id . ' (bnet id: ' . $this->bnet_id . ')');
 				        }
 				        
-				        $source = ItemSource::where('item_id', '=', $this->id)->where('item_source_type_id', '=', 4)->whereIn('bnet_source_id', $bossIDArr)->first();
+				        $sourceTypeID = ($boss) ? 21 : 4;
+				        $source = ItemSource::where('item_id', '=', $this->id)->where('item_source_type_id', '=', $sourceTypeID)->whereIn('bnet_source_id', $bossIDArr)->first();
 				        
 				        if (!$source) {
 					        $source = new ItemSource;
 					        $source->item_id = $this->id;
-					        $source->item_source_type_id = 4;
+					        $source->item_source_type_id = $sourceTypeID;
 					        $source->bnet_source_id = $npcID;
 					        $source->import_source = 'wowheadImport';
 				        }
