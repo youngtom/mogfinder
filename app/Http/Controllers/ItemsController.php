@@ -74,9 +74,9 @@ class ItemsController extends Controller
 	    }
 	    
 	    if ($character) {
-		    $characters = Character::where('id', '<>', $character->id)->where('user_id', '=', $user->id)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');
+		    $characters = Character::where('id', '<>', $character->id)->where('user_id', '=', $user->id)->where('level', '>=', 10)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');
 	    } else {
-		    $characters = Character::where('user_id', '=', $user->id)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');
+		    $characters = Character::where('user_id', '=', $user->id)->where('level', '>=', 10)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');
 	    }
 	    
 	    return view('items.overview')->with('categories', $mogslotCategories)->with('mogslotsByCategory', $mogslotsByCategory)->with('userMogslotCounts', $userMogslotCounts)->with('totalMogslotCounts', $totalMogslotCounts)->with('selectedCharacter', $character)->with('characters', $characters);
@@ -132,9 +132,9 @@ class ItemsController extends Controller
 	    }
 	    
 	    if ($character) {
-		    $characters = Character::where('id', '<>', $character->id)->where('user_id', '=', $user->id)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');
+		    $characters = Character::where('id', '<>', $character->id)->where('user_id', '=', $user->id)->where('level', '>=', 10)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');
 	    } else {
-		    $characters = Character::where('user_id', '=', $user->id)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');
+		    $characters = Character::where('user_id', '=', $user->id)->where('level', '>=', 10)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');
 	    }
 	    
 	    return view('items.zone-overview')->with('categories', $zoneCategories)->with('zonesByCategory', $zonesByCategory)->with('userZoneCounts', $userZoneCounts)->with('totalZoneCounts', $totalZoneCounts)->with('selectedCharacter', $character)->with('characters', $characters);
