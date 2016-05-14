@@ -106,7 +106,7 @@
 					$collected = in_array($display->id, $userDisplayIDs);
 					$displayItems = $display->items()->where('transmoggable', '=', 1)->get();
 					
-					if ($collected) {
+					if (false && $collected) {
 						$restrictedClassMask = 0;
 						foreach ($displayItems as $item) {
 							if (in_array($item->id, $userItemIDs)) {
