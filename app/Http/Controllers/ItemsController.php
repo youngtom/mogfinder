@@ -537,14 +537,15 @@ class ItemsController extends Controller
 			    echo $_label . ': ' . ($_time - $_startTime) . 's<br>';
 			    $_startTime = $_time;
 		    }
-		    echo 'Total displays: ' . $displays->count();
-		    die;
+		    echo 'Total displays: ' . $displays->count() . '<br>';
 	    }
 	    
 	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Search results for: <em>' . $query . '</em>')->with('search', true);
     }
     
     protected function showItemDisplays($displays, $mogslot = false, $priorityItemIDs = []) {
+	    $_startTime = microtime(true);
+	    $_timeProfiles = [];
 	    $user = Auth::user();
 	    
 	    $dispIds = $displays->lists('id');
@@ -552,10 +553,14 @@ class ItemsController extends Controller
 	    $userDisplayIDs = array_unique($userItems->lists('item_display_id')->toArray());
 	    $userItemIDs = $userItems->lists('item_id')->toArray();
 	    
+	    $_timeProfiles['id_setup'] = microtime(true);
+	    
 	    //get item source types
 	    $itemIDs = Item::whereIn('item_display_id', $dispIds)->get()->lists('id')->toArray();
 		$itemSourceTypeIDs = ItemSource::whereIn('item_id', $itemIDs)->groupBy('item_source_type_id')->get()->lists('item_source_type_id');
 		$itemSourceTypes = ItemSourceType::where('url_token', '<>', '')->whereIn('id', $itemSourceTypeIDs)->get();
+		
+		$_timeProfiles['source_types'] = microtime(true);
 		
 		$mogslotCount = $displays->groupBy('mogslot_id')->count();
 		
@@ -566,6 +571,8 @@ class ItemsController extends Controller
 		}
 		
 		$allowedRaceBitmask = ItemDisplay::getAllowedRaceBitmaskForDisplays($displays);
+		
+		$_timeProfiles['bitmasks'] = microtime(true);
 		
 		if (Item::where('allowable_classes', '>', 0)->whereIn('id', $itemIDs)->get()->count() || $mogslotCount > 1) {
 		    $classes = CharClass::orderBy('name', 'ASC')->get();
@@ -580,10 +587,14 @@ class ItemsController extends Controller
 			$classes = false;
 		}
 		
+		$_timeProfiles['classes'] = microtime(true);
+		
 		$factionRestrictedItemCount = Item::where(function ($query) {
 			$query->where('allowable_races', '>', 0);
 			$query->orWhere('locked_races', '>', 0);
 		})->whereIn('id', $itemIDs)->get()->count();
+		
+		$_timeProfiles['faction_restricted_items'] = microtime(true);
 		
 		if ($factionRestrictedItemCount) {
 		    $factions = Faction::where('race_bitmask', '>', 0)->orderBy('name', 'ASC')->get();
@@ -596,6 +607,16 @@ class ItemsController extends Controller
 		} else {
 			$factions = false;
 		}
+		
+		$_timeProfiles['factions'] = microtime(true);
+	    
+	    if (\Request::input('profile')) {
+		    foreach ($_timeProfiles as $_label => $_time) {
+			    echo $_label . ': ' . ($_time - $_startTime) . 's<br>';
+			    $_startTime = $_time;
+		    }
+		    die;
+	    }
 	    
 	    return view('items.display-list')->with('mogslot', $mogslot)->with('itemDisplays', $displays)->with('user', $user)->with('userDisplayIDs', $userDisplayIDs)->with('userItemIDs', $userItemIDs)->with('classes', $classes)->with('factions', $factions)->with('itemSourceTypes', $itemSourceTypes)->with('priorityItemIDs', $priorityItemIDs);
     }
