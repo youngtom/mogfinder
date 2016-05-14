@@ -89,8 +89,8 @@ class ItemDisplay extends Model
 	}
 	
 	public function getPrimaryItem($priorityIDs = null) {
-		if (false && $priorityIDs) {
-			$item = $this->items()->where('transmoggable', '=', 1)->whereIn('id', $priorityIDs)->orderBy('bnet_id', 'ASC')->first();
+		if ($priorityIDs) {
+			$item = $this->items->where('transmoggable', 1)->whereIn('id', $priorityIDs)->orderBy('bnet_id', 'ASC')->first();
 			
 			if ($item) {
 				return $item;
