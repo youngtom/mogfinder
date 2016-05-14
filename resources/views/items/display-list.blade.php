@@ -60,8 +60,8 @@
 										<li class="all-select"><a href="javascript:;" data-faction-mask="0" class="show-all">Show all</a></li>
 										<li class="all-select divider" roll="separator"></li>
 									<?php foreach ($factions as $faction) { ?>
-										<li><a href="#faction:<?=strtolower($faction->name)?>" data-faction-mask="<?=$faction->race_bitmask?>" data-faction-code="<?=strtolower($faction->name)?>" class="<?=strtolower($faction->name)?>">
-											<i class="game-icon-sm" style="background-image: url(<?=$faction->getFile('icon_image')->getWebPath()?>)"></i> <?=$faction->name?></a>
+										<li>
+											<a href="#faction:<?=strtolower($faction->name)?>" data-faction-mask="<?=$faction->race_bitmask?>" data-faction-code="<?=strtolower($faction->name)?>" class="<?=strtolower($faction->name)?>"><i class="game-icon-tiny icon-<?=strtolower($faction->name)?>"></i> <?=$faction->name?></a>
 										</li>
 									<?php } ?>
 									</ul>

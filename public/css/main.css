@@ -45,13 +45,19 @@
 	top: 0px;
 }
 
-.game-icon-sm {
+.game-icon-sm, .game-icon-tiny {
 	display: inline-block;
-	background-size: 100% 100%;
-	width: 20px;
-	height: 20px;
+	background-size: auto 100%;
 	vertical-align: middle;
+	background-position: center center;
+	background-repeat: no-repeat;
 }
+
+.game-icon-sm { width: 20px; height: 20px; }
+.game-icon-tiny { width: 15px; height: 15px; }
+
+.icon-horde { background-image: url(../img/icons/horde.png); }
+.icon-alliance { background-image: url(../img/icons/alliance.png); }
 
 .item-link.q0 { color: #9d9d9d; }
 .item-link.q1 { color: #fff; }
