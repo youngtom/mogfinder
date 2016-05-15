@@ -51,5 +51,6 @@ class ResetUserData extends Command
         Character::where('user_id', '=', $user->id)->delete();
         UserItem::where('user_id', '=', $user->id)->delete();
         UserDatafile::where('user_id', '=', $user->id)->delete();
+        UserItemDisplay::where('user_id', '=', $user->id)->delete();
     }
 }

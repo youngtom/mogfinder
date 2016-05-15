@@ -104,7 +104,7 @@ class UserController extends Controller
 			
 			return Response::json($response);
 		} else {
-			return App::abort();
+			return \App::abort();
 		}
 	}
 }
