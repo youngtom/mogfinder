@@ -75,7 +75,7 @@ function updateProgressbar(current, total, $button) {
 			var percent = Math.min(100, Math.round((current / total) * 100));
 			$bar.attr('data-target-percent', percent);
 			
-			if (!$bar.attr('data-animating')) {
+			if (parseInt($bar.attr('data-animating')) != 1) {
 				incrementProgressBar($button);
 			}
 		}
