@@ -200,11 +200,7 @@ class Character extends Model
 				    $charItemIDs[] = $userItem->id;
 			    }
 			    
-			    if ($dataFile) {
-				    $dataFile->incrementResponseData('current', 1);
-				    $dataFile->save();
-				    $count++;
-			    }
+			    $count++;
 		    }
 		}
 		
@@ -251,21 +247,12 @@ class Character extends Model
 						    $charItemIDs[] = $userItem->id;
 					    }
 					    
-					    if ($dataFile) {
-						    $dataFile->incrementResponseData('current', 1);
-						    $dataFile->save();
-						    $count++;
-					    }
+					    $count++;
 				    }
 				} else {
 					\Log::info('ItemLocation not found: ' . $locationImportTag);
 					
-					if ($dataFile) {
-					    $dataFile->incrementResponseData('current', count($itemArr));
-					    $dataFile->save();
-				    
-					    $count += count($itemArr);
-				    }
+					$count += count($itemArr);
 				}
 		    }
 		}
@@ -277,6 +264,11 @@ class Character extends Model
 		foreach($deleteItems as $item) {
 			$item->delete();
 		}
+		
+		if ($dataFile) {
+		    $dataFile->incrementResponseData('current', $count);
+		    $dataFile->save();
+	    }
 		
 		$this->latest_chardata = null;
 		$this->save();
