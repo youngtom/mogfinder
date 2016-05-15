@@ -272,7 +272,7 @@ class Character extends Model
 		
 		$deleteItems = UserItem::where('item_location_id', '<>', $questLocation->id)->where('character_id', '=', $this->id)->whereNotIn('id', $charItemIDs)->get();
 		
-		\Log::info('Character (' . $this->id . '): ' . $count . ' items processed. ' . $deletedItems->count() . ' deleted.');
+		\Log::info('Character (' . $this->id . '): ' . $count . ' items processed. ' . $deleteItems->count() . ' deleted.');
 		
 		foreach($deleteItems as $item) {
 			$item->delete();
