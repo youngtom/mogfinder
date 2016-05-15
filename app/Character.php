@@ -203,8 +203,8 @@ class Character extends Model
 			    if ($dataFile) {
 				    $dataFile->incrementResponseData('current', 1);
 				    $dataFile->save();
+				    $count++;
 			    }
-			    $count++;
 		    }
 		}
 		
@@ -254,8 +254,8 @@ class Character extends Model
 					    if ($dataFile) {
 						    $dataFile->incrementResponseData('current', 1);
 						    $dataFile->save();
+						    $count++;
 					    }
-					    $count++;
 				    }
 				} else {
 					\Log::info('ItemLocation not found: ' . $locationImportTag);
@@ -263,9 +263,9 @@ class Character extends Model
 					if ($dataFile) {
 					    $dataFile->incrementResponseData('current', count($itemArr));
 					    $dataFile->save();
-				    }
 				    
-				    $count += count($itemArr);
+					    $count += count($itemArr);
+				    }
 				}
 		    }
 		}
