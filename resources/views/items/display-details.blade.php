@@ -13,7 +13,7 @@
 	<div class="col-md-10 col-md-offset-1">
 		<div class="page-header">
 			<h1>
-				Display <?=$display->id?> - <?=ucwords($display->mogslot->singular_label)?>
+				Appearance <?=$display->id?> - <?=ucwords($display->mogslot->singular_label)?>
 				<span class="pull-right">
 		        	<?php if ($unlockedClasses && count($unlockedClasses)) { ?>
 		        	<i class="fa fa-btn fa-check partiallly-collected-star" title="Unlocked on:<br><?=implode('<br>', $unlockedClasses)?>" data-toggle="tooltip" data-placement="left"></i>

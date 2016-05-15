@@ -70,7 +70,7 @@
 				    }
 		    ?>
             <div class="panel panel-default item-display-panel">
-                <div class="panel-heading">Display <?=$displayID?>:</div>
+                <div class="panel-heading">Appearance <?=$displayID?>:</div>
                 <table class="table table-hover item-list-table">
                     <thead>
                         <tr>
