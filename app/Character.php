@@ -173,6 +173,8 @@ class Character extends Model
 	    $charItemIDs = [];
         
         $questLocation = ItemLocation::where('label', '=', 'quest')->first();
+        
+        $count = 0;
 			    
 	    if (@$charData['equipped']) {
 		    $equippedLocation = ItemLocation::where('label', '=', 'equipped')->first();
@@ -202,6 +204,7 @@ class Character extends Model
 				    $dataFile->incrementResponseData('current', 1);
 				    $dataFile->save();
 			    }
+			    $count++;
 		    }
 		}
 		
@@ -252,17 +255,24 @@ class Character extends Model
 						    $dataFile->incrementResponseData('current', 1);
 						    $dataFile->save();
 					    }
+					    $count++;
 				    }
 				} else {
+					\Log::info('ItemLocation not found: ' . $locationImportTag);
+					
 					if ($dataFile) {
-					    $dataFile->incrementResponseData('current', count ($itemArr));
+					    $dataFile->incrementResponseData('current', count($itemArr));
 					    $dataFile->save();
 				    }
+				    
+				    $count += count($itemArr);
 				}
 		    }
 		}
 		
 		$deleteItems = UserItem::where('item_location_id', '<>', $questLocation->id)->where('character_id', '=', $this->id)->whereNotIn('id', $charItemIDs)->get();
+		
+		\Log::info('Character (' . $this->id . '): ' . $count . ' items processed. ' . $deletedItems->count() . ' deleted.');
 		
 		foreach($deleteItems as $item) {
 			$item->delete();
