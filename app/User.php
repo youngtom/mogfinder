@@ -57,27 +57,29 @@ class User extends Authenticatable
 		    if ($charTag) {
 			    $character = Character::where('wow_guid', '=', $charTag)->where('user_id', '=', $this->id)->first();
 			    
-			    if (!$character) {
+			    if (!$character && $charData['charInfo']) {
 				    $character = new Character;
 				    $character->wow_guid = $charTag;
 				    $character->user_id = $this->id;
 				    $character->save();
 				}
 				
-				$character->updateCharacterFromDataArray($charData['charInfo']);
-			    
-			    $scanTime = (@$charData['scanTime']) ? $charData['scanTime'] : 0;
+				if ($character) {
+					$character->updateCharacterFromDataArray($charData['charInfo']);
+				    
+				    $scanTime = (@$charData['scanTime']) ? $charData['scanTime'] : 0;
+						
+					if ($scanTime > $character->last_scanned && $character->realm_id && $character->class_id && $character->race_id) {
+						// Queue item import
+						$job = (new ImportCharacterItems($character->id, $dataFile->id))->onQueue('med');
+						$this->dispatch($job);
+						
+						$character->last_scanned = $scanTime;
+						$character->latest_chardata = json_encode($charData);
+					}
 					
-				if ($scanTime > $character->last_scanned && $character->realm_id && $character->class_id && $character->race_id) {
-					// Queue item import
-					$job = (new ImportCharacterItems($character->id, $dataFile->id))->onQueue('med');
-					$this->dispatch($job);
-					
-					$character->last_scanned = $scanTime;
-					$character->latest_chardata = json_encode($charData);
+					$character->save();
 				}
-				
-				$character->save();
 			}
 	    }
 	    
