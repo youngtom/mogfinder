@@ -168,8 +168,6 @@ class Character extends Model
 	    
 	    $charData = json_decode($this->latest_chardata, true);
 	    
-	    $dataFile = ($dataFileID) ? UserDatafile::find($dataFileID) : false;
-	    
 	    $charItemIDs = [];
         
         $questLocation = ItemLocation::where('label', '=', 'quest')->first();
@@ -265,6 +263,7 @@ class Character extends Model
 			$item->delete();
 		}
 		
+		$dataFile = ($dataFileID) ? UserDatafile::find($dataFileID) : false;
 		if ($dataFile) {
 		    $dataFile->incrementResponseData('current', $count);
 		    $dataFile->save();
