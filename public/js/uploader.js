@@ -24,12 +24,12 @@ $(function () {
 	            $('#status-msg').show().html(data.result.msg);
 	            
 	            $('#upload-progress .progress-label').html('0%');
-	            updateProgressbar(0, parseInt(data.result.total), $button);
+	            updateProgressbar(0, parseInt(data.result.total));
 	            
 	            if (data.result.reportURL) {
 		            var reportPoll = function() {
 						$.getJSON(data.result.reportURL, function(polldata) {
-							updateProgressbar(polldata.current, polldata.total, $button);
+							updateProgressbar(polldata.current, polldata.total);
 							
 							if (polldata.current < polldata.total) {
 								setTimeout(reportPoll, 2500);
@@ -76,13 +76,13 @@ function updateProgressbar(current, total, $button) {
 			$bar.attr('data-target-percent', percent);
 			
 			if (parseInt($bar.attr('data-animating')) != 1) {
-				incrementProgressBar($button);
+				incrementProgressBar();
 			}
 		}
 	}
 }
 
-function incrementProgressBar($button) {
+function incrementProgressBar() {
 	var $bar = $('.progress-bar', $('#upload-progress'));
 	
 	$bar.attr('data-animating', 1);
@@ -98,13 +98,14 @@ function incrementProgressBar($button) {
 		
 		if (newPct < tgt && newPct < 100) {
 			setTimeout(function () {
-				incrementProgressBar($bar, $button);	
+				incrementProgressBar();	
 			}, 100);
 		} else {
 			$bar.attr('data-animating', 0);
 		}
 		
 		if (newPct == 100) {
+			var $button = $('#data-upload-button');
 			$button.removeClass('btn-warning').addClass('btn-success');
 	        $('span', $button).html('&nbsp;Complete');
 	        $('.fa-btn', $button).addClass('fa-check').removeClass('fa-circle-o-notch').removeClass('fa-spin');
