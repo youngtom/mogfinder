@@ -63,7 +63,7 @@ function resetUploadButton($button) {
 
 function updateProgressbar(current, total, $button) {
 	var $bar = $('.progress-bar', $('#upload-progress'));
-	$progress.show();
+	$('#upload-progress').show();
 	
 	var now = parseInt($bar.attr('aria-valuenow'));
 	$bar.attr('aria-valuemax', total);
