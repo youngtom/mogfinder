@@ -11,7 +11,7 @@ class Mogslot extends Model
 	protected $visible = ['id', 'simple_label', 'allowed_class_bitmask'];
 	
 	public function itemDisplays() {
-		return $this->hasMany('App\ItemDisplay');
+		return $this->hasMany('App\ItemDisplay')->where('transmoggable', '=', 1);
 	}
 	
 	public function mogslotCategory() {
