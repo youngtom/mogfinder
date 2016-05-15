@@ -10,7 +10,7 @@
 		foreach ($categories as $group => $categoryArr) {
 	?>
 	<div class="page-header">
-		<?php if (!$count++) { ?>
+		<?php if (count($characters) && !$count++) { ?>
 		<div class="btn-group pull-right" role="group">
 			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<?php if ($selectedCharacter) { ?>
