@@ -87,10 +87,10 @@ class Character extends Model
 		    return false;
 	    }
 	    
-        $region = $infoArr['region'];
-        $realmName = $infoArr['realm'];
-        $name = $infoArr['name'];
-        $factionName = $infoArr['faction'];
+        $region = @$infoArr['region'];
+        $realmName = @$infoArr['realm'];
+        $name = @$infoArr['name'];
+        $factionName = @$infoArr['faction'];
         
         if ($realmName && $region) {
 	        $realm = Realm::where('name', '=', $realmName)->where('region', '=', $region)->first();
