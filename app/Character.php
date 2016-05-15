@@ -78,6 +78,58 @@ class Character extends Model
 		}
 	}
 	
+	public function updateCharacterFromDataArray($infoArr) {
+	    if (!$infoArr) {
+		    return false;
+	    }
+	    
+        $region = $infoArr['region'];
+        $realmName = $infoArr['realm'];
+        $name = $infoArr['name'];
+        $factionName = $infoArr['faction'];
+        
+        if ($realmName && $region) {
+	        $realm = Realm::where('name', '=', $realmName)->where('region', '=', $region)->first();
+		    
+		    if (!$realm) {
+			    $realm = new Realm;
+			    $realm->name = $realmName;
+			    $realm->region = $region;
+			    $realm->save();
+		    }
+		    
+			$this->realm_id = $realm->id;
+		}
+	    
+	    if (!$this->class_id && @$infoArr['class']) {
+		    $class = CharClass::where('unlocalized_name', '=', $infoArr['class'])->first();
+		    $this->class_id = ($class) ? $class->id : null;
+	    }
+	    
+	    if ($factionName) {
+		    $faction = Faction::where('name', '=', $factionName)->first();
+			$this->faction_id = ($faction) ? $faction->id : $this->faction_id;
+		}
+	    
+	    if (@$infoArr['race']) {
+		    if (@$infoArr['race'] == 'Scourge') {
+			    $raceStr = 'Undead';
+		    } elseif (@$infoArr['race'] == 'Pandaren') {
+			    $raceStr = $infoArr['race'] . ' (' . $faction->name . ')';
+		    } else {
+			    $raceStr = $infoArr['race'];
+		    }
+		    
+		    $race = (@$infoArr['race']) ? Race::where('name', '=', $raceStr)->first() : false;
+		    $this->race_id = ($race) ? $race->id : $this->race_id;
+		}
+	    
+		$this->name = ($name) ?: $this->name;
+		$this->level = (@$infoArr['level']) ?: $this->level;
+		
+		$this->save();
+    }
+	
     public function importBnetData($returnFields = []) {
 	 	if (self::$apiClient === null) {
 			self::$apiClient = new \App\BnetWowApi(Config::get('settings.bnet_api_key'), Config::get('settings.bnet_api_locale'));  

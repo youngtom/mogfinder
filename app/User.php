@@ -54,15 +54,20 @@ class User extends Authenticatable
 	    \Log::info('Importing user data for user: ' . $this->id);
 	    
 	    foreach ($dataFile->import_data['chars'] as $charTag => $charData) {
-		    $character = ($charTag) ? Character::where('wow_guid', '=', $charTag)->where('user_id', '=', $this->id)->first() : false;
-		    
-		    if (!$character) {
-			    $character = $this->getCharacterFromDataArray($charData['charInfo'], false);
-			}
-		    
-		    if ($character) {
-				$scanTime = (@$charData['scanTime']) ? $charData['scanTime'] : 0;
+		    if ($charTag) {
+			    $character = Character::where('wow_guid', '=', $charTag)->where('user_id', '=', $this->id)->first();
+			    
+			    if (!$character) {
+				    $character = new Character;
+				    $character->wow_guid = $charTag;
+				    $character->user_id = $this->id;
+				    $character->save();
+				}
 				
+				$character->updateCharacterFromDataArray($charData['charInfo']);
+			    
+			    $scanTime = (@$charData['scanTime']) ? $charData['scanTime'] : 0;
+					
 				if ($scanTime > $character->last_scanned) {
 					// Queue item import
 					$job = (new ImportCharacterItems($character->id, $dataFile->id))->onQueue('med');
@@ -72,9 +77,8 @@ class User extends Authenticatable
 					$character->latest_chardata = json_encode($charData);
 				}
 				
-				$character->wow_guid = $charTag;
 				$character->save();
-		    }
+			}
 	    }
 	    
 	    if (@$dataFile->import_data['heirlooms'] && is_array($dataFile->import_data['heirlooms']) && count($dataFile->import_data['heirlooms'])) {
@@ -109,59 +113,6 @@ class User extends Authenticatable
         } else {
 	        return $this->characters()->where('id', '<>', $character->id)->get();
         }
-    }
-    
-    public function getCharacterFromDataArray($infoArr, $importFromBnet = true, $returnFields = []) {
-	    if (!$infoArr) {
-		    return false;
-	    }
-	    
-        $region = $infoArr['region'];
-        $realmName = $infoArr['realm'];
-        $name = $infoArr['name'];
-        $factionName = $infoArr['faction'];
-        
-        $realm = Realm::where('name', '=', $realmName)->where('region', '=', $region)->first();
-	    
-	    if (!$realm) {
-		    $realm = new Realm;
-		    $realm->name = $realmName;
-		    $realm->region = $region;
-		    $realm->save();
-	    }
-	    
-	    $character = Character::where('user_id', '=', $this->id)->where('realm_id', '=', $realm->id)->where('name', '=', $name)->first();
-	    
-	    if (!$character) {
-		    $class = (@$infoArr['class']) ? CharClass::where('unlocalized_name', '=', $infoArr['class'])->first() : false;
-		    $faction = Faction::where('name', '=', $factionName)->first();
-		    
-		    if (@$infoArr['race'] == 'Scourge') {
-			    $raceStr = 'Undead';
-		    } elseif (@$infoArr['race'] == 'Pandaren') {
-			    $raceStr = $infoArr['race'] . ' (' . $faction->name . ')';
-		    } else {
-			    $raceStr = $infoArr['race'];
-		    }
-		    
-		    $race = (@$infoArr['race']) ? Race::where('name', '=', $raceStr)->first() : false;
-		    
-			$character = new Character;
-			$character->name = $name;
-			$character->user_id = $this->id;
-			$character->realm_id = $realm->id;
-			$character->level = $infoArr['level'];
-			$character->class_id = ($class) ? $class->id : null;
-			$character->race_id = ($race) ? $race->id : null;
-			$character->faction_id = ($faction) ? $faction->id : $character->faction_id;
-			$character->save();
-	    }
-	    
-	    if ($importFromBnet) {
-		    $character->importBnetData($returnFields);
-	    }
-	    
-	    return $character;
     }
     
     public function getDuplicateItems($includeQuestItems = false, $character = null) {

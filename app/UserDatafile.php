@@ -51,23 +51,23 @@ class UserDatafile extends Model
 		}
 		
 		foreach ($this->import_data['chars'] as $charTag => $charData) {
-		    $character = Auth::user()->getCharacterFromDataArray($charData['charInfo'], false);
+		    $character = Character::where('wow_guid', '=', $charTag)->where('user_id', '=', Auth::user()->id)->first();		    
 		    
-		    if ($character) {
-				$scanTime = (@$charData['scanTime']) ? $charData['scanTime'] : 0;
+		    $lastScanned = ($character) ? $character->last_scanned : 0;
+		    
+		    $scanTime = (@$charData['scanTime']) ? $charData['scanTime'] : 0;
 				
-				if ($scanTime > $character->last_scanned) {
-					if (@$charData['equipped']) {
-						$count += count($charData['equipped']);
-					}
-					
-					if (@$charData['items']) {
-						foreach ($charData['items'] as $itemArr) {
-							$count += count($itemArr);
-						}
+			if ($scanTime > $lastScanned) {
+				if (@$charData['equipped']) {
+					$count += count($charData['equipped']);
+				}
+				
+				if (@$charData['items']) {
+					foreach ($charData['items'] as $itemArr) {
+						$count += count($itemArr);
 					}
 				}
-		    }
+			}
 		}
 		
 		return $count;
