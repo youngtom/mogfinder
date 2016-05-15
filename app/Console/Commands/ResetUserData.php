@@ -7,6 +7,7 @@ use App\User;
 use App\UserDatafile;
 use App\Character;
 use App\UserItem;
+use App\UserItemDisplay;
 
 class ResetUserData extends Command
 {
