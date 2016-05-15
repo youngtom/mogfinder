@@ -24,12 +24,12 @@ $(function () {
 	            $('#status-msg').show().html(data.result.msg);
 	            
 	            $('#upload-progress .progress-label').html('0%');
-	            updateProgressbar($('#upload-progress'), 0, parseInt(data.result.total), $button);
+	            updateProgressbar(0, parseInt(data.result.total), $button);
 	            
 	            if (data.result.reportURL) {
 		            var reportPoll = function() {
 						$.getJSON(data.result.reportURL, function(polldata) {
-							updateProgressbar($('#upload-progress'), polldata.current, polldata.total, $button);
+							updateProgressbar(polldata.current, polldata.total, $button);
 							
 							if (polldata.current < polldata.total) {
 								setTimeout(reportPoll, 2500);
@@ -61,8 +61,8 @@ function resetUploadButton($button) {
     $('span', $button).html($button.attr('data-default-text'));
 }
 
-function updateProgressbar($progress, current, total, $button) {
-	var $bar = $('.progress-bar', $progress);
+function updateProgressbar(current, total, $button) {
+	var $bar = $('.progress-bar', $('#upload-progress'));
 	$progress.show();
 	
 	var now = parseInt($bar.attr('aria-valuenow'));
@@ -76,13 +76,15 @@ function updateProgressbar($progress, current, total, $button) {
 			$bar.attr('data-target-percent', percent);
 			
 			if (!$bar.attr('data-animating')) {
-				incrementProgressBar($bar, $button);
+				incrementProgressBar($button);
 			}
 		}
 	}
 }
 
-function incrementProgressBar($bar, $button) {
+function incrementProgressBar($button) {
+	var $bar = $('.progress-bar', $('#upload-progress'));
+	
 	$bar.attr('data-animating', 1);
 	
 	var cur = ($bar.attr('data-current-percent')) ? parseInt($bar.attr('data-current-percent')) : 0;
