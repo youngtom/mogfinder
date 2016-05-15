@@ -85,7 +85,7 @@ class UserController extends Controller
 					$job = (new ImportUserData($user->id, $userFile->id))->onQueue('high');
 				    $this->dispatch($job);
 					
-					return Response::json(['success' => true, 'token' => $userFile->token, 'total' => $itemCount, 'reportURL' => url('upload-data/report/' . $userFile->token)]);
+					return Response::json(['success' => true, 'token' => $userFile->token, 'total' => $itemCount, 'reportURL' => url('upload-data/report/' . $userFile->token), 'msg' => 'This process may take a few minutes. You may leave this page at any time (progress will continue in the background)']);
 				}
 			} else {
 				Storage::delete($path . $filename);

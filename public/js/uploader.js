@@ -10,6 +10,7 @@ $(function () {
 	        $button.addClass('disabled');
 	        $('.fa-btn', $button).removeClass('fa-upload').addClass('fa-circle-o-notch').addClass('fa-spin');
 	        $('span', $button).html('&nbsp;Uploading...');
+	        $('.status.error').hide();
         },
         done: function (e, data) {
 	        var $button = $(this).parent();
@@ -20,6 +21,9 @@ $(function () {
 	            $('.status').hide();
 	            $('#luaupload').hide();
 	            
+	            $('#status-msg').show().html(data.result.msg);
+	            
+	            $('#upload-progress .progress-label').html('0%');
 	            updateProgressbar($('#upload-progress'), 0, parseInt(data.result.total));
 	            
 	            if (data.result.reportURL) {
@@ -72,9 +76,34 @@ function updateProgressbar($progress, current, total) {
 		$bar.attr('aria-valuenow', current);
 		
 		if (current && total) {
-			var percent = (current / total) * 100;
-			$bar.width(percent + '%');
-			$('.progress-label', $bar).html(String(Math.round(percent)) + '%')
+			var percent = Math.min(100, Math.round((current / total) * 100));
+			$bar.attr('data-target-percent', percent);
+			
+			if (!$bar.attr('data-animating')) {
+				incrementProgressBar($bar);
+			}
+		}
+	}
+}
+
+function incrementProgressBar($bar) {
+	$bar.attr('data-animating', 1);
+	
+	var cur = ($bar.attr('data-current-percent')) ? parseInt($bar.attr('data-current-percent')) : 0;
+	var tgt = parseInt($bar.attr('data-target-percent'));
+	var newPct = cur + 1;
+	
+	if (cur < tgt && cur < 100) {
+		$bar.width((cur + 1) + '%');
+		$('.progress-label', $bar).html((cur + 1) + '%');
+		$bar.attr('data-current-percent', newPct);
+		
+		if (newPct < tgt && newPct < 100) {
+			setTimeout(function () {
+				incrementProgressBar($bar);	
+			}, 100);
+		} else {
+			$bar.attr('data-animating', 0);
 		}
 	}
 }

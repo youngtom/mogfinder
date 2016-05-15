@@ -9,7 +9,7 @@
 }
 
 .uploader .progress-bar {
-	transition: 2s;
+	transition: 0.1s;
 }
 
 #upload-progress .progress-label {
@@ -23,4 +23,9 @@
 	color: white;
 	font-size: 75%;
 	transition: all 0.2s ease;
+}
+
+#status-msg {
+	margin-top: 20px;
+	font-style: italic;
 }

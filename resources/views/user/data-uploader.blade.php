@@ -36,6 +36,9 @@
 				</div>
 			</div>
 		</div>
+		<div class="row">
+			<div id="status-msg" class="col-md-10 text-center"></div>
+		</div>
 	</div>
 </div>
 @endsection
