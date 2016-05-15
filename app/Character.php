@@ -55,7 +55,11 @@ class Character extends Model
     }
     
     public function getToken() {
-	    return str_slug($this->name . ' ' . $this->realm->name . ' ' . $this->realm->region);
+	    if ($this->realm) {
+		    return str_slug($this->name . ' ' . $this->realm->name . ' ' . $this->realm->region);
+		} else {
+			return null;
+		}
     }
 	
 	public function canUseItem(Item $item) {
