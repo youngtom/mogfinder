@@ -24,19 +24,15 @@ $(function () {
 	            $('#status-msg').show().html(data.result.msg);
 	            
 	            $('#upload-progress .progress-label').html('0%');
-	            updateProgressbar($('#upload-progress'), 0, parseInt(data.result.total));
+	            updateProgressbar($('#upload-progress'), 0, parseInt(data.result.total), $button);
 	            
 	            if (data.result.reportURL) {
 		            var reportPoll = function() {
 						$.getJSON(data.result.reportURL, function(polldata) {
-							updateProgressbar($('#upload-progress'), polldata.current, polldata.total);
+							updateProgressbar($('#upload-progress'), polldata.current, polldata.total, $button);
 							
 							if (polldata.current < polldata.total) {
 								setTimeout(reportPoll, 2500);
-							} else {
-								$button.removeClass('btn-warning').addClass('btn-success');
-						        $('span', $button).html('&nbsp;Complete');
-						        $('.fa-btn', $button).addClass('fa-check').removeClass('fa-circle-o-notch').removeClass('fa-spin');
 							}
 						});
 					};
@@ -65,7 +61,7 @@ function resetUploadButton($button) {
     $('span', $button).html($button.attr('data-default-text'));
 }
 
-function updateProgressbar($progress, current, total) {
+function updateProgressbar($progress, current, total, $button) {
 	var $bar = $('.progress-bar', $progress);
 	$progress.show();
 	
@@ -80,13 +76,13 @@ function updateProgressbar($progress, current, total) {
 			$bar.attr('data-target-percent', percent);
 			
 			if (!$bar.attr('data-animating')) {
-				incrementProgressBar($bar);
+				incrementProgressBar($bar, $button);
 			}
 		}
 	}
 }
 
-function incrementProgressBar($bar) {
+function incrementProgressBar($bar, $button) {
 	$bar.attr('data-animating', 1);
 	
 	var cur = ($bar.attr('data-current-percent')) ? parseInt($bar.attr('data-current-percent')) : 0;
@@ -100,10 +96,17 @@ function incrementProgressBar($bar) {
 		
 		if (newPct < tgt && newPct < 100) {
 			setTimeout(function () {
-				incrementProgressBar($bar);	
+				incrementProgressBar($bar, $button);	
 			}, 100);
 		} else {
 			$bar.attr('data-animating', 0);
+		}
+		
+		if (newPct == 100) {
+			$button.removeClass('btn-warning').addClass('btn-success');
+	        $('span', $button).html('&nbsp;Complete');
+	        $('.fa-btn', $button).addClass('fa-check').removeClass('fa-circle-o-notch').removeClass('fa-spin');
+	        $('#status-msg').html('Import completed - ' + $bar.attr('aria-valuemax') + ' items processed.');
 		}
 	}
 }
