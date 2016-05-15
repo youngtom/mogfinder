@@ -68,7 +68,7 @@ class User extends Authenticatable
 			    
 			    $scanTime = (@$charData['scanTime']) ? $charData['scanTime'] : 0;
 					
-				if ($scanTime > $character->last_scanned) {
+				if ($scanTime > $character->last_scanned && $character->realm_id) {
 					// Queue item import
 					$job = (new ImportCharacterItems($character->id, $dataFile->id))->onQueue('med');
 					$this->dispatch($job);
