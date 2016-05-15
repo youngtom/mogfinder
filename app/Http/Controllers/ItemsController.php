@@ -372,6 +372,7 @@ class ItemsController extends Controller
 	    
 	    //search source labels
 	    $sources = ItemSource::search($q)->get();
+	    $vendorBnetIDs = [];
 	    
 	    if ($sources->count()) {
 		    foreach ($sources as $source) {
@@ -380,13 +381,16 @@ class ItemsController extends Controller
 					    $results['vendor'] = [];
 				    }
 				    
-				    $results['vendor'][] = [
-					    'type' => 'vendor',
-					    'value' => $source->label,
-					    'id' => $source->id,
-					    'link' => route('vendor', [$source->bnet_source_id]),
-					    'linkClass' => 'vendor'
-				    ];
+				    if (!in_array($source->bnet_source_id, $vendorBnetIDs)) {
+					    $results['vendor'][] = [
+						    'type' => 'vendor',
+						    'value' => $source->label,
+						    'id' => $source->id,
+						    'link' => route('vendor', [$source->bnet_source_id]),
+						    'linkClass' => 'vendor'
+					    ];
+					    $vendorBnetIDs[] = $source->bnet_source_id;
+					}
 			    }
 		    }
 	    }
