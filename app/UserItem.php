@@ -28,7 +28,7 @@ class UserItem extends Model
 		self::deleted(function ($item) {
 			$userDisplay = UserItemDisplay::where('item_display_id', '=', $item->item_display_id)->where('user_id', '=', $item->user_id)->first();
 			
-			if ($display) {
+			if ($userDisplay) {
 				$userDisplay->updateRestrictions();
 			}
 		});
