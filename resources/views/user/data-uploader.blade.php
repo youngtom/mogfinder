@@ -35,7 +35,7 @@
 					</div>
 				</div>
 				
-				<div id="status-msg" class="col-md-10 text-center"></div>
+				<div id="status-msg" class="text-center"></div>
 			</div>
 		</div>
 	</div>
