@@ -27,6 +27,8 @@ use DB;
 class TestController extends Controller
 {
 	public function index() {
+		Realm::importRealms('us');
+		die;
 		$sources = ItemSource::whereNotNull('item_currency_info')->get()->groupBy('item_id');
 		
 		foreach ($sources as $itemID => $sourceArr) {

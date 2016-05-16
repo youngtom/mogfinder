@@ -51,6 +51,10 @@ class BnetWowApi
 		return $this->_getEndpointData('/zone/', 'us');
 	}
 	
+	public function getRealmData($region) {
+		return $this->_getEndpointData('/realm/status', $region);
+	}
+	
     private function _getEndpointData($endpoint, $region = 'us', $params = array(), $expirationOverride = false) {
 	    $searchURL = str_replace('{$region}', strtolower($region), Config::get('settings.bnet_api_base_url')) . $endpoint;
 	    $searchURL .= (count($params)) ? '?' . http_build_query($params) : '';
@@ -87,7 +91,7 @@ class BnetWowApi
 		
 		try {
 			$res = self::$client->request('GET', $url, ['http_errors' => false]);
-		} catch (\Exception $e) {
+		} catch (\Exception $e) {			
 			return false;
 		}
 		

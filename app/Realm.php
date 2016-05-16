@@ -78,4 +78,16 @@ class Realm extends Model
 	    }
 	    return $this->connectedRealms;
     }
+    
+    public static function importRealms($region) {
+	    if (self::$apiClient === null) {
+			self::$apiClient = new BnetWowApi(Config::get('settings.bnet_api_key'), Config::get('settings.bnet_api_locale'));  
+	    }
+	    
+	    $data = self::$apiClient->getRealmData($region);
+	    dd($data);
+	    foreach ($data as $realmArr) {
+		    dd($realmArr);
+	    }
+    }
 }
