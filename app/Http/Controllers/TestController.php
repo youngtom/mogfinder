@@ -428,7 +428,7 @@ class TestController extends Controller
 		    $out[] = 'BnetSourceID: ' . $sourceTypeID;
 		    foreach ($sourceArr as $source) {
 			    if ($source->item->transmoggable) {
-				    $out[] = '<a href="' . $source->getWowheadLink($source->item) . '">' . $source->getSourceText() . '</a>: <a href="http://www.wowhead.com/item=' . $source->item->bnet_id . '" class="q' . $source->item->quality . '" rel="' . $source->item->getWowheadMarkup() . '">[' . $source->item->name . ']</a> - ' . $source->item->id;
+				    $out[] = '<a href="http://www.wowhead.com/' . $source->getWowheadMarkup($source->item) . '">' . $source->getSourceText() . '</a>: <a href="http://www.wowhead.com/item=' . $source->item->bnet_id . '" class="q' . $source->item->quality . '" rel="' . $source->item->getWowheadMarkup() . '">[' . $source->item->name . ']</a> - ' . $source->item->id;
 				}
 			}
 	    }
