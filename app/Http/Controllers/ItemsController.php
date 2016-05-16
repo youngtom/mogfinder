@@ -532,7 +532,7 @@ class ItemsController extends Controller
 	    //get item source types
 	    $itemIDs = Item::whereIn('item_display_id', $dispIds)->where('transmoggable', '=', 1)->get()->lists('id')->toArray();
 		$itemSourceTypeIDs = ItemSource::whereIn('item_id', $itemIDs)->groupBy('item_source_type_id')->get()->lists('item_source_type_id');
-		$itemSourceTypes = ItemSourceType::where('url_token', '<>', '')->whereIn('id', $itemSourceTypeIDs)->get();
+		$itemSourceTypes = ItemSourceType::where('ordering', '>', 0)->whereIn('id', $itemSourceTypeIDs)->orderBy('ordering', 'ASC')->get();
 		
 		$mogslotCount = $displays->groupBy('mogslot_id')->count();
 		
