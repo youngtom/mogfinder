@@ -201,6 +201,9 @@ class Character extends Model
 			    }
 			    
 			    $count++;
+			    if ($dataFileID) {
+				    DB::table('user_datafiles')->where('id', '=', $dataFileID)->increment('progress_current');
+			    }
 		    }
 		}
 		
@@ -247,11 +250,17 @@ class Character extends Model
 					    }
 					    
 					    $count++;
+					    if ($dataFileID) {
+						    DB::table('user_datafiles')->where('id', '=', $dataFileID)->increment('progress_current');
+					    }
 				    }
 				} else {
 					\Log::info('ItemLocation not found: ' . $locationImportTag);
 					
 					$count += count($itemArr);
+					if ($dataFileID) {
+					    DB::table('user_datafiles')->where('id', '=', $dataFileID)->increment('progress_current', count($itemArr));
+				    }
 				}
 		    }
 		}
@@ -263,12 +272,6 @@ class Character extends Model
 		foreach($deleteItems as $item) {
 			$item->delete();
 		}
-		
-		$dataFile = ($dataFileID) ? UserDatafile::find($dataFileID) : false;
-		if ($dataFile) {
-		    $dataFile->incrementResponseData('current', $count);
-		    $dataFile->save();
-	    }
 		
 		$this->latest_chardata = null;
 		$this->save();

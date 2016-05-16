@@ -78,8 +78,8 @@ class UserController extends Controller
 					$userFile->import_data = json_encode($data['MCCSaved']);
 					$userFile->token = substr($file->token, 0, 8) . substr(uniqid(), 0, 8);
 					$itemCount = $userFile->getItemCount();
-					$userFile->setResponseData('total', $itemCount);
-					$userFile->setResponseData('current', 0);
+					$userFile->progress_total = $itemCount;
+					$userFile->progress_current = 0;
 					$userFile->save();
 					
 					$job = (new ImportUserData($user->id, $userFile->id))->onQueue('high');
@@ -100,9 +100,7 @@ class UserController extends Controller
 		$userFile = UserDatafile::where('user_id', '=', Auth::user()->id)->where('token', '=', $token)->first();
 		
 		if ($userFile) {
-			$response = json_decode($userFile->response, true);
-			
-			return Response::json($response);
+			return Response::json($userFile->getResponseDataArray());
 		} else {
 			return \App::abort();
 		}

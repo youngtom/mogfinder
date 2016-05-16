@@ -29,6 +29,19 @@ class UserDatafile extends Model
 		return $this->responseData[$field] = $value;
 	}
 	
+	public function getResponseDataArray() {
+		$data = [
+			'current' => $this->progress_current,
+			'total' => $this->progress_total
+		];
+		
+		if ($this->response) {
+			$data['data'] = json_decode($this->response, true);
+		}
+		
+		return $data;
+	}
+	
 	public function incrementResponseData($field, $value) {
 		if ($this->responseData === null) {
 			$this->responseData = json_decode($this->response, true);
@@ -57,7 +70,7 @@ class UserDatafile extends Model
 			    $lastScanned = ($character) ? $character->last_scanned : 0;
 			    
 			    $scanTime = (@$charData['scanTime']) ? $charData['scanTime'] : 0;
-					
+				
 				if ($scanTime > $lastScanned) {
 					if (@$charData['equipped']) {
 						$count += count($charData['equipped']);

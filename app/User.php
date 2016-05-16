@@ -103,8 +103,7 @@ class User extends Authenticatable
 					}
 			    }
 			    
-			    $dataFile->incrementResponseData('current', 1);
-			    $dataFile->save();
+			    DB::table('user_datafiles')->where('id', '=', $dataFile->id)->increment('progress_current');
 	        }
 	    }
     }
