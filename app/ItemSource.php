@@ -121,7 +121,7 @@ class ItemSource extends Model
 		}
 	}
 	
-	public function getWowheadMarkup(Item $item, $format) {
+	public function getWowheadMarkup(Item $item, $format = false) {
 		$format = ($format) ?: $this->itemSourceType->wowhead_link_format;
 		
 		$replace = [
