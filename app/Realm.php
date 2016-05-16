@@ -94,7 +94,7 @@ class Realm extends Model
 			    $locale = $realmArr['locale'];
 			    
 			    if ($name && $slug) {
-				    $realm = Realm::where('region', '=', $region)->where(function ($query) {
+				    $realm = Realm::where('region', '=', $region)->where(function ($query) use ($name, $slug) {
 					    $query->where('name', '=', $name)->orWhere('url_token', '=', $slug);
 					})->first();
 				    
