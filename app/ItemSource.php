@@ -122,9 +122,7 @@ class ItemSource extends Model
 	}
 	
 	public function getWowheadMarkup(Item $item, $format) {
-		if (!$format) {
-			return false;
-		}
+		$format = ($format) ?: $this->itemSourceType->wowhead_link_format;
 		
 		$replace = [
 			'{$bnet_id}' => $this->bnet_source_id,
