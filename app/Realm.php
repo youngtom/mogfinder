@@ -85,9 +85,47 @@ class Realm extends Model
 	    }
 	    
 	    $data = self::$apiClient->getRealmData($region);
-	    dd($data);
-	    foreach ($data as $realmArr) {
-		    dd($realmArr);
-	    }
+	    $region = strtoupper($region);
+	    
+	    if (@$data['realms']) {
+		    foreach ($data['realms'] as $realmArr) {
+			    $name = $realmArr['name'];
+			    $slug = $realmArr['slug'];
+			    $locale = $realmArr['locale'];
+			    
+			    if ($name && $slug) {
+				    $realm = Realm::where('region', '=', $region)->where(function ($query) {
+					    $query->where('name', '=', $name)->orWhere('url_token', '=', $slug);
+					})->first();
+				    
+				    if (!$realm) {
+					    $realm = new Realm;
+					    $realm->region = $region;
+				    }
+				    
+				    $realm->name = $name;
+				    $realm->url_token = $slug;
+				    $realm->locale = $locale;
+				    $realm->save();
+				    
+				    \Log::info('Realm Imported: ' . $name . ' - ' . $region);
+				    
+				    foreach ($realmArr['connected_realms'] as $connectedSlug) {
+					    $connRealm = Realm::where('url_token', '=', $connectedSlug)->where('region', '=', $region)->first();
+					    
+					    if (!$connRealm) {
+						    $connRealm = new Realm;
+						    $connRealm->parent_realm_id = $realm->id;
+						    $connRealm->url_token = $connectedSlug;
+						    $connRealm->region = $region;
+						    $connRealm->name = 'PENDING_UPDATE';
+						    $connRealm->save();
+					    }
+				    }
+				} else {
+					\Log::error('Malformed data for realm import: ' . $name . ' - ' . $slug . ' (' . $region . ')');
+				}
+		    }
+		}
     }
 }

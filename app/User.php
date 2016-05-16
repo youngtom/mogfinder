@@ -109,8 +109,8 @@ class User extends Authenticatable
     }
     
     public function getOtherCharacters(Character $character, $mailable) {
-	    if ($mailable) {
-		    return $this->characters()->where('id', '<>', $character->id)->where('faction_id', '=', $character->faction_id)->where('realm_id', '=', $character->realm_id)->get();
+	    if ($mailable && $character->realm) {
+		    return $this->characters()->where('id', '<>', $character->id)->where('faction_id', '=', $character->faction_id)->whereIn('realm_id', $character->realm->getConnectedRealms()->lists('id')->toArray())->get();
         } else {
 	        return $this->characters()->where('id', '<>', $character->id)->get();
         }
