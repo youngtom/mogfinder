@@ -130,9 +130,11 @@
 									case 2:
 										echo '<i class="fa fa-btn fa-circle-o" title="Account Bound" data-toggle="tooltip" data-placement="left"></i>';
 										break;
+									/*
 									case 0;
 										echo '<i class="fa fa-btn fa-circle-thin" title="Not Bound" data-toggle="tooltip" data-placement="left"></i>';
 										break;
+									*/
 									default:
 										echo '&nbsp;';
 										break;
