@@ -120,6 +120,8 @@ class Character extends Model
 			    $raceStr = 'Undead';
 		    } elseif (@$infoArr['race'] == 'Pandaren') {
 			    $raceStr = $infoArr['race'] . ' (' . $faction->name . ')';
+			} elseif (@$infoArr['race'] == 'BloodElf') {
+				$raceStr = 'Blood Elf';
 		    } else {
 			    $raceStr = $infoArr['race'];
 		    }
@@ -234,7 +236,6 @@ class Character extends Model
 							        });
 							        
 							        if ($found) {
-								        \Log::info('Item (' . $item->name . ') usable on alt (' . $found->name . ' - ' . $found->realm->name . ')');
 								        $userItem = $this->addUserItem($item, $itemLink, $itemLocation, $bound);
 							        }
 						        }
