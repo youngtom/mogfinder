@@ -594,7 +594,7 @@ class ItemsController extends Controller
 	    $displays = ItemDisplay::whereIn('id', $displayIDs)->where('transmoggable', '=', 1)->get();
 	    
 	    $displays = $displays->filter(function ($display) use ($itemIDs) {
-		    return ($display->items()->whereNotIn('id', $itemIDs)->get()->count()) ? false : true;
+		    return ($display->items()->whereNotIn('id', $itemIDs)->count()) ? false : true;
 	    });
 	    dd($displays->count());
 	    
@@ -612,7 +612,7 @@ class ItemsController extends Controller
 	    $displays = ItemDisplay::whereIn('id', $displayIDs)->where('transmoggable', '=', 1)->get();
 	    
 	    $displays = $displays->filter(function ($display) use ($itemIDs) {
-		    return ($display->items()->whereNotIn('id', $itemIDs)->get()->count()) ? false : true;
+		    return ($display->items()->whereNotIn('id', $itemIDs)->count()) ? false : true;
 	    });
 	    
 	    $filteredItemIDs = Item::whereIn('item_display_id', $displays->lists('id')->toArray())->get()->lists('id')->toArray();
