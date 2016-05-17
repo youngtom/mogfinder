@@ -89,6 +89,9 @@
                     <li class="{{ set_active('upload-data') }}">
                         <a href="{{ url('/upload-data') }}"><i class="fa fa-fw fa-upload"></i> Upload Data</a>
                     </li>
+                    <li class="{{ set_active('feedback') }}">
+                        <a href="{{ url('/feedback') }}"><i class="fa fa-fw fa-envelope-o"></i> Feedback</a>
+                    </li>
                 </ul>
             </div>
             @endif

@@ -22,7 +22,7 @@
 					<div class="page-header">
 						<h3>Feedback <small>How you can help</small></h3>
 					</div>
-					<p>If you have any suggestions for site, run into any bugs, or find any items that are missing (or should not be listed) please <a href="#">let me know</a>.</p>
+					<p>If you have any suggestions for site, run into any bugs, or find any items that are missing (or should not be listed) please <a href="{{ url('/feedback') }}">let me know</a>.</p>
 				</div>
 		    </div>
 		</div>

@@ -16,7 +16,7 @@
                     {!! Form::open(array('route' => 'feedback_store', 'class' => 'form-horizontal')) !!}
                         {!! csrf_field() !!}
                         
-                        <input type="hidden" name="referrer" value="<?=URL::previous()?>" />
+                        <input type="hidden" name="referrer" value="<?=$referrer?>" />
 
                         <div class="form-group{{ $errors->has('subject') ? ' has-error' : '' }}">
                             <label class="col-md-4 control-label">Subject</label>
