@@ -596,6 +596,7 @@ class ItemsController extends Controller
 	    $displays = $displays->filter(function ($display) use ($itemIDs) {
 		    return ($display->items()->whereNotIn('id', $itemIDs)->get()->count()) ? false : true;
 	    });
+	    dd($displays->count());
 	    
 	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Legacy Item Displays');
     }
