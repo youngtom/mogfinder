@@ -65,7 +65,6 @@ Route::group(['middleware' => 'web'], function () {
     
     //wardrobe routes
     Route::get('/wardrobe', 'ItemsController@index');
-    Route::get('/wardrobe/legacy-displays/{auctionable?}', 'ItemsController@legacyDisplays');
     Route::get('/wardrobe/legacy-auctions', 'ItemsController@legacyAuctions');
     Route::get('/wardrobe/zones/', 'ItemsController@zoneOverview');
     Route::get('/wardrobe/zone/{zoneURL}', ['as' => 'zone', 'uses' => 'ItemsController@showZoneDisplays']);
@@ -77,7 +76,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('/wardrobe/{characterURL}', 'ItemsController@index');
     Route::get('/wardrobe/zones/{characterURL}', 'ItemsController@zoneOverview');
     Route::get('/wardrobe/duplicates/{selectedCharacterURL}', 'ItemsController@duplicates');
-    Route::get('/wardrobe/{group}/{category}/{mogslotURL}', 'ItemsController@showSlot')->where('group', '(armor|weapons)');
+    Route::get('/wardrobe/{group}/{category}/{mogslotURL}/{sourceURL?}/{auctionable?}', 'ItemsController@showSlot')->where(['group' => '(armor|weapons)', 'sourceURL' => '[A-Za-z\-]+']);
     Route::get('/wardrobe/{group}/{category}/{mogslotURL}/{displayID}', ['as' => 'display', 'uses' => 'ItemsController@showDisplay'])->where('group', '(armor|weapons)');
     
     //Search routes
