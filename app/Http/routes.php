@@ -65,6 +65,8 @@ Route::group(['middleware' => 'web'], function () {
     
     //wardrobe routes
     Route::get('/wardrobe', 'ItemsController@index');
+    Route::get('/wardrobe/legacy-displays/{auctionable?}', 'ItemsController@legacyDisplays');
+    Route::get('/wardrobe/legacy-auctions', 'ItemsController@legacyAuctions');
     Route::get('/wardrobe/zones/', 'ItemsController@zoneOverview');
     Route::get('/wardrobe/zone/{zoneURL}', ['as' => 'zone', 'uses' => 'ItemsController@showZoneDisplays']);
     Route::get('/wardrobe/boss/{zoneURL}/{bossURL}', ['as' => 'boss', 'uses' => 'ItemsController@showBossDisplays']);

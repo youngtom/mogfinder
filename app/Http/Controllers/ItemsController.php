@@ -577,10 +577,64 @@ class ItemsController extends Controller
 	    return view('items.display-list')->with('mogslot', $mogslot)->with('itemDisplays', $displays)->with('user', $user)->with('userDisplayIDs', $userDisplayIDs)->with('userItemIDs', $userItemIDs)->with('classes', $classes)->with('factions', $factions)->with('itemSourceTypes', $itemSourceTypes)->with('priorityItemIDs', $priorityItemIDs);
     }
     
+    public function legacyDisplays($auctionable = false) {
+	    $items = Item::whereNotIn('id', function ($query) {
+		    $query->select('item_id')->from('item_sources')->where('item_source_type_id', '<>', 17);
+	    })->where('transmoggable', '=', 1);
+	    
+	    if ($auctionable) {
+		    $items = $items->where('auctionable', '=', 1);
+	    }
+	    
+	    $items = $items->orderBy('bnet_id', 'ASC')->get();
+	    
+	    $itemIDs = $items->lists('id')->toArray();
+	    $displayIDs = $items->lists('item_display_id')->toArray();
+	    
+	    $displays = ItemDisplay::whereIn('id', $displayIDs)->where('transmoggable', '=', 1)->get();
+	    
+	    $displays = $displays->filter(function ($display) use ($itemIDs) {
+		    return ($display->items()->whereNotIn('id', $itemIDs)->get()->count()) ? false : true;
+	    });
+	    
+	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Legacy Item Displays');
+    }
+    
+    public function legacyAuctions() {
+	    $items = Item::whereNotIn('id', function ($query) {
+		    $query->select('item_id')->from('item_sources')->where('item_source_type_id', '<>', 17);
+	    })->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->get();
+	    
+	    $itemIDs = $items->lists('id')->toArray();
+	    $displayIDs = $items->lists('item_display_id')->toArray();
+	    
+	    $displays = ItemDisplay::whereIn('id', $displayIDs)->where('transmoggable', '=', 1)->get();
+	    
+	    $displays = $displays->filter(function ($display) use ($itemIDs) {
+		    return ($display->items()->whereNotIn('id', $itemIDs)->get()->count()) ? false : true;
+	    });
+	    
+	    $filteredItemIDs = Item::whereIn('item_display_id', $displays->lists('id')->toArray())->get()->lists('id')->toArray();
+	    
+	    $auctions = $this->auctionSearch($dispIds)->groupBy('item_display_id');
+		    
+	    if (!$auctions->count()) {
+		    $error = 'No auctions were found matching your search.';
+	    } else {
+		    $error = false;
+	    }
+	    
+	    $classes = CharClass::orderBy('name', 'ASC')->get();
+	    $mogslotCategories = MogslotCategory::all();
+	    $mogslotsByCategory = Mogslot::orderBy('simple_label', 'ASC')->get()->groupBy('mogslot_category_id');
+	    
+	    return view('items.auctions')->with('classes', $classes)->with('mogslotCategories', $mogslotCategories)->with('mogslots', $mogslotsByCategory)->with('auctions', $auctions)->with('selectedClass', false)->with('selectedCat', false)->with('selectedSlot', false)->with('error', $error);
+    }
+    
     public function showAuctions(Request $request) {
 	    $user = Auth::user();
 	    
-	    $classes = CharClass::orderBy('name', 'ASC')->get();;
+	    $classes = CharClass::orderBy('name', 'ASC')->get();
 	    $mogslotCategories = MogslotCategory::all();
 	    $mogslotsByCategory = Mogslot::orderBy('simple_label', 'ASC')->get()->groupBy('mogslot_category_id');
 	    
