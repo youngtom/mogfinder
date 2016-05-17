@@ -305,7 +305,7 @@ class ItemsController extends Controller
 			    return \App::abort(404);
 		    }
 		    
-		    $sourceItems = Item::whereNotIn('id', function ($query) use ($sourceType) {
+		    $sourceItems = Item::whereIn('id', function ($query) use ($sourceType) {
 			    $query->select('item_id')->from('item_sources')->where('item_source_type_id', '=', $sourceType->id);
 		    })->where('transmoggable', '=', 1);
 		    
@@ -321,6 +321,7 @@ class ItemsController extends Controller
 		    $ignoreItemIDs = array_diff($allItemIDs, $itemIDs);
 		    $ingoreItemDisplayIDs = Item::whereIn('id', $ignoreItemIDs)->get()->lists('item_display_id')->toArray();
 		    $displayIDs = array_diff($displayIDs, $ingoreItemDisplayIDs);
+		    dd($displayIDs);
 		    
 		    $displays = ItemDisplay::whereIn('id', $displayIDs)->where('transmoggable', '=', 1)->where('mogslot_id', '=', $mogslot->id)->orderBy('bnet_display_id', 'ASC')->get();
 		    
