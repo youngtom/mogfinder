@@ -56,7 +56,7 @@ class UserItem extends Model
 		}
 		
 		$linkInfo = Item::parseItemLink($this->item_link);
-		return $linkInfo['name'];
+		return ($linkInfo['name']) ?: $this->item->name;
 	}
 	
 	public function getWowheadMarkup() {
