@@ -283,7 +283,7 @@ class ItemsController extends Controller
 	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Boss: <em>' . $boss->name . ' (' . $zone->name . ')</em>');
     }
     
-    public function showSlot(Request $request, $group, $categoryURL, $mogslotURL, $sourceURL = false, $auctionable = false) {
+    public function showSlot(Request $request, $group, $categoryURL, $mogslotURL) {
 	    $category = MogslotCategory::where('group', '=', $group)->where('url_token', '=', $categoryURL)->first();
 	    
 	    if (!$category) {
@@ -296,41 +296,9 @@ class ItemsController extends Controller
 		    return \App::abort(404);
 	    }
 	    
-	    $headerText = ucwords($mogslot->mogslotCategory->group) . ': <em>' . $mogslot->label . '</em>';
+	    $displays = ItemDisplay::where('transmoggable', '=', 1)->where('mogslot_id', '=', $mogslot->id)->orderBy('bnet_display_id', 'ASC')->get();
 	    
-	    if ($sourceURL) {
-		    $sourceType = ItemSourceType::where('url_token', '=', $sourceURL)->first();
-		    
-		    if (!$sourceType) {
-			    return \App::abort(404);
-		    }
-		    
-		    $sourceItems = Item::whereIn('id', function ($query) use ($sourceType) {
-			    $query->select('item_id')->from('item_sources')->where('item_source_type_id', '=', $sourceType->id);
-		    })->where('transmoggable', '=', 1);
-		    
-		    if ($auctionable) {
-			    $sourceItems = $sourceItems->where('auctionable', '=', 1);
-		    }
-		    
-		    $sourceItems = $sourceItems->get();
-		    
-		    $itemIDs = $sourceItems->lists('id')->toArray();
-		    $displayIDs = $sourceItems->lists('item_display_id')->toArray();
-		    $allItemIDs = Item::whereIn('item_display_id', $displayIDs)->get()->lists('id')->toArray();
-		    $ignoreItemIDs = array_diff($allItemIDs, $itemIDs);
-		    $ingoreItemDisplayIDs = Item::whereIn('id', $ignoreItemIDs)->get()->lists('item_display_id')->toArray();
-		    $displayIDs = array_diff($displayIDs, $ingoreItemDisplayIDs);
-		    dd($displayIDs);
-		    
-		    $displays = ItemDisplay::whereIn('id', $displayIDs)->where('transmoggable', '=', 1)->where('mogslot_id', '=', $mogslot->id)->orderBy('bnet_display_id', 'ASC')->get();
-		    
-		    $headerText .= ' (' . $sourceType->simple_label . ')';
-	    } else {
-		    $displays = ItemDisplay::where('transmoggable', '=', 1)->where('mogslot_id', '=', $mogslot->id)->orderBy('bnet_display_id', 'ASC')->get();
-	    }
-	    
-	    return $this->showItemDisplays($displays, $mogslot)->with('headerText', $headerText);
+	    return $this->showItemDisplays($displays, $mogslot)->with('headerText', ucwords($mogslot->mogslotCategory->group) . ': <em>' . $mogslot->label . '</em>');
     }
     
     public function searchHints($query) {
@@ -609,18 +577,13 @@ class ItemsController extends Controller
 	    return view('items.display-list')->with('mogslot', $mogslot)->with('itemDisplays', $displays)->with('user', $user)->with('userDisplayIDs', $userDisplayIDs)->with('userItemIDs', $userItemIDs)->with('classes', $classes)->with('factions', $factions)->with('itemSourceTypes', $itemSourceTypes)->with('priorityItemIDs', $priorityItemIDs);
     }
     
+    public function legacyDisplays() {
+	    $displays = ItemDisplay::where('legacy', '=', 1)->where('transmoggable', '=', 1)->get();
+	    return $this->showItemDisplays($displays);
+    }
+    
     public function legacyAuctions() {
-	    $items = Item::whereIn('id', function ($query) {
-		    $query->select('item_id')->from('item_sources')->where('item_source_type_id', '=', 17);
-	    })->where('transmoggable', '=', 1)->get();
-	    
-	    $itemIDs = $items->lists('id')->toArray();
-	    $displayIDs = $items->lists('item_display_id')->toArray();
-	    $allItemIDs = Item::whereIn('item_display_id', $displayIDs)->get()->lists('id')->toArray();
-	    $ignoreItemIDs = array_diff($allItemIDs, $itemIDs);
-	    $ingoreItemDisplayIDs = Item::whereIn('id', $ignoreItemIDs)->get()->lists('item_display_id')->toArray();
-	    $displayIDs = array_diff($displayIDs, $ingoreItemDisplayIDs);
-	    
+	    $displays = ItemDisplay::where('legacy', '=', 1)->where('transmoggable', '=', 1)->get();
 	    $auctions = $this->auctionSearch($displays->lists('id')->toArray())->groupBy('item_display_id');
 		    
 	    if (!$auctions->count()) {
