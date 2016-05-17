@@ -26,7 +26,8 @@ class AddIndecesToItemSourcesTable extends Migration
     public function down()
     {
         Schema::table('item_sources', function (Blueprint $table) {
-            
+            $table->dropIndex(['bnet_source_id']);
+            $table->dropIndex(['label']);
         });
     }
 }
