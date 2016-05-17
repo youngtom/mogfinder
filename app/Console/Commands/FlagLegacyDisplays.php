@@ -44,7 +44,7 @@ class FlagLegacyDisplays extends Command
 	    ini_set('memory_limit','1024M');
 	    ini_set('max_exeuction_time',0);
 	    
-	    ItemDisplay::update(['legacy' => 0]);
+	    ItemDisplay::all()->update(['legacy' => 0]);
 	    
         $sourceItems = Item::whereIn('id', function ($query) {
 		    $query->select('item_id')->from('item_sources')->where('item_source_type_id', '=', 17);
