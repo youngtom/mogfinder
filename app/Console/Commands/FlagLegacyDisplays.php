@@ -44,8 +44,6 @@ class FlagLegacyDisplays extends Command
 	    ini_set('memory_limit','1024M');
 	    ini_set('max_exeuction_time',0);
 	    
-	    ItemDisplay::all()->update(['legacy' => 0]);
-	    
         $sourceItems = Item::whereIn('id', function ($query) {
 		    $query->select('item_id')->from('item_sources')->where('item_source_type_id', '=', 17);
 	    })->where('transmoggable', '=', 1)->orderBy('bnet_id', 'ASC')->get();
@@ -59,5 +57,6 @@ class FlagLegacyDisplays extends Command
 	    $displayIDs = array_diff($displayIDs, $ingoreItemDisplayIDs);
 	    
 	    ItemDisplay::whereIn('id', $displayIDs)->update(['legacy' => 1]);
+	    ItemDisplay::whereNotIn('id', $displayIDs)->update(['legacy' => 0]);
     }
 }
