@@ -26,7 +26,7 @@
 </head>
 
 <body>
-    <div id="wrapper">
+    <div id="wrapper" class="<?=(Auth::guest()) ? 'no-left-nav' : ''?>">
         <nav id="top-nav" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -56,6 +56,7 @@
                 @endif
             </ul>
             
+            @if (Auth::user())
             <form id="search-form" class="navbar-form navbar-right" action="{{ url('/search') }}">
                 <div class="form-group">
 	                <input type="text" class="form-control typeahead" name="q" placeholder="Search" />
@@ -90,6 +91,7 @@
                     </li>
                 </ul>
             </div>
+            @endif
         </nav>
 
         <div id="page-wrapper">
