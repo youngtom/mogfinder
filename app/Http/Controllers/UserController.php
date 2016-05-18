@@ -78,6 +78,11 @@ class UserController extends Controller
 					$userFile->import_data = json_encode($data['MCCSaved']);
 					$userFile->token = substr($file->token, 0, 8) . substr(uniqid(), 0, 8);
 					$itemCount = $userFile->getItemCount();
+					
+					if ($itemCount == 0) {
+						return Response::json(['success' => false, 'errormsg' => 'No items were found in the uploaded file. Please re-import your data from the game and try again.']);
+					}
+					
 					$userFile->progress_total = $itemCount;
 					$userFile->progress_current = 0;
 					$userFile->save();
