@@ -122,6 +122,8 @@ class Character extends Model
 			    $raceStr = $infoArr['race'] . ' (' . $faction->name . ')';
 			} elseif (@$infoArr['race'] == 'BloodElf') {
 				$raceStr = 'Blood Elf';
+		    } elseif (@$infoArr['race'] == 'NightElf') {
+				$raceStr = 'Night Elf';
 		    } else {
 			    $raceStr = $infoArr['race'];
 		    }
