@@ -220,7 +220,7 @@ class LuaParser implements \arrayaccess
             $string = true;
         }
         
-        return $string;
+        return utf8_encode($string);
     }
     
     /**
