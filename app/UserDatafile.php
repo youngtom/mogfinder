@@ -59,7 +59,7 @@ class UserDatafile extends Model
 	public function getItemCount() {
 		$count = 0;
 		
-		if (@$this->import_data['heirlooms'] && is_array($this->import_data['heirlooms'])) {
+		if (isset($this->import_data['heirlooms']) && is_array($this->import_data['heirlooms'])) {
 			$count += count($this->import_data['heirlooms']);	
 		}
 		

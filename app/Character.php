@@ -56,7 +56,7 @@ class Character extends Model
     
     public function getToken() {
 	    if ($this->realm) {
-		    return str_slug($this->name . ' ' . $this->realm->name . ' ' . $this->realm->region);
+		    return strtolower($this->name) . '-' . str_slug($this->realm->name . ' ' . $this->realm->region);
 		} else {
 			return null;
 		}
