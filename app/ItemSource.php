@@ -145,6 +145,8 @@ class ItemSource extends Model
 			];
 			
 			return strtr($this->itemSourceType->context_label, $replace);	
+		} elseif ($this->itemSourceType->label == 'BOSS_DROP' && $this->boss) {
+			return $this->boss->name;
 		} else {
 			$icon = ($this->faction) ? '<i class="game-icon-tiny icon-' . strtolower($this->faction->name) . '"></i> ' : '';
 			return $icon . $this->itemSourceType->context_label;
