@@ -79,7 +79,7 @@ class ItemsController extends Controller
 		    $characters = Character::where('user_id', '=', $user->id)->where('level', '>=', 10)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');
 	    }
 	    
-	    return view('items.overview')->with('categories', $mogslotCategories)->with('mogslotsByCategory', $mogslotsByCategory)->with('userMogslotCounts', $userMogslotCounts)->with('totalMogslotCounts', $totalMogslotCounts)->with('selectedCharacter', $character)->with('characters', $characters);
+	    return view('items.overview')->with('categories', $mogslotCategories)->with('mogslotsByCategory', $mogslotsByCategory)->with('userMogslotCounts', $userMogslotCounts)->with('totalMogslotCounts', $totalMogslotCounts)->with('selectedCharacter', $character)->with('characters', $characters)->with('pageTitle', 'Overview');
     }
     
     public function zoneOverview($characterURL = false) {
@@ -137,7 +137,7 @@ class ItemsController extends Controller
 		    $characters = Character::where('user_id', '=', $user->id)->where('level', '>=', 10)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');
 	    }
 	    
-	    return view('items.zone-overview')->with('categories', $zoneCategories)->with('zonesByCategory', $zonesByCategory)->with('userZoneCounts', $userZoneCounts)->with('totalZoneCounts', $totalZoneCounts)->with('selectedCharacter', $character)->with('characters', $characters);
+	    return view('items.zone-overview')->with('categories', $zoneCategories)->with('zonesByCategory', $zonesByCategory)->with('userZoneCounts', $userZoneCounts)->with('totalZoneCounts', $totalZoneCounts)->with('selectedCharacter', $character)->with('characters', $characters)->with('pageTitle', 'Zone Overview');
     }
     
     public function setMogslotIcons($mogslotID = null, $iconID = null) {
@@ -193,7 +193,7 @@ class ItemsController extends Controller
 	        $characters = Character::whereIn('id', $charIDs)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');
         }
                 
-        return view('items.duplicates')->with('duplicates', $dupeItems)->with('characters', $characters)->with('selectedCharacter', $selectedCharacter);
+        return view('items.duplicates')->with('duplicates', $dupeItems)->with('characters', $characters)->with('selectedCharacter', $selectedCharacter)->with('pageTitle', 'Duplicate Items');
     }
     
     public function showItem($bnetID) {
@@ -221,7 +221,7 @@ class ItemsController extends Controller
 		
 	    $displays = ItemDisplay::whereIn('id', $displayIDs)->get();
 	    
-	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Item: <em>' . $itemName . '</em>');
+	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Item: <em>' . $itemName . '</em>')->with('pageTitle', 'Item: ' . $itemName);
     }
     
     public function showVendorDisplays($bnetID) {
@@ -245,7 +245,7 @@ class ItemsController extends Controller
 	    $displayIDs = array_unique(Item::whereIn('id', $sourceItemIDs)->where('transmoggable', '=', 1)->get()->lists('item_display_id')->toArray());
 	    $displays = ItemDisplay::whereIn('id', $displayIDs)->get();
 	    
-	    return $this->showItemDisplays($displays, false, $sourceItemIDs)->with('headerText', 'Vendor: <em>' . $sourceLabel . '</em>');
+	    return $this->showItemDisplays($displays, false, $sourceItemIDs)->with('headerText', 'Vendor: <em>' . $sourceLabel . '</em>')->with('pageTitle', 'Vendor: ' . $sourceLabel);
     }
     
     public function showZoneDisplays($zoneURL) {
@@ -260,7 +260,7 @@ class ItemsController extends Controller
 	    $displayIDs = array_unique(Item::whereIn('id', $itemIDs)->where('transmoggable', '=', 1)->get()->lists('item_display_id')->toArray());
 	    $displays = ItemDisplay::whereIn('id', $displayIDs)->get();
 	    
-	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Zone: <em>' . $zone->name . '</em>');
+	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Zone: <em>' . $zone->name . '</em>')->with('pageTitle', $zone->name);
     }
     
     public function showBossDisplays($zoneURL, $bossURL) {
@@ -280,7 +280,7 @@ class ItemsController extends Controller
 	    $displayIDs = array_unique(Item::whereIn('id', $itemIDs)->where('transmoggable', '=', 1)->get()->lists('item_display_id')->toArray());
 	    $displays = ItemDisplay::whereIn('id', $displayIDs)->get();
 	    
-	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Boss: <em>' . $boss->name . ' (' . $zone->name . ')</em>');
+	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Boss: <em>' . $boss->name . ' (' . $zone->name . ')</em>')->with('pageTitle', $boss->name . ' | ' . $zone->name);
     }
     
     public function showSlot(Request $request, $group, $categoryURL, $mogslotURL) {
@@ -298,7 +298,7 @@ class ItemsController extends Controller
 	    
 	    $displays = ItemDisplay::where('transmoggable', '=', 1)->where('mogslot_id', '=', $mogslot->id)->orderBy('bnet_display_id', 'ASC')->get();
 	    
-	    return $this->showItemDisplays($displays, $mogslot)->with('headerText', ucwords($mogslot->mogslotCategory->group) . ': <em>' . $mogslot->label . '</em>');
+	    return $this->showItemDisplays($displays, $mogslot)->with('headerText', ucwords($mogslot->mogslotCategory->group) . ': <em>' . $mogslot->label . '</em>')->with('pageTitle', ucwords($mogslot->mogslotCategory->group) . ': ' . $mogslot->label);
     }
     
     public function searchHints($query) {
@@ -518,7 +518,7 @@ class ItemsController extends Controller
 		    return array_search($display->id, $displayIDs);
 	    });
 	    
-	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Search results for: <em>' . $query . '</em>')->with('search', true);
+	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Search results for: <em>' . $query . '</em>')->with('search', true)->with('pageTitle', 'Search | ' . $query);
     }
     
     protected function showItemDisplays($displays, $mogslot = false, $priorityItemIDs = []) {
@@ -579,7 +579,7 @@ class ItemsController extends Controller
     
     public function legacyDisplays() {
 	    $displays = ItemDisplay::where('legacy', '=', 1)->where('transmoggable', '=', 1)->get();
-	    return $this->showItemDisplays($displays);
+	    return $this->showItemDisplays($displays)->with('pageTitle', 'Legacy Item Appearances');
     }
     
     public function legacyAuctions() {
@@ -596,7 +596,7 @@ class ItemsController extends Controller
 	    $mogslotCategories = MogslotCategory::all();
 	    $mogslotsByCategory = Mogslot::orderBy('simple_label', 'ASC')->get()->groupBy('mogslot_category_id');
 	    
-	    return view('items.auctions')->with('classes', $classes)->with('mogslotCategories', $mogslotCategories)->with('mogslots', $mogslotsByCategory)->with('auctions', $auctions)->with('selectedClass', false)->with('selectedCat', false)->with('selectedSlot', false)->with('error', $error);
+	    return view('items.auctions')->with('classes', $classes)->with('mogslotCategories', $mogslotCategories)->with('mogslots', $mogslotsByCategory)->with('auctions', $auctions)->with('selectedClass', false)->with('selectedCat', false)->with('selectedSlot', false)->with('error', $error)->with('pageTitle', 'Legacy Auctions');
     }
     
     public function showAuctions(Request $request) {
@@ -650,7 +650,7 @@ class ItemsController extends Controller
 		    }
 		    
 		    if (!$mogslots->count()) {
-			    return view('items.auctions')->with('classes', $classes)->with('mogslotCategories', $mogslotCategories)->with('mogslots', $mogslotsByCategory)->with('error', 'There was an error with the search. Please try again.')->with('selectedClass', $class)->with('selectedCat', $selectedCat)->with('selectedSlot', $selectedSlot);
+			    return view('items.auctions')->with('classes', $classes)->with('mogslotCategories', $mogslotCategories)->with('mogslots', $mogslotsByCategory)->with('error', 'There was an error with the search. Please try again.')->with('selectedClass', $class)->with('selectedCat', $selectedCat)->with('selectedSlot', $selectedSlot)->with('pageTitle', 'Auction Search');
 		    }
 		    
 		    if ($classmask) {
@@ -672,7 +672,7 @@ class ItemsController extends Controller
 		    $error = 'Please select an item type.';
 	    }
 	    
-	    return view('items.auctions')->with('classes', $classes)->with('mogslotCategories', $mogslotCategories)->with('mogslots', $mogslotsByCategory)->with('auctions', $auctions)->with('selectedClass', $class)->with('selectedCat', $selectedCat)->with('selectedSlot', $selectedSlot)->with('error', $error);
+	    return view('items.auctions')->with('classes', $classes)->with('mogslotCategories', $mogslotCategories)->with('mogslots', $mogslotsByCategory)->with('auctions', $auctions)->with('selectedClass', $class)->with('selectedCat', $selectedCat)->with('selectedSlot', $selectedSlot)->with('error', $error)->with('pageTitle', 'Auction Search');
     }
     
     public function auctionSearch($dispIds) {
@@ -777,6 +777,6 @@ class ItemsController extends Controller
 		
 		$auctions = (!$userItems->count()) ? $this->auctionSearch([$display->id]) : false;
 	    
-	    return view('items.display-details')->with('display', $display)->with('userItems', $userItems)->with('displayItems', $displayItems)->with('unlockedClasses', $unlockedClasses)->with('auctions', $auctions);
+	    return view('items.display-details')->with('display', $display)->with('userItems', $userItems)->with('displayItems', $displayItems)->with('unlockedClasses', $unlockedClasses)->with('auctions', $auctions)->with('pageTitle', 'Appearance ' . $display->id . ' - ' . ucwords($display->mogslot->singular_label));
     }
 }

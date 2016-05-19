@@ -16,7 +16,7 @@ class ContactController extends Controller
 	
     public function index() {
 	    $referrer = (old('referrer')) ?: \URL::previous();
-	    return view('contact.feedback')->with('referrer', $referrer);
+	    return view('contact.feedback')->with('referrer', $referrer)->with('pageTitle', 'Feedback');
     }
     
     public function store(FeedbackFormRequest $request) {

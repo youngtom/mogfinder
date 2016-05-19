@@ -23,11 +23,11 @@ class UserController extends Controller
     }
     
     public function getDashboard() {
-	    return view('user.dashboard');
+	    return view('user.dashboard')->with('pageTitle', 'Dashboard');
     }
     
 	public function dataUpload() {
-	    return view('user.data-uploader');
+	    return view('user.data-uploader')->with('pageTitle', 'Data Uploader');
 	}
 	
 	public function dataUploadHandler(Request $request) {
