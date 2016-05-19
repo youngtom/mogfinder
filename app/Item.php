@@ -269,9 +269,9 @@ class Item extends Model
 		return ($this->bonus) ? 'bonus=' . $this->bonus : '';
 	}
 	
-	public function getSourceDataHTML() {
+	public function getSourceDataHTML($includeHidden = false) {
 		$_sources = collect();
-		$itemSourcesByType = $this->itemSources->groupBy('item_source_type_id');
+		$itemSourcesByType = ($includeHidden) ? $this->itemSources->groupBy('item_source_type_id') : $this->itemSources->where('hidden', 0)->groupBy('item_source_type_id');;
 		$extraSourceSlots = max(4 - $itemSourcesByType->count(), 0);
 		
 		foreach ($itemSourcesByType as $itemSourceTypeID => $sources) {

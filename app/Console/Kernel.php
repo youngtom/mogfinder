@@ -52,7 +52,8 @@ class Kernel extends ConsoleKernel
         Commands\RefreshItemDisplayZones::class,
         Commands\UpdateItemSourceRelatedItems::class,
         Commands\FlagLegacyDisplays::class,
-        Commands\ImportSourceItemSources::class
+        Commands\ImportSourceItemSources::class,
+        Commands\CreateHiddenItemSources::class
     ];
 
     /**

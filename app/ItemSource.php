@@ -70,6 +70,10 @@ class ItemSource extends Model
         return $this->belongsTo('App\Faction');
 	}
 	
+	public function sourceItem() {
+		return $this->hasOne('App\Item', 'id', 'source_item_id');
+	}
+	
 	public function updateSourceItem($save = true) {
 		if (!$this->itemSourceType) {
 			return false;
