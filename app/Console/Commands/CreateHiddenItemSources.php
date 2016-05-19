@@ -55,7 +55,7 @@ class CreateHiddenItemSources extends Command
 					$newSource->boss_id = $source->boss_id;
 					$newSource->zone_id = $source->zone_id;
 					$newSource->hidden = 1;
-					$newSource->import_souce = 'hiddenSourceImport';
+					$newSource->import_source = 'hiddenSourceImport';
 					$newSource->save();
 					$this->line('New source created for item: ' . $newSource->item_id . '(Type: ' . $newSource->item_source_type_id . ' - bnetID: ' . $newSource->bnet_source_id . ')');
 				} else {
