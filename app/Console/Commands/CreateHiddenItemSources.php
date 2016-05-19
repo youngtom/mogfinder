@@ -42,7 +42,7 @@ class CreateHiddenItemSources extends Command
         $itemSources = ItemSource::whereNotNull('source_item_id')->get();
         
         foreach ($itemSources as $itemSource) {
-	        $itemSourceDropSources = $itemSource->sourceItem->itemSources()->whereIn('item_source_type_id', [4, 15, 21]);
+	        $itemSourceDropSources = $itemSource->sourceItem->itemSources()->whereIn('item_source_type_id', [4, 15, 21])->get();
 	        
 	        foreach ($itemSourceDropSources as $source) {
 				$newSource = ItemSource::where('item_id', '=', $itemSource->item_id)->where('item_source_type_id', '=', $source->item_source_type_id)->where('bnet_source_id', '=', $source->bnet_source_id)->where('boss_id', '=', $source->boss_id)->where('zone_id', '=', $source->zone_id)->first();

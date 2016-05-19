@@ -271,7 +271,7 @@ class Item extends Model
 	
 	public function getSourceDataHTML($includeHidden = false) {
 		$_sources = collect();
-		$itemSourcesByType = ($includeHidden) ? $this->itemSources()->groupBy('item_source_type_id') : $this->itemSources()->where('hidden', '=', 0)->groupBy('item_source_type_id');;
+		$itemSourcesByType = ($includeHidden) ? $this->itemSources->groupBy('item_source_type_id') : $this->itemSources()->where('hidden', '=', 0)->get()->groupBy('item_source_type_id');
 		$extraSourceSlots = max(4 - $itemSourcesByType->count(), 0);
 		
 		foreach ($itemSourcesByType as $itemSourceTypeID => $sources) {
