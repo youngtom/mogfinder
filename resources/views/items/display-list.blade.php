@@ -208,7 +208,7 @@
 				                    <tbody>
 									<?php
 										foreach ($displayItems as $item) {
-											$sourceTypeIDs = implode('|', $item->itemSources->where('hidden', 0)->lists('item_source_type_id')->toArray());
+											$sourceTypeIDs = implode('|', $item->itemSources()->where('hidden', '=', 0)->get()->lists('item_source_type_id')->toArray());
 											$priority = (is_array($priorityItemIDs) && in_array($item->id, $priorityItemIDs)) ? 'priority' : '';
 											
 											if ($mogslot || $item->allowable_classes) {
