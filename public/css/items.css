@@ -17,7 +17,8 @@
 .auction-list-table .seller { width: 15% }
 .auction-list-table .realm { width: 15% }
 .auction-list-table .price { width: 17.5% }
-#display-accordion .item-list-table .itemname { width: 50%; }
+#display-accordion .item-list-table .itemname { width: 40%; }
+#display-accordion .item-list-table .source { width: 50%; }
 
 a.expand-collapse { color: #ccc; }
 
