@@ -51,7 +51,8 @@ class Kernel extends ConsoleKernel
         Commands\wowhead\UpdateItemsLockedRaces::class,
         Commands\RefreshItemDisplayZones::class,
         Commands\UpdateItemSourceRelatedItems::class,
-        Commands\FlagLegacyDisplays::class
+        Commands\FlagLegacyDisplays::class,
+        Commands\ImportSourceItemSources::class
     ];
 
     /**
