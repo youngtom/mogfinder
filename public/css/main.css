@@ -164,6 +164,7 @@ a.warrior { color: #C79C6E !important; }
 	position: relative;
 	white-space: nowrap;
 	text-decoration: none;
+	overflow: hidden;
 }
 
 .tt-hint { color: #888; }
