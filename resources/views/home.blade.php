@@ -15,7 +15,7 @@
 					</div>
 					<ol>
 						<li>Go to the <a href="{{ url('/register') }}">Registration</a> page and sign up for an account.</li>
-						<li>Download and install the <a href="{{ asset('/files/ItemCollector.zip') }}">MogCollector ItemCollector</a> addon.  This mod is used to gather a list of items you have collected.</li>
+						<li>Download and install the <a href="{{ url('/download') }}">MogCollector ItemCollector</a> addon.  This mod is used to gather a list of items you have collected.</li>
 						<li>Log in to each character you wish to scan. Be sure to also open your bank and void storage so that all items can be scanned.</li>
 						<li>Go to the <a href="{{ url('/user/upload-data') }}">data uploader</a> page and follow the instructions to upload the generated saved variables file. This process may take awhile, depending on how much data needs to be imported.</li>
 					</ol>
