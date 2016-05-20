@@ -277,10 +277,12 @@ class Character extends Model
 		
 		$this->latest_chardata = null;
 		$this->save();
-						
-		// Queue quest import
-		$job = (new ImportCharacterQuestItems($this->id))->onQueue('low');
-	    $this->dispatch($job);
+		
+		if ($this->level && $this->level >= 10) {
+			// Queue quest import
+			$job = (new ImportCharacterQuestItems($this->id))->onQueue('low');
+		    $this->dispatch($job);
+		}
     }
     
     public function importQuestItemData() {
