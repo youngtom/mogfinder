@@ -108,7 +108,7 @@ class User extends Authenticatable
 	    }
 	    
 	    if (@$dataFile->import_data['guilds'] && is_array($dataFile->import_data['guilds']) && count($dataFile->import_data['guilds'])) {
-		    foreach ($dataFile->import_data['heirlooms'] as $guildID => $guildData) {
+		    foreach ($dataFile->import_data['guilds'] as $guildID => $guildData) {
 			    $guildItemIDs = [];
 			    
 			    if (@$guildData['guildInfo'] && @$guildData['guildInfo']['faction'] && @$guildData['guildInfo']['realm'] && @$guildData['guildInfo']['region'] && @$guildData['guildInfo']['items'] && count($guildData['guildInfo']['items'])) {
