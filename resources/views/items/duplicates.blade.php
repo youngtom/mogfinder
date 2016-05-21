@@ -88,8 +88,12 @@
 							<?php if ($item->character) { ?>
 							<td class="charname"><?=$item->character->name?></td>
 							<td class="charrealm"><?=$item->character->realm->name?></td>
-							<?php } elseif ($item->location_label) { ?>
-							<td class="guildname" colspan="2"><?=$item->location_label?></td>
+							<?php
+								} elseif ($item->location_label) {	
+									list($guildName, $guildRealm) = explode(' - ', $item->location_label);
+							?>
+							<td class="charname"><?=$guildName?></td>
+							<td class="charrealm"><?=$guildRealm?></td>
 							<?php } ?>
 							<td class="itemloc"><?=ucwords($item->itemLocation->shorthand)?></td>
 							<td class="dupeitemname" <?=(!$restrictedClasses) ? 'colspan="2"' : ''?>><a href="http://www.wowhead.com/item=<?=$item->item->bnet_id?>" target="_blank" rel="<?=$item->getWowheadMarkup()?>" class="item-link q<?=$item->getItemQuality()?>">[<?=$item->getName()?>]</a></td>
