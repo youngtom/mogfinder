@@ -114,7 +114,6 @@ class User extends Authenticatable
 			    if (@$guildData['guildInfo'] && @$guildData['guildInfo']['faction'] && @$guildData['guildInfo']['realm'] && @$guildData['guildInfo']['region'] && @$guildData['items'] && count($guildData['items'])) {
 				    $guildRealm = Realm::where('name', '=', $guildData['guildInfo']['realm'])->where('region', '=', ucwords($guildData['guildInfo']['region']))->first();
 				    $guildFaction = Faction::where('name', '=', $guildData['guildInfo']['faction'])->first();
-				    \Log::info('GUILD: ' . $guildID);
 				    
 				    if ($guildRealm && $guildFaction) {
 					    $guildBankLocation = ItemLocation::where('import_tag', '=', 'guildbank')->first();
@@ -124,8 +123,6 @@ class User extends Authenticatable
 							    list($bound, $xmoggable, $itemLink) = explode('--', $itemStr);
 			    
 							    $userItem = UserItem::where('user_id', '=', $this->id)->where('item_location_id', '=', $guildBankLocation->id)->where('location_label', '=', $guildID)->where('item_link', $itemLink)->first();
-							    
-							    \Log::info('Gbank item: ' . $itemLink);
 				    
 							    if (!$userItem) {
 								    $item = Item::findItemFromLink($itemLink);
@@ -135,7 +132,6 @@ class User extends Authenticatable
 								        
 								        $found = false;
 								        $alts->each(function ($alt) use ($item, &$found) {
-									        \Log::info('Checking alt for item: ' . $alt->name . ' (' . $item->name . ')');
 									        if ($alt->canUseItem($item)) {
 												$found = $alt;
 												return false;
@@ -151,11 +147,7 @@ class User extends Authenticatable
 									        $userItem->location_label = $guildID;
 									        $userItem->bound = $bound;
 									        $userItem->save();
-								        } else {
-									        \Log::info('Gbank item not usable (' . $item->name . ')');
 								        }
-							        } else {
-								        \Log::info('Item not xmoggable');
 							        }
 								}
 													    
