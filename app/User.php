@@ -106,6 +106,72 @@ class User extends Authenticatable
 			    DB::table('user_datafiles')->where('id', '=', $dataFile->id)->increment('progress_current');
 	        }
 	    }
+	    
+	    if (@$dataFile->import_data['guilds'] && is_array($dataFile->import_data['guilds']) && count($dataFile->import_data['guilds'])) {
+		    foreach ($dataFile->import_data['heirlooms'] as $guildID => $guildData) {
+			    $guildItemIDs = [];
+			    
+			    if (@$guildData['guildInfo'] && @$guildData['guildInfo']['faction'] && @$guildData['guildInfo']['realm'] && @$guildData['guildInfo']['region'] && @$guildData['guildInfo']['items'] && count($guildData['guildInfo']['items'])) {
+				    $guildRealm = Realm::where('name', '=', $guildData['guildInfo']['realm'])->where('region', '=', ucwords($guildData['guildInfo']['region']))->first();
+				    $guildFaction = Faction::where('name', '=', $guildData['guildInfo']['faction'])->first();
+				    
+				    if ($guildRealm && $guildFaction) {
+					    $guildBankLocation = ItemLocation::where('import_tag', '=', 'guildbank')->first();
+					    
+					    foreach ($guildData['guildInfo']['items'] as $tabID => $itemArr) {
+						    foreach ($itemArr as $itemStr) {
+							    list($bound, $xmoggable, $itemLink) = explode('--', $itemStr);
+			    
+							    $userItem = UserItem::where('user_id', '=', $this->id)->where('location_id', '=', $guildBankLocation->id)->where('location_label', '=', $guildID)->where('item_link', $itemLink)->first();
+				    
+							    if (!$userItem) {
+								    $item = Item::findItemFromLink($itemLink);
+								    
+								    if ($item && $item->isTransmoggable()) {
+								        if ($this->canUseItem($item)) {
+									    	$userItem = $this->addUserItem($item, $itemLink, $itemLocation, $bound);
+								        } elseif ($bound != 1) {
+									        $alts = $this->characters()->where('realm_id', '=', $guildRealm->id)->where('faction_id', '=', $guildFaction->id)->get();
+									        
+									        $found = false;
+									        $alts->each(function ($alt) use ($item, &$found) { 
+										        if ($alt->canUseItem($item)) {
+													$found = $alt;
+													return false;
+												}
+									        });
+									        
+									        if ($found) {
+										        $userItem = new UserItem;
+										        $userItem->user_id = $this->id;
+										        $userItem->item_id = $item->id;
+										        $userItem->item_display_id = $item->item_display_id;
+										        $userItem->item_location_id = $guildBankLocation->id;
+										        $userItem->location_label = $guildID;
+										        $userItem->bound = $bound;
+										        $userItem->save();
+									        }
+								        }
+								    }
+								}
+													    
+							    if ($userItem) {
+								    $guildItemIDs[] = $userItem->id;
+							    }
+							    
+								DB::table('user_datafiles')->where('id', '=', $dataFile->id)->increment('progress_current');
+						    }
+					    }
+					    
+					    $deleteItems = UserItem::where('user_id', '=', $this->id)->where('item_location_id', '=', $guildBankLocation->id)->where('location_label', '=', $guildID)->whereNotIn('id', $guildItemIDs)->get();
+					    
+					    foreach($deleteItems as $item) {
+							$item->delete();
+						}
+				    }
+			    }
+			}
+		}
     }
     
     public function getOtherCharacters(Character $character, $mailable) {

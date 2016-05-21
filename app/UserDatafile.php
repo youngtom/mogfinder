@@ -85,6 +85,21 @@ class UserDatafile extends Model
 			}
 		}
 		
+		if (@$this->import_data['guilds'] && is_array($this->import_data['guilds']) && count($this->import_data['guilds'])) {
+		    foreach ($this->import_data['heirlooms'] as $guildID => $guildData) {
+			    if (@$guildData['guildInfo'] && @$guildData['guildInfo']['faction'] && @$guildData['guildInfo']['realm'] && @$guildData['guildInfo']['region'] && @$guildData['guildInfo']['items'] && count($guildData['guildInfo']['items'])) {
+				    $guildRealm = Realm::where('name', '=', $guildData['guildInfo']['realm'])->where('region', '=', ucwords($guildData['guildInfo']['region']))->first();
+				    $guildFaction = Faction::where('name', '=', $guildData['guildInfo']['faction'])->first();
+				    
+				    if ($guildRealm && $guildFaction) {
+					    foreach ($guildData['guildInfo']['items'] as $tabID => $itemArr) {
+						    $count += count($itemArr);
+					    }
+				    }
+			    }
+			}
+		}
+		
 		return $count;
 	}
 }

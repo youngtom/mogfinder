@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddHiddenFieldToItemSourcesTable extends Migration
+class AddLocationLabelToUserItemsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,8 +12,8 @@ class AddHiddenFieldToItemSourcesTable extends Migration
      */
     public function up()
     {
-        Schema::table('item_sources', function (Blueprint $table) {
-            $table->boolean('hidden')->default(0)->after('id');
+        Schema::table('user_items', function (Blueprint $table) {
+            $table->string('location_label')->nullable()->after('location_id');
         });
     }
 
@@ -24,8 +24,8 @@ class AddHiddenFieldToItemSourcesTable extends Migration
      */
     public function down()
     {
-        Schema::table('item_sources', function (Blueprint $table) {
-            $table->dropColumn('hidden');
+        Schema::table('user_items', function (Blueprint $table) {
+            $table->dropColumn('location_label');
         });
     }
 }
