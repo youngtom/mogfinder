@@ -323,7 +323,7 @@ class Character extends Model
 		return $newItems;
     }
     
-    public function importQuests($questIDs, $force) {
+    public function importQuests($questIDs, $force = false) {
 	    if (!$force) {
 		    $existingImportedQuests = ($this->quests_imported) ? explode(',', $this->quests_imported) : [];
 			$questIDs = array_diff($questIDs, $existingImportedQuests);

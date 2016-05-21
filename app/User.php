@@ -123,36 +123,39 @@ class User extends Authenticatable
 							    list($bound, $xmoggable, $itemLink) = explode('--', $itemStr);
 			    
 							    $userItem = UserItem::where('user_id', '=', $this->id)->where('item_location_id', '=', $guildBankLocation->id)->where('location_label', '=', $guildID)->where('item_link', $itemLink)->first();
+							    
+							    \Log::info('Gbank item: ' . $itemLink);
 				    
 							    if (!$userItem) {
 								    $item = Item::findItemFromLink($itemLink);
 								    
-								    if ($item && $item->isTransmoggable()) {
-								        if ($this->canUseItem($item)) {
-									    	$userItem = $this->addUserItem($item, $itemLink, $itemLocation, $bound);
-								        } elseif ($bound != 1) {
-									        $alts = $this->characters()->where('realm_id', '=', $guildRealm->id)->where('faction_id', '=', $guildFaction->id)->get();
-									        
-									        $found = false;
-									        $alts->each(function ($alt) use ($item, &$found) { 
-										        if ($alt->canUseItem($item)) {
-													$found = $alt;
-													return false;
-												}
-									        });
-									        
-									        if ($found) {
-										        $userItem = new UserItem;
-										        $userItem->user_id = $this->id;
-										        $userItem->item_id = $item->id;
-										        $userItem->item_display_id = $item->item_display_id;
-										        $userItem->item_location_id = $guildBankLocation->id;
-										        $userItem->location_label = $guildID;
-										        $userItem->bound = $bound;
-										        $userItem->save();
-									        }
+								    if ($item && $item->isTransmoggable()) {								       
+								        $alts = $this->characters()->where('realm_id', '=', $guildRealm->id)->where('faction_id', '=', $guildFaction->id)->get();
+								        
+								        $found = false;
+								        $alts->each(function ($alt) use ($item, &$found) {
+									        \Log::info('Checking alt for item: ' . $alt->name . ' (' . $item->name . ')');
+									        if ($alt->canUseItem($item)) {
+												$found = $alt;
+												return false;
+											}
+								        });
+								        
+								        if ($found) {
+									        $userItem = new UserItem;
+									        $userItem->user_id = $this->id;
+									        $userItem->item_id = $item->id;
+									        $userItem->item_display_id = $item->item_display_id;
+									        $userItem->item_location_id = $guildBankLocation->id;
+									        $userItem->location_label = $guildID;
+									        $userItem->bound = $bound;
+									        $userItem->save();
+								        } else {
+									        \Log::info('Gbank item not usable (' . $item->name . ')');
 								        }
-								    }
+							        } else {
+								        \Log::info('Item not xmoggable');
+							        }
 								}
 													    
 							    if ($userItem) {
