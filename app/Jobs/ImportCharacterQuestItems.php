@@ -34,6 +34,6 @@ class ImportCharacterQuestItems extends Job implements ShouldQueue
     {
 	    $character = Character::findOrFail($this->character_id);
 	    
-        $character->importQuestItemData();
+        $character->importBnetQuestItemData();
     }
 }
