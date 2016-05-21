@@ -320,7 +320,7 @@ class Character extends Model
 		}
     }
     
-    public function importQuests($quests) {
+    public function importQuests($questIDs) {
 	    $questSourceType = ItemSourceType::where('label', '=', 'REWARD_FOR_QUEST')->first();
 	    $questLocation = ItemLocation::where('label', '=', 'quest')->first();
 	    
