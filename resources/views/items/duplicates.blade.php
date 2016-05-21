@@ -88,9 +88,8 @@
 							<?php if ($item->character) { ?>
 							<td class="charname"><?=$item->character->name?></td>
 							<td class="charrealm"><?=$item->character->realm->name?></td>
-							<?php } else { ?>
-							<td class="charname">&nbsp;</td>
-							<td class="charrealm">&nbsp;</td>
+							<?php } elseif ($item->location_label) { ?>
+							<td class="guildname" colspan="2"><?=$item->location_label?></td>
 							<?php } ?>
 							<td class="itemloc"><?=ucwords($item->itemLocation->shorthand)?></td>
 							<td class="dupeitemname" <?=(!$restrictedClasses) ? 'colspan="2"' : ''?>><a href="http://www.wowhead.com/item=<?=$item->item->bnet_id?>" target="_blank" rel="<?=$item->getWowheadMarkup()?>" class="item-link q<?=$item->getItemQuality()?>">[<?=$item->getName()?>]</a></td>

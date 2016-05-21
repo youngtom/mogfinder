@@ -5,6 +5,7 @@
 
 .item-list-table .charname { width: 15% }
 .item-list-table .charrealm { width: 10% }
+.item-list-table .guildname { width: 25% }
 .item-list-table .itemloc { width: 15% }
 .item-list-table .itemname { width: 40% }
 .item-list-table .dupeitemname { width: 35% }
