@@ -295,21 +295,22 @@ class Character extends Model
 		}
     }
     
-    public function importBnetQuestItemData() {
+    public function importBnetQuestItemData($force = false) {
 	    if (!isset($this->additionalData['quests'])) {
 		    $this->importBnetData(['quests']);
 	    }
 	    
 	    \Log::info('Importing quest data for character: ' . $this->id);
 	    
+	    $newItems = 0;
 	    if (@$this->additionalData['quests'] && is_array($this->additionalData['quests'])) {
 			$questImportToken = md5(serialize($this->additionalData['quests']));
 		    
-		    if ($questImportToken != $this->quest_import_token) {
+		    if ($questImportToken != $this->quest_import_token || $force) {
 			    $questIDs = $this->additionalData['quests'];
 			    
 			    if (count($questIDs)) {
-				    $this->importQuests($questIDs);
+				    $newItems = $this->importQuests($questIDs, $force);
 			    }
 			
 				$this->quest_import_token = $questImportToken;
@@ -318,11 +319,19 @@ class Character extends Model
 		} else {
 			\Log::error('Failed loading bnet quest data for character: ' . $this->id);
 		}
+		
+		return $newItems;
     }
     
-    public function importQuests($questIDs) {
-	    $existingImportedQuests = ($this->quests_imported) ? explode(',', $this->quests_imported) : [];
-	    $questIDs = array_diff($questIDs, $existingImportedQuests);
+    public function importQuests($questIDs, $force) {
+	    if (!$force) {
+		    $existingImportedQuests = ($this->quests_imported) ? explode(',', $this->quests_imported) : [];
+			$questIDs = array_diff($questIDs, $existingImportedQuests);
+		} else {
+			$existingImportedQuests = [];
+		}
+		
+		$newItems = 0;
 	    
 	    if (count($questIDs)) {
 		    $questSourceType = ItemSourceType::where('label', '=', 'REWARD_FOR_QUEST')->first();
@@ -337,6 +346,7 @@ class Character extends Model
 				   if (!$userItem && $itemSource->item && $itemSource->item->isTransmoggable()) {
 				   		if ($this->eligibleForQuestReward($itemSource->item, $itemSource->dynamic_quest_rewards)) {
 							$userItem = $this->addUserItem($itemSource->item, null, $questLocation, null);
+							$newItems++;
 						}
 				   	}
 			    });
@@ -344,6 +354,8 @@ class Character extends Model
 		    
 		    $this->quests_imported = implode(',', array_unique(array_merge($existingImportedQuests, $questIDs)));
 		}
+		
+		return $newItems;
     }
     
     public function addUserItem($item, $itemLink, ItemLocation $location, $bound = 1) {

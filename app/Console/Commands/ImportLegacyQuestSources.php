@@ -71,7 +71,7 @@ class ImportLegacyQuestSources extends Command
 		
         $legacyItemIDs = ItemSource::where('item_source_type_id', '=', 17)->get(['item_id'])->lists('item_id')->toArray();
         
-        $items = Item::whereIn('id', $legacyItemIDs)->get();
+        $items = Item::whereIn('id', $legacyItemIDs)->where('transmoggable', '=', 1)->get();
         $bar = $this->output->createProgressBar($items->count());
         
         $questBnetIDs = [];

@@ -54,7 +54,8 @@ class Kernel extends ConsoleKernel
         Commands\FlagLegacyDisplays::class,
         Commands\ImportSourceItemSources::class,
         Commands\CreateHiddenItemSources::class,
-        Commands\ImportLegacyQuestSources::class
+        Commands\ImportLegacyQuestSources::class,
+        Commands\ImportCharacterQuests::class
     ];
 
     /**
