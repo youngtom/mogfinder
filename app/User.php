@@ -108,6 +108,9 @@ class User extends Authenticatable
 	    }
 	    
 	    if (@$dataFile->import_data['guilds'] && is_array($dataFile->import_data['guilds']) && count($dataFile->import_data['guilds'])) {
+		    $guildIDs = [];
+		    $guildBankLocation = ItemLocation::where('import_tag', '=', 'guildbank')->first();
+		    
 		    foreach ($dataFile->import_data['guilds'] as $guildID => $guildData) {
 			    $guildItemIDs = [];
 			    
@@ -116,7 +119,7 @@ class User extends Authenticatable
 				    $guildFaction = Faction::where('name', '=', $guildData['guildInfo']['faction'])->first();
 				    
 				    if ($guildRealm && $guildFaction) {
-					    $guildBankLocation = ItemLocation::where('import_tag', '=', 'guildbank')->first();
+					    $guildIDs[] = $guildID;
 					    
 					    foreach ($guildData['items'] as $tabID => $itemArr) {
 						    foreach ($itemArr as $itemStr) {
@@ -166,6 +169,12 @@ class User extends Authenticatable
 						}
 				    }
 			    }
+			}
+			
+			$deleteItems = UserItem::where('user_id', '=', $this->id)->where('item_location_id', '=', $guildBankLocation->id)->whereNotIn('location_label', $guildIDs)->get();
+			
+			foreach($deleteItems as $item) {
+				$item->delete();
 			}
 		}
     }
