@@ -114,6 +114,7 @@ class User extends Authenticatable
 			    if (@$guildData['guildInfo'] && @$guildData['guildInfo']['faction'] && @$guildData['guildInfo']['realm'] && @$guildData['guildInfo']['region'] && @$guildData['items'] && count($guildData['items'])) {
 				    $guildRealm = Realm::where('name', '=', $guildData['guildInfo']['realm'])->where('region', '=', ucwords($guildData['guildInfo']['region']))->first();
 				    $guildFaction = Faction::where('name', '=', $guildData['guildInfo']['faction'])->first();
+				    \Log::info('GUILD: ' . $guildID);
 				    
 				    if ($guildRealm && $guildFaction) {
 					    $guildBankLocation = ItemLocation::where('import_tag', '=', 'guildbank')->first();
