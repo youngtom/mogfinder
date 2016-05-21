@@ -29,6 +29,6 @@ class HomeController extends Controller
     
     public function download()
     {
-        return view('download');
+        return view('download')->with('pageTitle', 'Addon Download');;
     }
 }
