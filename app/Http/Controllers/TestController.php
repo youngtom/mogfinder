@@ -27,6 +27,8 @@ use DB;
 class TestController extends Controller
 {
 	public function index() {
+		$character = Character::find(1546);
+		$character->importItemData();
 		die;
 		$sources = ItemSource::whereNotNull('item_currency_info')->get()->groupBy('item_id');
 		
@@ -421,13 +423,13 @@ class TestController extends Controller
     }
     
     public function listSources($id) {
-	    $sources = ItemSource::where('item_source_type_id', '=', $id)->orderBy('bnet_source_id', 'ASC')->get()->groupBy('bnet_source_id');
+	    $sources = ItemSource::where('created_at', '>=', '2016-05-16')->orderBy('bnet_source_id', 'ASC')->get()->groupBy('item_source_type_id');
 	    $out = [];
 	    
 	    foreach ($sources as $sourceTypeID => $sourceArr) {
 		    $out[] = 'BnetSourceID: ' . $sourceTypeID;
 		    foreach ($sourceArr as $source) {
-			    if ($source->item->transmoggable) {
+			    if ($source->item) {
 				    $out[] = '<a href="http://www.wowhead.com/' . $source->getWowheadMarkup($source->item) . '">' . $source->getSourceText() . '</a>: <a href="http://www.wowhead.com/item=' . $source->item->bnet_id . '" class="q' . $source->item->quality . '" rel="' . $source->item->getWowheadMarkup() . '">[' . $source->item->name . ']</a> - ' . $source->item->id;
 				}
 			}
