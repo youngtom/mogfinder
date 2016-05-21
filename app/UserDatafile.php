@@ -63,6 +63,11 @@ class UserDatafile extends Model
 			$count += count($this->import_data['heirlooms']);	
 		}
 		
+		if (!is_array($this->import_data['chars'])) {
+			\Log::error('Missing char data in user_id: ' . $this->user_id . ' fileid: ' . $this->file_id);
+			return 0;
+		}
+		
 		foreach ($this->import_data['chars'] as $charTag => $charData) {
 		    $character = Character::where('wow_guid', '=', $charTag)->where('user_id', '=', Auth::user()->id)->first();		    
 		    
