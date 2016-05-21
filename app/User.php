@@ -122,7 +122,7 @@ class User extends Authenticatable
 						    foreach ($itemArr as $itemStr) {
 							    list($bound, $xmoggable, $itemLink) = explode('--', $itemStr);
 			    
-							    $userItem = UserItem::where('user_id', '=', $this->id)->where('location_id', '=', $guildBankLocation->id)->where('location_label', '=', $guildID)->where('item_link', $itemLink)->first();
+							    $userItem = UserItem::where('user_id', '=', $this->id)->where('item_location_id', '=', $guildBankLocation->id)->where('location_label', '=', $guildID)->where('item_link', $itemLink)->first();
 				    
 							    if (!$userItem) {
 								    $item = Item::findItemFromLink($itemLink);

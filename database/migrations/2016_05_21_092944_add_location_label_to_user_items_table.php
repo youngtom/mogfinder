@@ -13,7 +13,7 @@ class AddLocationLabelToUserItemsTable extends Migration
     public function up()
     {
         Schema::table('user_items', function (Blueprint $table) {
-            $table->string('location_label')->nullable()->after('location_id');
+            $table->string('location_label')->nullable()->after('item_location_id');
         });
     }
 
