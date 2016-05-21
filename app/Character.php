@@ -340,7 +340,7 @@ class Character extends Model
 		    foreach ($questIDs as $questID) {
 			    $itemSources = ItemSource::where('bnet_source_id', '=', $questID)->where('item_source_type_id', '=', $questSourceType->id)->get();
 			    
-			    $itemSources->each(function ($itemSource) use ($questLocation) {
+			    $itemSources->each(function ($itemSource) use ($questLocation, &$newItems) {
 				   $userItem = $this->items()->where('item_id', '=', $itemSource->item_id)->where('item_location_id', '=', $questLocation->id)->first();
 				   
 				   if (!$userItem && $itemSource->item && $itemSource->item->isTransmoggable()) {
