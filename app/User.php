@@ -111,14 +111,14 @@ class User extends Authenticatable
 		    foreach ($dataFile->import_data['guilds'] as $guildID => $guildData) {
 			    $guildItemIDs = [];
 			    
-			    if (@$guildData['guildInfo'] && @$guildData['guildInfo']['faction'] && @$guildData['guildInfo']['realm'] && @$guildData['guildInfo']['region'] && @$guildData['guildInfo']['items'] && count($guildData['guildInfo']['items'])) {
+			    if (@$guildData['guildInfo'] && @$guildData['guildInfo']['faction'] && @$guildData['guildInfo']['realm'] && @$guildData['guildInfo']['region'] && @$guildData['items'] && count($guildData['items'])) {
 				    $guildRealm = Realm::where('name', '=', $guildData['guildInfo']['realm'])->where('region', '=', ucwords($guildData['guildInfo']['region']))->first();
 				    $guildFaction = Faction::where('name', '=', $guildData['guildInfo']['faction'])->first();
 				    
 				    if ($guildRealm && $guildFaction) {
 					    $guildBankLocation = ItemLocation::where('import_tag', '=', 'guildbank')->first();
 					    
-					    foreach ($guildData['guildInfo']['items'] as $tabID => $itemArr) {
+					    foreach ($guildData['items'] as $tabID => $itemArr) {
 						    foreach ($itemArr as $itemStr) {
 							    list($bound, $xmoggable, $itemLink) = explode('--', $itemStr);
 			    
