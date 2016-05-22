@@ -45,8 +45,6 @@ class ImportLegacyQuestDataExternal extends Command
         $items = Item::whereIn('id', $legacyItemIDs)->where('transmoggable', '=', 1)->get();
         $bar = $this->output->createProgressBar($items->count());
         
-        $items = Item::where('bnet_id', '=', 6085)->get();
-        
         foreach($items as $item) {
 	        $html = WowheadCache::getLegacyItemHtml($item->bnet_id);
 	        
