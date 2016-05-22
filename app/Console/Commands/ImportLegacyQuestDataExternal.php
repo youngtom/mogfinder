@@ -87,7 +87,7 @@ class ImportLegacyQuestDataExternal extends Command
         $bar->finish();
     }
     
-    private function _processWowheadHtml($html) {
+    private function _processWowheadHtml($html, $bnetID) {
 	    preg_match_all('/new Listview\(\{template\:\'quest\',id\:\'reward\-of\'(.+),data\:(?P<data>\[.+\])(.+)\)\;/', $html, $matches);
 	    
 	    if (@$matches['data'][0]) {
