@@ -94,6 +94,7 @@ class ImportLegacyQuestDataExternal extends Command
 			$json = preg_replace('/,(")?(reqlevel)(?(1)\1|)/', ',"reqlevel"', $json);
 			$json = preg_replace('/,(")?(itemrewards)(?(1)\1|)/', ',"itemrewards"', $json);
 			$json = preg_replace('/,(")?(money)(?(1)\1|)/', ',"money"', $json);
+			$json = preg_replace('/,(")?(itemchoices)(?(1)\1|)/', ',"itemchoices"', $json);
 			$json = preg_replace('/,(")?(xp)(?(1)\1|)/', ',"xp"', $json);
 			$json = preg_replace('/,(")?(category)(?(1)\1|)\:(.+),/', ',', $json);
 			$json = preg_replace('/,(")?(category2)(?(1)\1|)/', ',"category2"', $json);
