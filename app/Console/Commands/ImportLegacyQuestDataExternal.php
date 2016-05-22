@@ -66,6 +66,7 @@ class ImportLegacyQuestDataExternal extends Command
 						    $itemSource->bnet_source_id = $questID;
 						    $itemSource->hidden = 1;
 						    $itemSource->import_source = 'openwowImport';
+						    $this->line('Adding source for ' . $item->bnet_id);
 					    }
 					    
 					    if (@$questArr['side'] && ($questArr['side'] == 1 || $questArr['side'] == 2)) {
