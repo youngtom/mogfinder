@@ -163,7 +163,7 @@ class User extends Authenticatable
 					    }
 					    
 					    $deleteItems = UserItem::where('user_id', '=', $this->id)->where('item_location_id', '=', $guildBankLocation->id)->where('location_label', '=', $guildID)->whereNotIn('id', $guildItemIDs)->get();
-					    \Log::info('Deleting ' . $items->count() . ' items for guild bank ' . $guildID);
+					    \Log::info('Deleting ' . $deleteItems->count() . ' items for guild bank ' . $guildID);
 					    foreach($deleteItems as $item) {
 							$item->delete();
 						}
