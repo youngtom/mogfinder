@@ -117,8 +117,9 @@ class User extends Authenticatable
 			    if (@$guildData['guildInfo'] && @$guildData['guildInfo']['faction'] && @$guildData['guildInfo']['realm'] && @$guildData['guildInfo']['region']) {
 				    $guildRealm = Realm::where('name', '=', $guildData['guildInfo']['realm'])->where('region', '=', ucwords($guildData['guildInfo']['region']))->first();
 				    $guildFaction = Faction::where('name', '=', $guildData['guildInfo']['faction'])->first();
+				    $characters = $this->characters()->where('realm_id', '=', $guildRealm->id)->where('faction_id', '=', $guildFaction->id)->get();
 				    
-				    if ($guildRealm && $guildFaction) {
+				    if ($guildRealm && $guildFaction && count($characters)) {
 					    $guildIDs[] = $guildID;
 					    
 					    if (@$guildData['items'] && count($guildData['items'])) {
@@ -131,13 +132,11 @@ class User extends Authenticatable
 								    if (!$userItem) {
 									    $item = Item::findItemFromLink($itemLink);
 									    
-									    if ($item && $item->isTransmoggable()) {								       
-									        $alts = $this->characters()->where('realm_id', '=', $guildRealm->id)->where('faction_id', '=', $guildFaction->id)->get();
-									        
+									    if ($item && $item->isTransmoggable()) {
 									        $found = false;
-									        $alts->each(function ($alt) use ($item, &$found) {
-										        if ($alt->canUseItem($item)) {
-													$found = $alt;
+									        $characters->each(function ($character) use ($item, &$found) {
+										        if ($character->canUseItem($item)) {
+													$found = $character;
 													return false;
 												}
 									        });
@@ -152,11 +151,7 @@ class User extends Authenticatable
 										        $userItem->item_link = $itemLink;
 										        $userItem->bound = $bound;
 										        $userItem->save();
-									        } else {
-										        \Log::info('GUILDIMPORT - No alt found for item: ' . $itemLink);
 									        }
-								        } elseif (!$item) {
-									        \Log::info('GUILDIMPORT - No item found for item: ' . $itemLink);
 								        }
 									}
 														    
