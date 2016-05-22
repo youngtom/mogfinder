@@ -46,6 +46,7 @@ class ImportLegacyQuestDataExternal extends Command
         $bar = $this->output->createProgressBar($items->count());
         
         foreach($items as $item) {
+	        $this->line($item->bnet_id);
 	        $html = WowheadCache::getLegacyItemHtml($item->bnet_id);
 	        
 	        if ($html) {
@@ -53,26 +54,26 @@ class ImportLegacyQuestDataExternal extends Command
 				
 				if (!$sourceData || !count($sourceData)) {
 					$this->info('Source data not found for bnet id: ' . $item->bnet_id);
-				}
-				
-				foreach ($sourceData as $questArr) {
-					$questID = $questArr['id'];
-					
-					$itemSource = ItemSource::where('item_source_type_id', '=', 7)->where('bnet_source_id', '=', $questID)->where('item_id', '=', $item->id)->first();
-			    
-				    if (!$itemSource) {
-					    $itemSource = new ItemSource;
-					    $itemSource->item_id = $item->id;
-					    $itemSource->item_source_type_id = 7;
-					    $itemSource->bnet_source_id = $questID;
-					    $itemSource->hidden = 1;
-					    $itemSource->import_source = 'openwowImport';
-				    }
+				} else {
+					foreach ($sourceData as $questArr) {
+						$questID = $questArr['id'];
+						
+						$itemSource = ItemSource::where('item_source_type_id', '=', 7)->where('bnet_source_id', '=', $questID)->where('item_id', '=', $item->id)->first();
 				    
-				    if (@$questArr['side'] && ($questArr['side'] == 1 || $questArr['side'] == 2)) {
-					    $itemSource->faction_id = $questArr['side'];
-				    }
-				    $itemSource->save();
+					    if (!$itemSource) {
+						    $itemSource = new ItemSource;
+						    $itemSource->item_id = $item->id;
+						    $itemSource->item_source_type_id = 7;
+						    $itemSource->bnet_source_id = $questID;
+						    $itemSource->hidden = 1;
+						    $itemSource->import_source = 'openwowImport';
+					    }
+					    
+					    if (@$questArr['side'] && ($questArr['side'] == 1 || $questArr['side'] == 2)) {
+						    $itemSource->faction_id = $questArr['side'];
+					    }
+					    $itemSource->save();
+					}
 				}
 			}
 			
