@@ -22,7 +22,7 @@
 	text-shadow: 1px 1px 1px rgba(0, 0, 0, .75);
 	color: white;
 	font-size: 75%;
-	transition: all 0.2s ease;
+	transition: all 1s ease;
 }
 
 #status-msg {
