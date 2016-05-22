@@ -152,7 +152,11 @@ class User extends Authenticatable
 										        $userItem->item_link = $itemLink;
 										        $userItem->bound = $bound;
 										        $userItem->save();
+									        } else {
+										        \Log::info('GUILDIMPORT - No alt found for item: ' . $itemLink);
 									        }
+								        } elseif (!$item) {
+									        \Log::info('GUILDIMPORT - No item found for item: ' . $itemLink);
 								        }
 									}
 														    
