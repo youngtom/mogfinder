@@ -45,11 +45,13 @@ class ImportLegacyQuestDataExternal extends Command
         $items = Item::whereIn('id', $legacyItemIDs)->where('transmoggable', '=', 1)->get();
         $bar = $this->output->createProgressBar($items->count());
         
+        $items = Item::where('bnet_id', '=', 6085)->get();
+        
         foreach($items as $item) {
 	        $html = WowheadCache::getLegacyItemHtml($item->bnet_id);
 	        
 	        if ($html) {
-				$sourceData = $this->_processWowheadHtml($html);				
+				$sourceData = $this->_processWowheadHtml($html);
 				
 				if (!$sourceData || !count($sourceData)) {
 					$this->info('Source data not found for bnet id: ' . $item->bnet_id);
@@ -88,7 +90,6 @@ class ImportLegacyQuestDataExternal extends Command
 	    
 	    if (@$matches['data'][0]) {
 			$json = $matches['data'][0];
-			$json = preg_replace('/,(")?(name)(?(1)\1|)/', ',"name"', $json);
 			$json = preg_replace('/(")?(id)(?(1)\1|)\:/', '"id":', $json);
 			$json = preg_replace('/,(")?(level)(?(1)\1|)/', ',"level"', $json);
 			$json = preg_replace('/,(")?(side)(?(1)\1|)/', ',"side"', $json);
@@ -100,6 +101,7 @@ class ImportLegacyQuestDataExternal extends Command
 			$json = preg_replace('/,(")?(category)(?(1)\1|)\:(.+),/', ',', $json);
 			$json = preg_replace('/,(")?(category2)(?(1)\1|)/', ',"category2"', $json);
 			$json = preg_replace('/,(")?(type)(?(1)\1|)/', ',"type"', $json);
+			$json = preg_replace('/,(")?(name)(?(1)\1|)\:(.+),/', ',', $json);
 			$json = preg_replace('/(")?(undefined)(?(1)\1|)/', '"undefined"', $json);
 			$json = str_replace("'", '"', $json);
 			
