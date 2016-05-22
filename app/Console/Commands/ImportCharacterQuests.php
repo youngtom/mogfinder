@@ -46,7 +46,14 @@ class ImportCharacterQuests extends Command
         
         foreach ($characters as $character) {
 	        $this->info('Importing quests for ' . $character->name . ' - ' . $character->realm->name . ' (' . $character->realm->region . ')');
-	        $newItems = $character->importBnetQuestItemData(true);
+	        $questIDs = explode(',', $character->quests_imported);
+	        
+	        $newItems = 0;
+	        if ($questIDs) {
+		        $newItems = $character->importQuests($questIDs, true);
+	        }
+	        
+	        $newItems += $character->importBnetQuestItemData();
 	        $this->line($newItems . ' new item(s) added');
 	        $bar->advance();
         }
