@@ -121,47 +121,49 @@ class User extends Authenticatable
 				    if ($guildRealm && $guildFaction) {
 					    $guildIDs[] = $guildID;
 					    
-					    foreach ($guildData['items'] as $tabID => $itemArr) {
-						    foreach ($itemArr as $itemStr) {
-							    list($bound, $xmoggable, $itemLink) = explode('--', $itemStr);
-			    
-							    $userItem = UserItem::where('user_id', '=', $this->id)->where('item_location_id', '=', $guildBankLocation->id)->where('location_label', '=', $guildID)->where('item_link', $itemLink)->first();
+					    if (count($guildData['items'])) {
+						    foreach ($guildData['items'] as $tabID => $itemArr) {
+							    foreach ($itemArr as $itemStr) {
+								    list($bound, $xmoggable, $itemLink) = explode('--', $itemStr);
 				    
-							    if (!$userItem) {
-								    $item = Item::findItemFromLink($itemLink);
-								    
-								    if ($item && $item->isTransmoggable()) {								       
-								        $alts = $this->characters()->where('realm_id', '=', $guildRealm->id)->where('faction_id', '=', $guildFaction->id)->get();
-								        
-								        $found = false;
-								        $alts->each(function ($alt) use ($item, &$found) {
-									        if ($alt->canUseItem($item)) {
-												$found = $alt;
-												return false;
-											}
-								        });
-								        
-								        if ($found) {
-									        $userItem = new UserItem;
-									        $userItem->user_id = $this->id;
-									        $userItem->item_id = $item->id;
-									        $userItem->item_display_id = $item->item_display_id;
-									        $userItem->item_location_id = $guildBankLocation->id;
-									        $userItem->location_label = $guildID;
-									        $userItem->item_link = $itemLink;
-									        $userItem->bound = $bound;
-									        $userItem->save();
+								    $userItem = UserItem::where('user_id', '=', $this->id)->where('item_location_id', '=', $guildBankLocation->id)->where('location_label', '=', $guildID)->where('item_link', $itemLink)->first();
+					    
+								    if (!$userItem) {
+									    $item = Item::findItemFromLink($itemLink);
+									    
+									    if ($item && $item->isTransmoggable()) {								       
+									        $alts = $this->characters()->where('realm_id', '=', $guildRealm->id)->where('faction_id', '=', $guildFaction->id)->get();
+									        
+									        $found = false;
+									        $alts->each(function ($alt) use ($item, &$found) {
+										        if ($alt->canUseItem($item)) {
+													$found = $alt;
+													return false;
+												}
+									        });
+									        
+									        if ($found) {
+										        $userItem = new UserItem;
+										        $userItem->user_id = $this->id;
+										        $userItem->item_id = $item->id;
+										        $userItem->item_display_id = $item->item_display_id;
+										        $userItem->item_location_id = $guildBankLocation->id;
+										        $userItem->location_label = $guildID;
+										        $userItem->item_link = $itemLink;
+										        $userItem->bound = $bound;
+										        $userItem->save();
+									        }
 								        }
-							        }
-								}
-													    
-							    if ($userItem) {
-								    $guildItemIDs[] = $userItem->id;
+									}
+														    
+								    if ($userItem) {
+									    $guildItemIDs[] = $userItem->id;
+								    }
+								    
+									DB::table('user_datafiles')->where('id', '=', $dataFile->id)->increment('progress_current');
 							    }
-							    
-								DB::table('user_datafiles')->where('id', '=', $dataFile->id)->increment('progress_current');
 						    }
-					    }
+						}
 					    
 					    $deleteItems = UserItem::where('user_id', '=', $this->id)->where('item_location_id', '=', $guildBankLocation->id)->where('location_label', '=', $guildID)->whereNotIn('id', $guildItemIDs)->get();
 					    
