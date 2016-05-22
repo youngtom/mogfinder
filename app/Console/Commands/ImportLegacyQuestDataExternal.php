@@ -46,7 +46,6 @@ class ImportLegacyQuestDataExternal extends Command
         $bar = $this->output->createProgressBar($items->count());
         
         foreach($items as $item) {
-	        $this->line($item->bnet_id);
 	        $html = WowheadCache::getLegacyItemHtml($item->bnet_id);
 	        
 	        if ($html) {
