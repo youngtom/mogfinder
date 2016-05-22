@@ -45,6 +45,8 @@ class ImportLegacyQuestDataExternal extends Command
         $items = Item::whereIn('id', $legacyItemIDs)->where('transmoggable', '=', 1)->get();
         $bar = $this->output->createProgressBar($items->count());
         
+        //$items = Item::where('bnet_id', '=', 16720)->get();
+        
         foreach($items as $item) {
 	        $html = WowheadCache::getLegacyItemHtml($item->bnet_id);
 	        
@@ -86,7 +88,7 @@ class ImportLegacyQuestDataExternal extends Command
     }
     
     private function _processWowheadHtml($html) {
-	    preg_match_all('/new Listview\(\{template\:\'quest\'(.+),data\:(?P<data>\[.+\])(.+)\)\;/', $html, $matches);
+	    preg_match_all('/new Listview\(\{template\:\'quest\',id\:\'reward\-of\'(.+),data\:(?P<data>\[.+\])(.+)\)\;/', $html, $matches);
 	    
 	    if (@$matches['data'][0]) {
 			$json = $matches['data'][0];
