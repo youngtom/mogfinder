@@ -148,6 +148,7 @@ class User extends Authenticatable
 									        $userItem->item_display_id = $item->item_display_id;
 									        $userItem->item_location_id = $guildBankLocation->id;
 									        $userItem->location_label = $guildID;
+									        $userItem->item_link = $itemLink;
 									        $userItem->bound = $bound;
 									        $userItem->save();
 								        }
