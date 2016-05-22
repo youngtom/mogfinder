@@ -121,7 +121,7 @@ class User extends Authenticatable
 				    if ($guildRealm && $guildFaction) {
 					    $guildIDs[] = $guildID;
 					    
-					    if (count($guildData['items'])) {
+					    if (count(@$guildData['items'])) {
 						    foreach ($guildData['items'] as $tabID => $itemArr) {
 							    foreach ($itemArr as $itemStr) {
 								    list($bound, $xmoggable, $itemLink) = explode('--', $itemStr);
