@@ -53,7 +53,6 @@ class ImportLegacyQuestDataExternal extends Command
 				
 				if (!$sourceData || !count($sourceData)) {
 					$this->info('Source data not found for bnet id: ' . $item->bnet_id);
-					return false;
 				}
 				
 				foreach ($sourceData as $questArr) {
