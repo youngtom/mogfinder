@@ -51,10 +51,10 @@ class ImportLegacyQuestDataExternal extends Command
 	        $html = WowheadCache::getLegacyItemHtml($item->bnet_id);
 	        
 	        if ($html) {
-				$sourceData = $this->_processWowheadHtml($html);
+				$sourceData = $this->_processWowheadHtml($html, $item->bnet_id);
 				
 				if (!$sourceData || !count($sourceData)) {
-					$this->info('Source data not found for bnet id: ' . $item->bnet_id);
+					//$this->info('Source data not found for bnet id: ' . $item->bnet_id);
 				} else {
 					foreach ($sourceData as $questArr) {
 						$questID = $questArr['id'];
@@ -68,9 +68,9 @@ class ImportLegacyQuestDataExternal extends Command
 						    $itemSource->bnet_source_id = $questID;
 						    $itemSource->hidden = 1;
 						    $itemSource->import_source = 'openwowImport';
-						    $this->line('Adding source for ' . $item->bnet_id);
+						    //$this->line('Adding source for ' . $item->bnet_id);
 					    } else {
-						    $this->line('Source already exists for ' . $item->bnet_id . ' (' . $itemSource->import_source . ')');
+						    //$this->line('Source already exists for ' . $item->bnet_id . ' (' . $itemSource->import_source . ')');
 					    }
 					    
 					    if (@$questArr['side'] && ($questArr['side'] == 1 || $questArr['side'] == 2)) {
@@ -110,8 +110,7 @@ class ImportLegacyQuestDataExternal extends Command
 			$jsonArr = json_decode($json, true);
 			
 			if (!$jsonArr) {
-				$this->error('Malformed json for item: ' . $json);
-				die;
+				$this->error('Malformed json for item ' . $bnetID . ': ' . $json);
 			}
 			
 			return $jsonArr;
