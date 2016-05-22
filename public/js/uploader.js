@@ -128,7 +128,10 @@ function updateProgressbar(current, total, $button) {
 	            from: currentPct,
 	            to: Math.round(percent),
 	            speed: 1000,
-	            refreshInterval: 50
+	            refreshInterval: 50,
+	            onComplete: function(value) {
+	                $bar.attr('data-current-pct', Math.round(percent));
+	            }
 	        });
 			
 			if (current >= total) {
