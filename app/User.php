@@ -114,7 +114,7 @@ class User extends Authenticatable
 		    foreach ($dataFile->import_data['guilds'] as $guildID => $guildData) {
 			    $guildItemIDs = [];
 			    
-			    if (@$guildData['guildInfo'] && @$guildData['guildInfo']['faction'] && @$guildData['guildInfo']['realm'] && @$guildData['guildInfo']['region'] && @$guildData['items']) {
+			    if (@$guildData['guildInfo'] && @$guildData['guildInfo']['faction'] && @$guildData['guildInfo']['realm'] && @$guildData['guildInfo']['region']) {
 				    $guildRealm = Realm::where('name', '=', $guildData['guildInfo']['realm'])->where('region', '=', ucwords($guildData['guildInfo']['region']))->first();
 				    $guildFaction = Faction::where('name', '=', $guildData['guildInfo']['faction'])->first();
 				    
@@ -164,7 +164,7 @@ class User extends Authenticatable
 					    }
 					    
 					    $deleteItems = UserItem::where('user_id', '=', $this->id)->where('item_location_id', '=', $guildBankLocation->id)->where('location_label', '=', $guildID)->whereNotIn('id', $guildItemIDs)->get();
-					    \Log::info('Deleting ' . $deleteItems->count() . ' items for guild bank ' . $guildID);
+					    
 					    foreach($deleteItems as $item) {
 							$item->delete();
 						}
