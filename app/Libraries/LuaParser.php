@@ -170,18 +170,19 @@ class LuaParser implements \arrayaccess
                 break;
             }
             
-            $strs = explode("=", $this->lua[$i]);
+            $strs = explode("=", utf8_decode($this->lua[$i]));
+            $_key = utf8_encode($this->arrayId(trim($strs[0])));
             
             if (isset($strs[1]) && trim($strs[1]) == "{") {
               $i++;
-              $data[$this->arrayId(trim($strs[0]))] = $this->parser($i);
+              $data[$_key] = $this->parser($i);
             } elseif (trim($strs[0]) == "}" || trim($strs[0]) == "},") {
               $i++;
               $stop = true;
             } else {
               $i++;
-              if (strlen($this->arrayId(trim($strs[0]))) > 0 && strlen($strs[1]) > 0) {
-                $data[$this->arrayId(trim($strs[0]))] = $this->trimValue($strs[1]);
+              if (strlen($_key) > 0 && strlen($strs[1]) > 0) {
+                $data[$_key] = $this->trimValue($strs[1]);
               }
             } 
           }

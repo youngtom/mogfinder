@@ -69,7 +69,7 @@ class UserDatafile extends Model
 		}
 		
 		foreach ($this->import_data['chars'] as $charTag => $charData) {
-		    $character = Character::where('wow_guid', '=', $charTag)->where('user_id', '=', Auth::user()->id)->first();		    
+		    $character = Character::where('wow_guid', '=', $charTag)->where('user_id', '=', Auth::user()->id)->first();
 		    
 		    if ($character || count($charData['charInfo'])) {
 			    $lastScanned = ($character) ? $character->last_scanned : 0;
