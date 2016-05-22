@@ -52,6 +52,7 @@ class AuctionDataUpdate extends Command
 	        $characters = Character::whereIn('realm_id', $realmIDs)->get();
 	        
 	        if ($characters->count()) {
+		        \Log::info('Updating auction data for realm: ' . $realm->name . ' - ' . $realm->region);
 		        $this->line('Updating auction data for realm: ' . $realm->name . ' - ' . $realm->region);
 		        $realm->updateAuctionData();
 		    }
