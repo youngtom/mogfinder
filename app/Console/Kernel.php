@@ -55,7 +55,8 @@ class Kernel extends ConsoleKernel
         Commands\ImportSourceItemSources::class,
         Commands\CreateHiddenItemSources::class,
         Commands\ImportLegacyQuestSources::class,
-        Commands\ImportCharacterQuests::class
+        Commands\ImportCharacterQuests::class,
+        Commands\ImportLegacyQuestDataExternal::class
     ];
 
     /**

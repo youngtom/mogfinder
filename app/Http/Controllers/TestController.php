@@ -27,8 +27,19 @@ use DB;
 class TestController extends Controller
 {
 	public function index() {
-		$character = Character::find(1546);
-		$character->importItemData();
+		$legacyItemIDs = ItemSource::where('item_source_type_id', '=', 17)->get(['item_id'])->lists('item_id')->toArray();
+		$sourcedItemIDs = ItemSource::where('item_source_type_id', '<>', 17)->whereIn('item_id', $legacyItemIDs)->get(['item_id'])->lists('item_id')->toArray();
+		
+		$legacyItemIDs = array_diff($legacyItemIDs, $sourcedItemIDs);
+		
+		$items = Item::where('transmoggable', '=', 1)->whereIn('id', $legacyItemIDs)->where('item_bind', '=', 1)->whereNotIn('quality', [7, 5])->orderBy('bnet_id', 'ASC')->get();
+		
+		foreach ($items as $item) {
+			$out[] = 'Item: <a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="item-link q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
+		}
+		
+		return view('test')->with('out', $out)->with('newline', "<br>");
+		
 		die;
 		$sources = ItemSource::whereNotNull('item_currency_info')->get()->groupBy('item_id');
 		

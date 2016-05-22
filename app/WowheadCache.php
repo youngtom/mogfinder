@@ -13,15 +13,19 @@ class WowheadCache extends Model
 	    return self::_getHtml('item=' . $itemID);
     }
     
-    private static function _getHtml($endpoint) {
-	    if ($cache = self::where('endpoint', '=', $endpoint)->where('expiration', '>', time())->orderBy('expiration', 'DESC')->first()) {
+    public static function getLegacyItemHtml($itemID) {
+	    return self::_getHtml('item=' . $itemID, 'http://wotlk.openwow.com/');
+    }
+    
+    private static function _getHtml($endpoint, $baseURL = 'http://www.wowhead.com/') {
+	    $url = $baseURL . $endpoint;
+	    
+	    if ($cache = self::where('request_uri', '=', $url)->where('expiration', '>', time())->orderBy('expiration', 'DESC')->first()) {
 		    return $cache->data;
 	    } else {
 			if (self::$client === null) {
 				self::$client = new \GuzzleHttp\Client();
 			}
-			
-		    $url = 'http://www.wowhead.com/' . $endpoint;
 		    
 		    try {
 				$res = self::$client->request('GET', $url);
