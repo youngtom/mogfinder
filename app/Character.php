@@ -98,7 +98,7 @@ class Character extends Model
 		        $query->orWhere('localized_name', '=', $realmName);
 	        })->where('region', '=', $region)->first();
 		    
-		    if (!$realm && preg_match_all('/Player\-(?P<realmid>\d+)\-([A-Za-z0-9+])/', $this->wow_guid, $matches);) {
+		    if (!$realm && preg_match_all('/Player\-(?P<realmid>\d+)\-([A-Za-z0-9+])/', $this->wow_guid, $matches)) {
 			    $realmGUID = $matches['realmid'][0];
 			    
 			    if (!$realmGUID) {
