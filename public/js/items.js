@@ -142,7 +142,7 @@ $(document).ready(function () {
 		filterCharacterItems(charID);
 		
 		if (charID) {
-			$('.panel-group').addClass('chaaracter-filtered');
+			$('.panel-group').addClass('character-filtered');
 		} else {
 			$('.panel-group').removeClass('character-filtered');
 		}
