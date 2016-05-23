@@ -57,11 +57,11 @@ class BnetWowApi
 	
     private function _getEndpointData($endpoint, $region = 'us', $params = array(), $expirationOverride = false) {
 	    $baseURLByRegion = [
-		    'us' => 'https://us.api.battle.net/',
-		    'eu' => 'https://eu.api.battle.net/',
-		    'kr' => 'https://kr.api.battle.net/',
-		    'tw' => 'https://tw.api.battle.net/',
-		    'cn' => 'https://api.battlenet.com.cn/'
+		    'us' => 'https://us.api.battle.net/wow',
+		    'eu' => 'https://eu.api.battle.net/wow',
+		    'kr' => 'https://kr.api.battle.net/wow',
+		    'tw' => 'https://tw.api.battle.net/wow',
+		    'cn' => 'https://api.battlenet.com.cn/wow'
 	    ];
 	    
 	    $region = strtolower($region);
