@@ -70,7 +70,7 @@
 				    }
 				    
 				    $items = $items->sortBy(function ($item) {
-					    return ($item->character) ? $item->character->name : null;
+					    return ($item->character && $item->character->realm) ? $item->character->realm->name . '|' . $item->character->name : null;
 				    });
 		    ?>
             <div class="panel panel-default item-display-panel">
