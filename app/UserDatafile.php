@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Auth;
+use App\Character;
 
 class UserDatafile extends Model
 {
@@ -99,7 +100,7 @@ class UserDatafile extends Model
 				        $query->orWhere('localized_name', '=', $realmName);
 			        })->where('region', '=', ucwords($guildData['guildInfo']['region']))->first();
 				    $guildFaction = Faction::where('name', '=', $guildData['guildInfo']['faction'])->first();
-				    $characters = $this->characters()->where('realm_id', '=', $guildRealm->id)->where('faction_id', '=', $guildFaction->id)->get();
+				    $characters = Character::where('user_id', '=', $this->user_id)->where('realm_id', '=', $guildRealm->id)->where('faction_id', '=', $guildFaction->id)->get();
 				    
 				    if ($guildRealm && $guildFaction && count($characters)) {
 					    foreach ($guildData['items'] as $tabID => $itemArr) {
