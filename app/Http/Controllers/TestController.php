@@ -27,10 +27,13 @@ use DB;
 class TestController extends Controller
 {
 	public function index() {
-		Realm::importRealms('cn');
-		Realm::importRealms('tw');
-		Realm::importRealms('tw');
-		Realm::importRealms('kr');
+		$characters = Character::all();
+		foreach ($characters as $char) {
+			$character->url_token = $character->getToken();
+			$character->save();
+			
+			echo $character->name . ': ' . $character->url_token . '<br>';
+		}
 		die;
 		$legacyItemIDs = ItemSource::where('item_source_type_id', '=', 17)->get(['item_id'])->lists('item_id')->toArray();
 		$sourcedItemIDs = ItemSource::where('item_source_type_id', '<>', 17)->whereIn('item_id', $legacyItemIDs)->get(['item_id'])->lists('item_id')->toArray();
