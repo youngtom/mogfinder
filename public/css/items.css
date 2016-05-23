@@ -94,7 +94,7 @@ a.expand-collapse { color: #ccc; }
 .item-row.invalid-character { opacity: .5; }
 .item-row.quest-filtered { display: none; }
 
-.item-row.priority { background-color: #222; display: table-row !important; }
+.item-row.priority, .item-row.highlight { background-color: #222; display: table-row !important; }
 
 .selectable-filter.all-selected .all-select { display: none; }
 

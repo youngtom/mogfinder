@@ -219,16 +219,17 @@ function filterFactionItems(factionMask) {
 }
 
 function filterCharacterItems(charID) {
-	$('.item-display-panel').removeClass('filtered').removeClass('priority');
+	$('.item-display-panel').removeClass('filtered');
+	$('.item-row').removeClass('highlight');
 	
 	if (charID) {
 		$('.item-display-panel').each(function () {
 			if (!$('.item-row[data-character-id="' + charID + '"]', $(this)).length) {
 				$(this).addClass('filtered');
-			} else {
-				$(this).addClass('priority');
 			}
 		});
+		
+		$('.item-row[data-character-id="' + charID + '"]').addClass('highlight');
 	}
 }
 
