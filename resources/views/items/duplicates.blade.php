@@ -60,7 +60,7 @@
 			</div>
 			
 	        <?php 
-		        foreach ($duplicates as $displayID => $itemArr) {
+		        foreach ($duplicates as $displayID => $items) {
 			        $restrictedClasses = false;
 			        foreach ($itemArr as $item) {
 				    	if ($item->item->allowable_classes || $item->item->allowable_races) {
@@ -68,6 +68,10 @@
 					    	break;
 				    	}
 				    }
+				    
+				    $items = $items->sortBy(function ($item) {
+					    return $item->character->name;
+				    });
 		    ?>
             <div class="panel panel-default item-display-panel">
                 <div class="panel-heading">Appearance <?=$displayID?>:</div>
@@ -83,7 +87,7 @@
                         </tr>
                     </thead>
                     <tbody>
-					<?php foreach ($itemArr as $item) { ?>
+					<?php foreach ($items as $item) { ?>
 						<tr class="item-row" data-character-id="<?=($item->character && $item->itemLocation->shorthand != 'quest') ? $item->character->id : 0?>" data-quest-item="<?=($item->itemLocation->shorthand == 'quest') ? 1 : 0?>">
 							<?php if ($item->character) { ?>
 							<td class="charname"><?=$item->character->name?></td>
