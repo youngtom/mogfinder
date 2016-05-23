@@ -218,13 +218,16 @@ class User extends Authenticatable
 	    
 	    if ($includeQuestItems || $character) {
 		    $heirloomLocation = ItemLocation::where('label', '=', 'heirlooms')->first();
+		    $equippedLocation = ItemLocation::where('label', '=', 'equipped')->first();
+		    
+		    $irrelevantLocations = [$questLocation->id, $heirloomLocation->id, $equippedLocation->id]
 		    
 			foreach ($dupeItems as $displayID => $itemArr) {
-				$allQuest = true;
+				$allIrrelevant = true;
 				$involvesCharacter = false;
 				foreach ($itemArr as $item) {
-					if ($item->item_location_id != $questLocation->id && $item->item_location_id != $heirloomLocation->id) {
-						$allQuest = false;
+					if (!in_array($item->item_location_id, $irrelevantLocations)) {
+						$allIrrelevant = false;
 						
 						if ($character) {
 							if ($character->id == $item->character_id) {
@@ -237,7 +240,7 @@ class User extends Authenticatable
 					}
 				}
 				
-				if (($includeQuestItems && $allQuest) || ($character && !$involvesCharacter)) {
+				if (($includeQuestItems && $allIrrelevant) || ($character && !$involvesCharacter)) {
 					unset($dupeItems[$displayID]);
 				}
 			}
