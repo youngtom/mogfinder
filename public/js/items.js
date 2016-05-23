@@ -219,12 +219,14 @@ function filterFactionItems(factionMask) {
 }
 
 function filterCharacterItems(charID) {
-	$('.item-display-panel').removeClass('filtered');
+	$('.item-display-panel').removeClass('filtered').removeClass('priority');
 	
 	if (charID) {
 		$('.item-display-panel').each(function () {
 			if (!$('.item-row[data-character-id="' + charID + '"]', $(this)).length) {
 				$(this).addClass('filtered');
+			} else {
+				$(this).addClass('priority');
 			}
 		});
 	}
