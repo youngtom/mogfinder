@@ -29,6 +29,7 @@ class TestController extends Controller
 	public function index() {
 		Realm::importRealms('cn');
 		Realm::importRealms('tw');
+		Realm::importRealms('tw');
 		Realm::importRealms('kr');
 		die;
 		$legacyItemIDs = ItemSource::where('item_source_type_id', '=', 17)->get(['item_id'])->lists('item_id')->toArray();
