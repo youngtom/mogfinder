@@ -68,11 +68,10 @@
 					    	break;
 				    	}
 				    }
-				    /*
+				    
 				    $items = $items->sortBy(function ($item) {
-					    return $item->character->name;
+					    return ($item->character) ? $item->character->name : null;
 				    });
-				    */
 		    ?>
             <div class="panel panel-default item-display-panel">
                 <div class="panel-heading">Appearance <?=$displayID?>:</div>
@@ -99,6 +98,9 @@
 							?>
 							<td class="charname"><?=$guildName?></td>
 							<td class="charrealm"><?=$guildRealm?></td>
+							<?php } else { ?>
+							<td class="charname">&nbsp;</td>
+							<td class="charrealm">&nbsp;</td>
 							<?php } ?>
 							<td class="itemloc"><?=ucwords($item->itemLocation->shorthand)?></td>
 							<td class="dupeitemname" <?=(!$restrictedClasses) ? 'colspan="2"' : ''?>><a href="http://www.wowhead.com/item=<?=$item->item->bnet_id?>" target="_blank" rel="<?=$item->getWowheadMarkup()?>" class="item-link q<?=$item->getItemQuality()?>">[<?=$item->getName()?>]</a></td>
