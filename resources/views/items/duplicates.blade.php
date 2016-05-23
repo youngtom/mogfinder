@@ -69,7 +69,7 @@
 				    	}
 				    }
 				    
-				    $items = $items->sortBy(function ($item, $key) {
+				    $items = $items->sortBy(function ($item) {
 					    return $item->character->name;
 				    });
 		    ?>
