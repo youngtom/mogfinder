@@ -62,7 +62,7 @@
 	        <?php 
 		        foreach ($duplicates as $displayID => $items) {
 			        $restrictedClasses = false;
-			        foreach ($itemArr as $item) {
+			        foreach ($items as $item) {
 				    	if ($item->item->allowable_classes || $item->item->allowable_races) {
 					    	$restrictedClasses = true;
 					    	break;
