@@ -51,8 +51,14 @@ class BnetWowApi
 		return $this->_getEndpointData('/zone/', 'us');
 	}
 	
-	public function getRealmData($region, $locale = 'en_US') {
-		return $this->_getEndpointData('/realm/status', $region, ['locale' => $locale]);
+	public function getRealmData($region, $locale = 'en_US', $realm = false) {
+		$params = ['locale' => $locale];
+		
+		if ($realm) {
+			$params['realm'] = $realm;
+		}
+		
+		return $this->_getEndpointData('/realm/status', $region, $params);
 	}
 	
     private function _getEndpointData($endpoint, $region = 'us', $params = array(), $expirationOverride = false) {
