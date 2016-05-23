@@ -68,10 +68,11 @@
 					    	break;
 				    	}
 				    }
-				    
+				    /*
 				    $items = $items->sortBy(function ($item) {
 					    return $item->character->name;
 				    });
+				    */
 		    ?>
             <div class="panel panel-default item-display-panel">
                 <div class="panel-heading">Appearance <?=$displayID?>:</div>
