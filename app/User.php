@@ -220,7 +220,7 @@ class User extends Authenticatable
 		    $heirloomLocation = ItemLocation::where('label', '=', 'heirlooms')->first();
 		    $equippedLocation = ItemLocation::where('label', '=', 'equipped')->first();
 		    
-		    $irrelevantLocations = [$questLocation->id, $heirloomLocation->id, $equippedLocation->id]
+		    $irrelevantLocations = [$questLocation->id, $heirloomLocation->id, $equippedLocation->id];
 		    
 			foreach ($dupeItems as $displayID => $itemArr) {
 				$allIrrelevant = true;
