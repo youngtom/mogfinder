@@ -68,14 +68,30 @@ class User extends Authenticatable
 					$character->updateCharacterFromDataArray($charData['charInfo']);
 				    
 				    $scanTime = (@$charData['scanTime']) ? $charData['scanTime'] : 0;
-						
-					if ($scanTime > $character->last_scanned && $character->realm_id && $character->class_id && $character->race_id) {
-						// Queue item import
-						$job = (new ImportCharacterItems($character->id, $dataFile->id))->onQueue('med');
-						$this->dispatch($job);
-						
-						$character->last_scanned = $scanTime;
-						$character->latest_chardata = json_encode($charData);
+					
+					if ($scanTime > $character->last_scanned) {
+						if ($character->realm_id && $character->class_id && $character->race_id) {
+							// Queue item import
+							$job = (new ImportCharacterItems($character->id, $dataFile->id))->onQueue('med');
+							$this->dispatch($job);
+							
+							$character->last_scanned = $scanTime;
+							$character->latest_chardata = json_encode($charData);
+						} else {
+							$count = 0;
+							
+							if (@$charData['equipped']) {
+								$count += count($charData['equipped']);
+							}
+							
+							if (@$charData['items']) {
+								foreach ($charData['items'] as $itemArr) {
+									$count += count($itemArr);
+								}
+							}
+							
+							DB::table('user_datafiles')->where('id', '=', $dataFile->id)->increment('progress_current', $count);
+						}
 					}
 					
 					$character->save();
@@ -115,7 +131,11 @@ class User extends Authenticatable
 			    $guildItemIDs = [];
 			    
 			    if (@$guildData['guildInfo'] && @$guildData['guildInfo']['faction'] && @$guildData['guildInfo']['realm'] && @$guildData['guildInfo']['region']) {
-				    $guildRealm = Realm::where('name', '=', $guildData['guildInfo']['realm'])->where('region', '=', ucwords($guildData['guildInfo']['region']))->first();
+				    $realmName = $guildData['guildInfo']['realm'];
+				    $guildRealm = Realm::where(function ($query) use ($realmName) {
+				        $query->where('name', '=', $realmName);
+				        $query->orWhere('localized_name', '=', $realmName);
+			        })->where('region', '=', ucwords($guildData['guildInfo']['region']))->first();
 				    $guildFaction = Faction::where('name', '=', $guildData['guildInfo']['faction'])->first();
 				    $characters = $this->characters()->where('realm_id', '=', $guildRealm->id)->where('faction_id', '=', $guildFaction->id)->get();
 				    

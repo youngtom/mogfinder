@@ -93,10 +93,15 @@ class UserDatafile extends Model
 		if (@$this->import_data['guilds'] && is_array($this->import_data['guilds']) && count($this->import_data['guilds'])) {
 		    foreach ($this->import_data['guilds'] as $guildID => $guildData) {
 			    if (@$guildData['guildInfo'] && @$guildData['guildInfo']['faction'] && @$guildData['guildInfo']['realm'] && @$guildData['guildInfo']['region'] && @$guildData['items']) {
-				    $guildRealm = Realm::where('name', '=', $guildData['guildInfo']['realm'])->where('region', '=', ucwords($guildData['guildInfo']['region']))->first();
+				    $realmName = $guildData['guildInfo']['realm'];
+				    $guildRealm = Realm::where(function ($query) use ($realmName) {
+				        $query->where('name', '=', $realmName);
+				        $query->orWhere('localized_name', '=', $realmName);
+			        })->where('region', '=', ucwords($guildData['guildInfo']['region']))->first();
 				    $guildFaction = Faction::where('name', '=', $guildData['guildInfo']['faction'])->first();
+				    $characters = $this->characters()->where('realm_id', '=', $guildRealm->id)->where('faction_id', '=', $guildFaction->id)->get();
 				    
-				    if ($guildRealm && $guildFaction) {
+				    if ($guildRealm && $guildFaction && count($characters)) {
 					    foreach ($guildData['items'] as $tabID => $itemArr) {
 						    $count += count($itemArr);
 					    }

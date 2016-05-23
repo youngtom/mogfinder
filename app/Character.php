@@ -56,7 +56,7 @@ class Character extends Model
     
     public function getToken() {
 	    if ($this->realm) {
-		    return strtolower($this->name) . '-' . str_slug($this->realm->name . ' ' . $this->realm->region);
+		    return strtolower($this->name) . '-' . $this->realm->getUrlSlug();
 		} else {
 			return null;
 		}
@@ -93,13 +93,25 @@ class Character extends Model
         $factionName = @$infoArr['faction'];
         
         if ($realmName && $region) {
-	        $realm = Realm::where('name', '=', $realmName)->where('region', '=', $region)->first();
+	        $realm = Realm::where(function ($query) use ($realmName) {
+		        $query->where('name', '=', $realmName);
+		        $query->orWhere('localized_name', '=', $realmName);
+	        })->where('region', '=', $region)->first();
 		    
-		    if (!$realm) {
-			    $realm = new Realm;
-			    $realm->name = $realmName;
-			    $realm->region = $region;
-			    $realm->save();
+		    if (!$realm && preg_match_all('/Player\-(?P<realmid>\d+)\-([A-Za-z0-9+])/', $this->wow_guid, $matches);) {
+			    $realmGUID = $matches['realmid'][0];
+			    
+			    if (!$realmGUID) {
+				    return false;
+			    }
+			    
+			    $realmIDs = Character::where('wow_guid', 'LIKE', 'Player-' . $realmGUID . '-%')->get(['realm_id'])->lists('realm_id')->toArray();
+			    
+			    if (count($realmIDs) == 1 && $realmIDs[0]) {
+				    $this->realm_id = $realmIDs[0];
+			    } else {
+				    return false;
+			    }
 		    }
 		    
 			$this->realm_id = $realm->id;

@@ -21,6 +21,10 @@ class Realm extends Model
 	    return $this->hasOne('App\Realm');
     }
     
+    public function getUrlSlug() {
+	    return strtolower($this->url_token . '-' . $this->region);
+    }
+    
     public function updateAuctionData() {
 	    if ($this->parent_realm_id) {
 		    return false;
