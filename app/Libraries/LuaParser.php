@@ -23,239 +23,392 @@ namespace App\Libraries;
  
 use Exception;
  
-class LuaParser implements \arrayaccess
-{
-    /**
-     * The variable contraining the lua lines to be parsed
-     * @var array
-     */
-    protected $lua = array();
-    
-    /**
-     * The current possition in the array we are parsing
-     * @var integer
-     */
-    protected $position = 0;
-    
-    /**
-     * The size of the lua array
-     * @var integer
-     */
-    protected $lines = 0;
-    
-    /**
-     * Array containing the result of the parse
-     * @var array
-     */
-    protected $data = array();
-    
-    /**
-     * Constructor
-     *
-     * Takes on input, checks if its an array, file or string.
-     *
-     * @param mixed $input Array, file or string to be parsed
-     * @return LuaParser
-     */
-    public function __construct($input)
-    {
-        if(is_array($input)) {
-            $this->lua = $input;
-        } elseif(is_string($input)) {
-            if(is_file($input)) {
-                $this->lua = file($input);
-            } else {
-                $this->lua = explode("\n", $input);
-            }
-        }
-        if(is_array($this->lua)) {
-            $this->lines = count($this->lua);
-        }
-        // The array should be bigger than 1 line, else we have probably gotten
-        // a invalid file as input.
-        if($this->lines <= 1) {
-	        return false;
-        }
-        $this->parse();
-        return $this;
-    }
-    
-    /**
-     * Method for enabling array access to parsed data.
-     *
-     * Sets a value to the array based on offset.
-     *
-     * @param string|integer $offset
-     * @param mixed $value
-     * @return void
-     */
-    public function offsetSet($offset, $value) {
-        $this->data[$offset] = $value;
-    }
-    
-    /**
-     * Method for enabling array access to parsed data.
-     *
-     * Checks if value is set at offset.
-     *
-     * @param string|integer $offset
-     * @return void
-     */
-    public function offsetExists($offset) {
-        return isset($this->data[$offset]);
-    }
-    
-    /**
-     * Method for enabling array access to parsed data.
-     *
-     * Unsets part of the array based on offset.
-     *
-     * @param string|integer $offset
-     * @return void
-     */
-    public function offsetUnset($offset) {
-        unset($this->data[$offset]);
-    }
-    
-    /**
-     * Method for enabling array access to parsed data.
-     *
-     * Gets data from array based on offset.
-     *
-     * @param string|integer $offset
-     * @return void
-     */
-    public function offsetGet($offset) {
-        return isset($this->data[$offset]) ? $this->data[$offset] : null;
-    }
-    
-    /**
-     * Returns the array the parsed from the lua file.
-     *
-     * @return array The resulting array from the parse
-     */
-    public function toArray()
-    {
-        return $this->data;
-    }
-    
-    /**
-     * Starts the parsing of the lua array.
-     *
-     * @return void
-     */
-    protected function parse()
-    {
-        $this->data = $this->parser();
-        // Clear the array containing the lua data file to save memory usage.
-        unset($this->lua);
-    }
-    
-    /**
-     * Does the actually parsing of the lua table.
-     *
-     * @return void
-     */
-    protected function parser(&$position = false)
-    {
-        if($position == false) {
-            $position = &$this->position;
-        }
-        $data = array();
-        $stop = false;
-        if ($position < $this->lines) {
-          for ($i = $position; $stop == false;) {
-            if ($i >= $this->lines) {
-                $stop = true;
-                break;
-            }
-            
-            $strs = explode("=", utf8_decode($this->lua[$i]));
-            $_key = utf8_encode($this->arrayId(trim($strs[0])));
-            
-            if (isset($strs[1]) && trim($strs[1]) == "{") {
-              $i++;
-              $data[$_key] = $this->parser($i);
-            } elseif (trim($strs[0]) == "}" || trim($strs[0]) == "},") {
-              $i++;
-              $stop = true;
-            } else {
-              $i++;
-              if (strlen($_key) > 0 && strlen($strs[1]) > 0) {
-                $data[$_key] = $this->trimValue($strs[1]);
-              }
-            } 
-          }
-        }
-        $position = $i;
-        return $data;
-    }
-    
-    /**
-     * Trims of leading and trailing quotationmarks and tailing comman from
-     * the value.
-     *
-     * Example:
-     *  Input: "Value",
-     *  Output: Value
-     *
-     * @param string $string String to be trimmed
-     * @return string Trimmed string
-     */
-    protected function trimValue($string)
-    {
-        $string = trim($string);
-        if (substr($string,0,1)=="\"") {
-            $string = trim(substr($string,1,strlen($string)));
-        }
-        if (substr($string,-1,1)==",") {
-            $string = trim(substr($string,0,strlen($string)-1));
-        }
-        if (substr($string,-1,1)=="\"") {
-            $string = trim(substr($string,0,strlen($string)-1));
-        }
-        if ($string =='false') {
-            $string = false;
-        }
-        if ($string =='true') {
-            $string = true;
-        }
-        
-        return utf8_encode($string);
-    }
-    
-    /**
-     * Extracts the Key-Value for array indexing.
-     *
-     * String Example:
-     *  Input: ["Key"]
-     *  Output: Key
-     * Integer Example:
-     *  Input: [0]
-     *  Output: 0
-     *
-     *  @param string $string String to extract array index from
-     *  @return string Array index
-     */
-    protected function arrayId($string)
-    {
-        $id = sscanf($string, "[%d]");  
-        if (strlen($id[0])>0) {
-          return $id[0];    
-        } else {
-          if (substr($string,0,1)=="[") {
-            $string  = substr($string,1,strlen($string));
-          }
-          if (substr($string,0,1)=="\"") {
-            $string  = substr($string,1,strlen($string));
-          }
-          if (substr($string,-1,1)=="]") {
-            $string  = substr($string,0,strlen($string)-1);
-          }
-          if (substr($string,-1,1)=="\"") {
-            $string  = substr($string,0,strlen($string)-1);
-          }
-          return $string;
-        } 
-    }
+class LuaParser {
+	private $source;
+	private $source_len;
+	
+	private $offset = 0;
+	private $line = 1;
+	private $EOF = false;
+	private $stack = array();
+	
+	private $exports = array();
+	
+	// Interface ---------------------------------------------------------------
+	
+	public function __construct($lua) {
+		$this->source = $lua;
+		$this->source_len = strlen($lua);
+	}
+	
+	// Cleaning code before parse
+	private function preparse() {
+		// Remove comments
+		//$this->_source = preg_replace("/--.*$/m", "", $this->_source); [<- BROKEN]
+	}
+	
+	// Parse and return PHP
+	public function parse() {
+		$this->preparse();
+		
+		while(!$this->isEOF()) {
+			$operands = $this->parseRoot();
+			$this->exports[$operands[0]] = $operands[1];
+		}
+		
+		return $this->exports;
+	}
+	
+	// Navigators --------------------------------------------------------------
+	
+	// <-
+	private function &back(&$value = null) {
+		if($this->offset-1 >= 0) {
+			$char = $this->source[--$this->offset];
+			if($char == "\n") $this->line--;
+		}
+		
+		return $value;
+	}
+	
+	// v
+	private function char() {
+		return $this->source[$this->offset];
+	}
+	
+	// ->
+	private function next($count = 1) {
+		if($this->offset+1 >= strlen($this->source)) {
+			$this->EOF = true;
+			return "";
+		}
+		
+		$buffer = "";
+		while($count-- && !$this->EOF) {
+			$buffer .= ($char = $this->source[$this->offset++]);
+			if($char == "\n") $this->line++;
+		}
+		
+		$this->checkEOF();
+		
+		return $buffer;
+	}
+	
+	// Stack -------------------------------------------------------------------
+	
+	private function save() {
+		array_push($this->stack, array($this->offset, $this->line, $this->EOF));
+	}
+	
+	private function delete() {
+		array_pop($this->stack);
+	}
+	
+	private function restore() {
+		$ctx = array_pop($this->stack);
+		$this->offset = $ctx[0];
+		$this->line = $ctx[1];
+		$this->EOF = $ctx[2];
+	}
+	
+	// Buffer ------------------------------------------------------------------
+	
+	private function pos() {
+		return $this->offset;
+	}
+	
+	private function slice($begin, $end) {
+		$len = ($end-1)-$begin;
+		return substr($this->source, $begin, $end-$begin);
+	}
+	
+	// Tools -------------------------------------------------------------------
+	
+	// Parse error
+	private function error($error) {
+		throw new Exception($error." (got '".$this->char()."') on line ".$this->line);
+	}
+	
+	private function errorBack($error) {
+		$this->back();
+		$this->error($error);
+	}
+	
+	private function checkEOF() {
+		if($this->EOF) {
+			$this->errorBack("unexpected end-of-file");
+		}
+	}
+	
+	// Eat whitepaces
+	private function whitespaces() {
+		$whitespaces = array(" ", "\t", "\n", "\r");
+		while(in_array($this->next(), $whitespaces) && !$this->EOF);
+		$this->back();
+		
+		if($this->EOF) {
+			return;
+		}
+		
+		$this->save();
+		if($this->next(2) == "--") {
+			$this->restore();
+			$this->comments();
+			$this->whitespaces();
+		} else {
+			$this->restore();
+		}
+	}
+	
+	// Eat comments
+	private function comments() {
+		if($this->next() == "-" && $this->next() == "-") {
+			// Multi-line
+			if($this->next() == "[" && $this->next() == "[") {
+				while($char = $this->next() && !$this->EOF) {
+					if($char == "-") {
+						$this->save();
+						if($this->next(3) == "-]]") {
+							$this->delete();
+							break;
+						}
+						$this->restore();
+					}
+				}
+				
+				$this->checkEOF();
+			} else {
+				// Single line
+				while($this->next() != "\n" && !$this->EOF);
+			}
+		} else {
+			$this->errorBack("comment expected");
+		}
+	}
+	
+	// Parsers -----------------------------------------------------------------
+	
+	// Parse a root assignment
+	private function parseRoot() {
+		$ident = $this->parseIdent();
+		$this->parseEqual();
+		$value = $this->parseValue();
+		
+		return array($ident, $value);
+	}
+	
+	// Parse a root identifier
+	private function parseIdent() {
+		static $identChars = false;
+		if(!$identChars) {
+			$identChars = str_split("abcdefghijklmnopqrstuvwxyz0123456789_");
+		}
+		
+		$this->whitespaces();
+		
+		$start = $this->pos();
+		while(in_array(strtolower($this->next()), $identChars) && !$this->EOF);
+		$this->back();
+		
+		$this->checkEOF();
+		
+		$ident = $this->slice($start, $this->pos());
+		
+		if($ident == "") {
+			$this->errorBack("identifier expected");
+		}
+		
+		return $ident;
+	}
+	
+	// Parse a '='
+	private function parseEqual() {
+		$this->whitespaces();
+		if($this->next() != "=") {
+			$this->errorBack("equal expected");
+		}
+	}
+	
+	// Parse a ','
+	private function parseComma() {
+		$this->whitespaces();
+		if($this->next() != ",") {
+			$this->errorBack("comma expected");
+		}
+	}
+	
+	// Parse a Lua value
+	private function parseValue($scalar = false) {
+		static $numChars = false;
+		if(!$numChars) {
+			$numChars = str_split("0123456789+-ex.");
+		}
+		
+		$this->whitespaces();
+		
+		switch($char = $this->char()) {
+			case "t":
+				if($scalar) {
+					$this->error("invalid scalar value");
+				}
+				if($this->next(4) != "true") {
+					$this->error("invalid boolean true");
+				}
+				return true;
+				
+			case "f":
+				if($scalar) {
+					$this->error("invalid scalar value");
+				}
+				if($this->next(5) != "false") {
+					$this->error("invalid boolean false");
+				}
+				return false;
+				
+			case "n":
+				if($scalar) {
+					$this->error("invalid scalar value");
+				}
+				if($this->next(3) != "nil") {
+					$this->error("invalid nil");
+				}
+				return null;
+				
+			case "{":
+				if($scalar) {
+					$this->error("invalid scalar value");
+				}
+				$this->next();
+				return $this->parseObject();
+				
+			case "'":
+			case '"':
+				return $this->parseString();
+				
+			default:
+				// Number
+				if(!in_array($char, $numChars)) {
+					$this->error("value expected");
+				}
+				
+				$start = $this->pos();
+				while(in_array(strtolower($this->next()), $numChars) && !$this->EOF);
+				$this->back();
+				
+				$this->checkEOF();
+				
+				$number = $this->slice($start, $this->pos());
+				
+				if(!is_numeric($number)) {
+					$this->errorBack("number expected");
+				}
+				
+				return ($number*1);
+		}
+	}
+	
+	// Parse an object
+	private function parseObject() {
+		$obj = array();
+		
+		try {
+			while(true && !$this->EOF) {
+				try {
+					$this->save();
+					$key = $this->parseKey();
+					$this->parseEqual();
+				} catch(Exception $e) {
+					$this->restore();
+					$key = false;
+				}
+				
+				$value = $this->parseValue();
+				
+				if($key) {
+					$obj[$key] = $value;
+				} else {
+					$obj[] = $value;
+				}
+				
+				$this->parseComma();
+			}
+			
+			$this->checkEOF();
+		} catch(Exception $e) {
+			try {
+				$this->parseCloseBrace();
+			} catch(Exception $e2) {
+				throw $e;
+			}
+			return $obj;
+		}
+	}
+	
+	// Parse a object key
+	private function parseKey() {
+		$this->whitespaces();
+		
+		$this->parseOpenBracket();
+		$key = $this->parseValue(true);
+		$this->parseCloseBracket();
+		
+		return $key;
+	}
+	
+	// Parse a string
+	private function parseString() {
+		$this->whitespaces();
+		
+		$delimiter = $this->next();
+		
+		if($delimiter != "'" && $delimiter != '"') {
+			$this->errorBack("invalid string delimiter");
+		}
+		
+		$start = $this->pos();
+		while(($char = $this->next()) != $delimiter && !$this->EOF) {
+			if($char == '\\') {
+				$this->next();
+			}
+		}
+		
+		$this->checkEOF();
+		
+		return $this->slice($start, $this->pos()-1);
+	}
+	
+	// Parse a '['
+	private function parseOpenBracket() {
+		$this->whitespaces();
+		if($this->next() != "[") {
+			$this->errorBack("open bracket expected");
+		}
+	}
+	
+	// Parse a ']'
+	private function parseCloseBracket() {
+		$this->whitespaces();
+		if($this->next() != "]") {
+			$this->errorBack("close bracket expected");
+		}
+	}
+	
+	// Parse '}'
+	private function parseCloseBrace() {
+		$this->whitespaces();
+		if($this->next() != "}") {
+			$this->errorBack("close brace expected");
+		}
+	}
+	
+	// Lookahead EOF
+	private function isEOF() {
+		$this->whitespaces();
+		return $this->EOF;
+	}
+}
+
+function parse_lua($lua) {
+	$parser = new LuaParser($lua);
+	return $parser->parse();
 }

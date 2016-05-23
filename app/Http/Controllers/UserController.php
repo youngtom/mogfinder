@@ -52,8 +52,8 @@ class UserController extends Controller
 				return Response::json(['success' => false, 'errormsg' => 'An unknown error occurred']);
 			}
 			
-			$parser = new LuaParser($fullPath . $filename);
-			$data = ($parser) ? $parser->toArray() : false;
+			$parser = new LuaParser(file_get_contents($fullPath . $filename));
+			$data = ($parser) ? $parser->parse() : false;
 			
 			if ($parser && $data && @$data['MCCSaved']) {
 				$fileMD5 = md5_file($fullPath . $filename);
