@@ -13,7 +13,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+	    $currentModVersion = \App\StoredVariable::where('var', '=', 'current_mod_version')->first()->val;
+        view()->share('currentModVersion', $currentModVersion);
     }
 
     /**

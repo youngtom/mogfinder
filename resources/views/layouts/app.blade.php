@@ -93,7 +93,7 @@
                         <a href="{{ url('/feedback') }}"><i class="fa fa-fw fa-envelope-o"></i> Feedback</a>
                     </li>
                     <li class="{{ set_active('download') }}">
-                        <a href="{{ url('/download') }}"><i class="fa fa-fw fa-download"></i> Download Addon v2.1.0</a>
+                        <a href="{{ url('/download') }}"><i class="fa fa-fw fa-download"></i> Download Addon v<?=$currentModVersion?></a>
                     </li>
                 </ul>
             </div>
