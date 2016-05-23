@@ -51,12 +51,23 @@ class BnetWowApi
 		return $this->_getEndpointData('/zone/', 'us');
 	}
 	
-	public function getRealmData($region) {
-		return $this->_getEndpointData('/realm/status', $region);
+	public function getRealmData($region, $locale = 'en_US') {
+		return $this->_getEndpointData('/realm/status', $region, ['locale' => $locale]);
 	}
 	
     private function _getEndpointData($endpoint, $region = 'us', $params = array(), $expirationOverride = false) {
-	    $searchURL = str_replace('{$region}', strtolower($region), Config::get('settings.bnet_api_base_url')) . $endpoint;
+	    $baseURLByRegion = [
+		    'us' => 'https://us.api.battle.net/',
+		    'eu' => 'https://eu.api.battle.net/',
+		    'kr' => 'https://kr.api.battle.net/',
+		    'tw' => 'https://tw.api.battle.net/',
+		    'cn' => 'https://api.battlenet.com.cn/'
+	    ];
+	    
+	    $region = strtolower($region);
+	    $baseURL = (array_key_exists($region, $baseURLByRegion)) ? $baseURLByRegion[$region] : Config::get('settings.bnet_api_base_url_default');
+	    
+	    $searchURL = $baseURL . $endpoint;
 	    $searchURL .= (count($params)) ? '?' . http_build_query($params) : '';
 	    $params = array_merge($this->defaultParameters, $params);
 	    $url = str_replace('{$region}', strtolower($region), Config::get('settings.bnet_api_base_url')) . $endpoint . '?' . http_build_query($params);
