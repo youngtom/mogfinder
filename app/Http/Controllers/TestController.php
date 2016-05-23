@@ -28,7 +28,7 @@ class TestController extends Controller
 {
 	public function index() {
 		$characters = Character::all();
-		foreach ($characters as $char) {
+		foreach ($characters as $character) {
 			$character->url_token = $character->getToken();
 			$character->save();
 			
