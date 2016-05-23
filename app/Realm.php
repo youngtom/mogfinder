@@ -126,6 +126,8 @@ class Realm extends Model
 					\Log::error('Malformed data for realm import: ' . $name . ' - ' . $slug . ' (' . $region . ')');
 				}
 		    }
+		} else {
+			\Log::error('Realm data not found for region: ' . $region);
 		}
     }
 }
