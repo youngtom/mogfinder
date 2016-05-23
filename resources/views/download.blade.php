@@ -16,8 +16,8 @@
 		    </div>
 		</div>
 		<div class="row">
-			<h2>Addon Change History:</h2>
 			<dl class="dl-horizontal">
+				<dd><h2>Addon Change History</h2></dd>
 				<dt>2.1.0</dt>
 				<dd>Added guild bank scanning. "/mcc gb" to scan the current tab of the guild bank. "/mcc gbclear" to clear current guild data.</dd>
 				<dd>Added completed quest scanning</dd>
