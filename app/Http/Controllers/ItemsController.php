@@ -301,6 +301,116 @@ class ItemsController extends Controller
 	    return $this->showItemDisplays($displays, $mogslot)->with('headerText', ucwords($mogslot->mogslotCategory->group) . ': <em>' . $mogslot->label . '</em>')->with('pageTitle', ucwords($mogslot->mogslotCategory->group) . ': ' . $mogslot->label);
     }
     
+    public function itemFinder(Request $request) {
+	    $classes = CharClass::orderBy('name', 'ASC')->get();
+	    $factions = Faction::whereNotNull('race_bitmask')->get();
+	    $mogslotCategories = MogslotCategory::all();
+	    $mogslotsByCategory = Mogslot::whereNotNull('mogslot_category_id')->orderBy('simple_label', 'ASC')->get()->groupBy('mogslot_category_id');
+	    $allSources = ItemSourceType::whereNotNull('url_token')->orderBy('ordering', 'ASC')->get();
+	    
+	    $zones = Zone::orderBy('name', 'ASC')->get();
+	    $zoneCategories = ZoneCategory::whereIn('id', $zones->lists('zone_category_id')->toArray())->get();
+	    
+	    $zonesByCategory = $zones->groupBy('zone_category_id');
+	    $bossesByZone = Boss::whereNull('parent_boss_id')->orderBy('bnet_id', 'ASC')->get()->groupBy('zone_id');
+	    
+	    $searchError = false;
+	    
+	    if (array_filter($request->all())) {
+		    $request->flash();
+		    $submitted = true;
+		    $displays = collect();
+		    
+		    $showCollected = ($request->input('show_collected')) ? true : false;
+		    $showUncollected = ($request->input('show_uncollected')) ? true : false;
+		    
+		    if ($showCollected || $showUncollected) {
+			    $selectedCat = ($request->input('cat')) ? MogslotCategory::find($request->input('cat')) : false;
+			    $selectedSlot = ($request->input('slot')) ? Mogslot::find($request->input('slot')) : false;
+			    
+			    $selectedZone = ($request->input('zone')) ? Zone::find($request->input('zone')) : false;
+			    $selectedBoss = ($request->input('boss')) ? Boss::find($request->input('boss')) : false;
+			    $selectedSourceType = ($request->input('source')) ? ItemSourceType::where('url_token', '=', $request->input('source'))->first() : false;
+			    $selectedFaction = ($request->input('faction') && $request->input('faction') <= 2) ? Faction::find($request->input('faction')) : false;
+			    $selectedClass = ($request->input('class')) ? CharClass::find($request->input('class')) : false;
+			    
+			    if ($request->input('item_name')) {
+				    $items = $this->searchItems($request->input('item_name'), true, false, false);
+			    } else {
+				    $items = Item::where('transmoggable', '=', 1)->get();
+			    }
+			    
+			    $itemIDs = $items->lists('id')->toArray();
+			    
+			    if ($selectedBoss && count($itemIDs)) {
+				    $bossItemIDs = array_unique(ItemSource::where('boss_id', '=', $boss->id)->whereIn('item_id', $itemIDs)->get(['item_id'])->lists('item_id')->toArray());
+				    $itemIDs = array_intersect($itemIDs, $bossItemIDs);
+			    }
+			    
+			    if ($selectedZone && count($itemIDs)) {
+				    $zoneSourceTypeIDs = ItemSourceType::where('zone_relevant', '=', 1)->get()->lists('id')->toArray();
+					$zoneItemIDs = array_unique(ItemSource::where('zone_id', '=', $selectedZone->id)->whereIn('item_source_type_id', $zoneSourceTypeIDs)->whereIn('item_id', $itemIDs)->get(['item_id'])->lists('item_id')->toArray());
+					$itemIDs = array_intersect($itemIDs, $zoneItemIDs);
+			    }
+			    
+			    if ($selectedSourceType && count($itemIDs)) {
+				    $sourceItemIDs = array_unique(ItemSource::where('item_source_type_id', '=', $selectedSourceType->id)->whereIn('item_id', $itemIDs)->get(['item_id'])->lists('item_id')->toArray());
+				    
+				    if ($request->input('only_selected_source')) {
+					    $otherSourceItemIDs = array_unique(ItemSource::where('item_source_type_id', '<>', $selectedSourceType->id)->whereIn('item_id', $itemIDs)->get(['item_id'])->lists('item_id')->toArray());
+					    $sourceItemIDs = array_diff($itemIDs, $otherSourceItemIDs);
+				    }
+				    $itemIDs = array_intersect($itemIDs, $sourceItemIDs);
+			    }
+			    
+			    if (count($itemIDs)) {
+				    $displayIDs = Item::whereIn('id', $itemIDs)->get(['item_display_id'])->lists('item_display_id')->toArray();
+				    
+				    if ($selectedSlot) {
+					    $mogslots = Mogslot::where('id', '=', $selectedSlot->id)->get();
+				    } elseif ($selectedCat) {
+					    $mogslots = Mogslot::where('mogslot_category_id', '=', $selectedCat->id)->get();
+				    } else {
+					    $mogslots = Mogslot::all();
+				    }
+				    
+				    $displays = ItemDisplay::whereIn('id', $displayIDs)->whereIn('mogslot_id', $mogslots->lists('id')->toArray())->get();
+				    
+				    if ($selectedClass || $selectedRace) {
+					    $classmask = ($selectedClass) ? pow(2, $selectedClass->id) : false;
+					    $racemask = ($selectedFaction) ? $selectedFaction->race_bitmask : false;
+					    
+					    $displays = $displays->filter(function ($display) use ($classmask, $racemask) {
+						    return ((!$racemask || $display->restricted_races === null || ($display->restricted_races & $racemask) != 0) && (!$classMask || $display->restricted_classes === null || ($display->restricted_classes & $classmask) != 0));
+						});
+				    }
+				    
+				    if ($showCollected != $showUncollected) {
+					    $userItems = $user->userItems()->whereIn('item_display_id', $displays->lists('id')->toArray())->get();
+					    $userDisplayIDs = array_unique($userItems->lists('item_display_id')->toArray());
+					    
+					    $displays = $displays->filter(function ($display) use ($showCollected, $userDisplayIDs) {
+						    if ($showCollected) {
+							    return in_array($display->id, $userDisplayIDs);
+						    } else {
+							    return !in_array($display->id, $userDisplayIDs);
+						    }
+					    });
+				    }
+			    }
+			} else {
+				$searchError = 'Please select collected and/or not collected appearance checkbox.';
+			}
+		    
+		    $view = $this->showItemDisplays($displays, false, $itemIDs, 'items.item-finder');
+	    } else {
+		    $submitted = false;
+		    $view = view('items.item-finder');
+	    }
+	    
+	    return $view->with('allSources', $allSources)->with('allClasses', $classes)->with('allFactions', $factions)->with('mogslotCategories', $mogslotCategories)->with('mogslots', $mogslotsByCategory)->with('selectedCat', false)->with('selectedZone', false)->with('zonesByCategory', $zonesByCategory)->with('zoneCategories', $zoneCategories)->with('bossesByZone', $bossesByZone)->with('submitted', $submitted)->with('searchError', $searchError);
+    }
+    
     public function searchHints($query) {
 	    $q = '"' . $query . '"';
 	    $results = [];
@@ -425,81 +535,7 @@ class ItemsController extends Controller
     }
     
     public function search($query) {
-	    $query = str_replace('+', ' ', $query);
-	    $q = '"' . $query . '"';
-	    $items = collect();
-	    
-	    if (is_numeric($query)) {
-		    $bnetIDItems = Item::where('bnet_id', '=', $query)->get();
-		    
-		    foreach ($bnetIDItems as $item) {
-			    if ($item->transmoggable == 1 && $item->item_display_id) {
-				    $items->push($item);
-			    } else {
-				    $sourceItemIDs = ItemSource::where('source_item_id', '=', $item->id)->get()->lists('item_id')->toArray();
-				    
-				    if (count($sourceItemIDs)) {
-					    $sourceItems = Item::whereIn('id', $sourceItemIDs)->where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->get();
-					    
-					    $items = $items->merge($sourceItems);
-				    }
-			    }
-		    }
-	    } else {
-			//search for items
-			$itemsByName = Item::where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->search($q)->get();
-			$items = $items->merge($itemsByName);
-			
-			//search for items from related items
-			$allRelatedItemIDs = ItemSource::whereNotNull('source_item_id')->get(['source_item_id'])->lists('source_item_id')->toArray();
-			$relatedItemIDs = Item::whereIn('id', $allRelatedItemIDs)->search($q)->get()->lists('id')->toArray();
-			
-			if (count($relatedItemIDs)) {
-				$itemIDs = ItemSource::whereIn('source_item_id', $relatedItemIDs)->get()->lists('item_id')->toArray();
-				$itemsFromItems = Item::whereIn('id', $itemIDs)->where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->get();
-				$items = $items->merge($itemsFromItems);
-			}
-		    
-		    //search for bosses
-			$bosses = ($items->count()) ? Boss::where('name', '=', $query)->get() : Boss::search($q)->get();
-			
-			if ($bosses->count()) {
-				$itemIDs = [];
-				foreach ($bosses as $boss) {
-					$itemIDs = array_merge($itemIDs, ItemSource::where('boss_id', '=', $boss->id)->get()->lists('item_id')->toArray());
-				}
-				
-				if (count($itemIDs)) {
-					$bossItems = Item::whereIn('id', $itemIDs)->where('transmoggable', '=', 1)->where('item_display_id', '>', 0)->get();
-					$items = $items->merge($bossItems);
-				}
-			}
-			
-			//search for zones
-			$zones = ($items->count()) ? Zone::where('name', '=', $query)->get() : Zone::search($q)->get();
-			
-			if ($zones->count()) {
-				$itemIDs = [];
-				$zoneSourceTypeIDs = ItemSourceType::where('zone_relevant', '=', 1)->get()->lists('id')->toArray();
-				
-				foreach ($zones as $zone) {
-				    $itemIDs = array_merge($itemIDs, ItemSource::where('zone_id', '=', $zone->id)->whereIn('item_source_type_id', $zoneSourceTypeIDs)->get()->lists('item_id')->toArray());
-				}
-				
-				if (count($itemIDs)) {
-					$zoneItems = Item::whereIn('id', $itemIDs)->where('transmoggable', '=', 1)->where('item_display_id', '>', 0)->get();
-					$items = $items->merge($zoneItems);
-				}
-			}
-			
-			//search source labels
-			$sourceItemIDs = ($items->count()) ? ItemSource::where('label', '=', $query)->get()->lists('item_id')->toArray() : ItemSource::search($q)->get()->lists('item_id')->toArray();;
-			
-			if (count($sourceItemIDs)) {
-				$sourceItems = Item::whereIn('id', $sourceItemIDs)->where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->get();
-				$items = $items->merge($sourceItems);
-			}
-		}
+	    $items = $this->searchItems($query);
 		
 	    $itemIDs = $items->lists('id')->toArray();
 	    
@@ -521,7 +557,92 @@ class ItemsController extends Controller
 	    return $this->showItemDisplays($displays, false, $itemIDs)->with('headerText', 'Search results for: <em>' . $query . '</em>')->with('search', true)->with('pageTitle', 'Search | ' . $query);
     }
     
-    protected function showItemDisplays($displays, $mogslot = false, $priorityItemIDs = []) {
+    protected function searchItems($query, $searchItemNames = true, $searchZones = true, $searchBosses = true, $searchSources = true) {
+	    $query = str_replace('+', ' ', $query);
+	    $q = '"' . $query . '"';
+	    $items = collect();
+	    
+	    if (is_numeric($query)) {
+		    $bnetIDItems = Item::where('bnet_id', '=', $query)->get();
+		    
+		    foreach ($bnetIDItems as $item) {
+			    if ($item->transmoggable == 1 && $item->item_display_id) {
+				    $items->push($item);
+			    } else {
+				    $sourceItemIDs = ItemSource::where('source_item_id', '=', $item->id)->get()->lists('item_id')->toArray();
+				    
+				    if (count($sourceItemIDs)) {
+					    $sourceItems = Item::whereIn('id', $sourceItemIDs)->where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->get();
+					    
+					    $items = $items->merge($sourceItems);
+				    }
+			    }
+		    }
+	    } else {
+		    if ($searchItemNames) {
+				//search for items
+				$itemsByName = Item::where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->search($q)->get();
+				$items = $items->merge($itemsByName);
+				
+				//search for items from related items
+				$allRelatedItemIDs = ItemSource::whereNotNull('source_item_id')->get(['source_item_id'])->lists('source_item_id')->toArray();
+				$relatedItemIDs = Item::whereIn('id', $allRelatedItemIDs)->search($q)->get()->lists('id')->toArray();
+				
+				if (count($relatedItemIDs)) {
+					$itemIDs = ItemSource::whereIn('source_item_id', $relatedItemIDs)->get()->lists('item_id')->toArray();
+					$itemsFromItems = Item::whereIn('id', $itemIDs)->where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->get();
+					$items = $items->merge($itemsFromItems);
+				}
+			}
+		    
+		    if ($searchBosses) { //search for bosses
+				$bosses = ($items->count()) ? Boss::where('name', '=', $query)->get() : Boss::search($q)->get();
+				
+				if ($bosses->count()) {
+					$itemIDs = [];
+					foreach ($bosses as $boss) {
+						$itemIDs = array_merge($itemIDs, ItemSource::where('boss_id', '=', $boss->id)->get()->lists('item_id')->toArray());
+					}
+					
+					if (count($itemIDs)) {
+						$bossItems = Item::whereIn('id', $itemIDs)->where('transmoggable', '=', 1)->where('item_display_id', '>', 0)->get();
+						$items = $items->merge($bossItems);
+					}
+				}
+			}
+			
+			if ($searchZones) { //search for zones
+				$zones = ($items->count()) ? Zone::where('name', '=', $query)->get() : Zone::search($q)->get();
+				
+				if ($zones->count()) {
+					$itemIDs = [];
+					$zoneSourceTypeIDs = ItemSourceType::where('zone_relevant', '=', 1)->get()->lists('id')->toArray();
+					
+					foreach ($zones as $zone) {
+					    $itemIDs = array_merge($itemIDs, ItemSource::where('zone_id', '=', $zone->id)->whereIn('item_source_type_id', $zoneSourceTypeIDs)->get()->lists('item_id')->toArray());
+					}
+					
+					if (count($itemIDs)) {
+						$zoneItems = Item::whereIn('id', $itemIDs)->where('transmoggable', '=', 1)->where('item_display_id', '>', 0)->get();
+						$items = $items->merge($zoneItems);
+					}
+				}
+			}
+			
+			if ($searchSources) { //search source labels
+				$sourceItemIDs = ($items->count()) ? ItemSource::where('label', '=', $query)->get()->lists('item_id')->toArray() : ItemSource::search($q)->get()->lists('item_id')->toArray();;
+				
+				if (count($sourceItemIDs)) {
+					$sourceItems = Item::whereIn('id', $sourceItemIDs)->where('item_display_id', '>', 0)->where('transmoggable', '=', 1)->get();
+					$items = $items->merge($sourceItems);
+				}
+			}
+		}
+		
+		return $items;
+    }
+    
+    protected function showItemDisplays($displays, $mogslot = false, $priorityItemIDs = [], $template = 'items.display-list') {
 	    $user = Auth::user();
 	    
 	    $dispIds = $displays->lists('id');
@@ -574,7 +695,7 @@ class ItemsController extends Controller
 			$factions = false;
 		}
 	    
-	    return view('items.display-list')->with('mogslot', $mogslot)->with('itemDisplays', $displays)->with('user', $user)->with('userDisplayIDs', $userDisplayIDs)->with('userItemIDs', $userItemIDs)->with('classes', $classes)->with('factions', $factions)->with('itemSourceTypes', $itemSourceTypes)->with('priorityItemIDs', $priorityItemIDs);
+	    return view($template)->with('mogslot', $mogslot)->with('itemDisplays', $displays)->with('user', $user)->with('userDisplayIDs', $userDisplayIDs)->with('userItemIDs', $userItemIDs)->with('classes', $classes)->with('factions', $factions)->with('itemSourceTypes', $itemSourceTypes)->with('priorityItemIDs', $priorityItemIDs);
     }
     
     public function legacyDisplays() {
@@ -594,7 +715,7 @@ class ItemsController extends Controller
 	    
 	    $classes = CharClass::orderBy('name', 'ASC')->get();
 	    $mogslotCategories = MogslotCategory::all();
-	    $mogslotsByCategory = Mogslot::orderBy('simple_label', 'ASC')->get()->groupBy('mogslot_category_id');
+	    $mogslotsByCategory = Mogslot::whereNotNull('mogslot_category_id')->orderBy('simple_label', 'ASC')->get()->groupBy('mogslot_category_id');
 	    
 	    return view('items.auctions')->with('classes', $classes)->with('mogslotCategories', $mogslotCategories)->with('mogslots', $mogslotsByCategory)->with('auctions', $auctions)->with('selectedClass', false)->with('selectedCat', false)->with('selectedSlot', false)->with('error', $error)->with('pageTitle', 'Legacy Auctions');
     }
@@ -604,7 +725,7 @@ class ItemsController extends Controller
 	    
 	    $classes = CharClass::orderBy('name', 'ASC')->get();
 	    $mogslotCategories = MogslotCategory::all();
-	    $mogslotsByCategory = Mogslot::orderBy('simple_label', 'ASC')->get()->groupBy('mogslot_category_id');
+	    $mogslotsByCategory = Mogslot::whereNotNull('mogslot_category_id')->orderBy('simple_label', 'ASC')->get()->groupBy('mogslot_category_id');
 	    
 	    $class = $request->input('class') ? CharClass::find($request->input('class')) : false;
 	    $slotID = $request->input('slot') ?: false;

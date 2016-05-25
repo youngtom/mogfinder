@@ -5,16 +5,12 @@
 @stop
 
 @section('js')
-	<script src="{{ asset('js/auctions.js') }}"></script>
+	<script src="{{ asset('js/class-type-toggle.js') }}"></script>
+	<script src="{{ asset('//wow.zamimg.com/widgets/power.js') }}"></script>
 @stop
 
 @section('content')
-<script>
-	var mogslots = <?=$mogslots->toJson()?>;
-	var categories = <?=$mogslotCategories->toJson()?>;
-	var classes = <?=$classes->toJson()?>;
-</script>
-
+@include('shared.class-type-toggle')
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-10 col-md-offset-1 item-scroll-with-nav">

@@ -15,8 +15,6 @@ $(document).ready(function () {
 	$('select#class').on('change', function () {
 		filterSlotSelect($('option:selected', $(this)).attr('data-classmask'));
 	}).trigger('change');
-	
-	$.getScript('//wow.zamimg.com/widgets/power.js');
 });
 
 function filterClassSelect(filterMask) {

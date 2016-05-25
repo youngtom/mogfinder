@@ -1,0 +1,9 @@
+#appearance-finder-form .col-sm-2,
+#appearance-finder-form .col-sm-3,
+#appearance-finder-form .col-sm-4,
+#appearance-finder-form .col-sm-6 {
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+#appearance-finder-form label { padding-right: 10px; width: 100%; }

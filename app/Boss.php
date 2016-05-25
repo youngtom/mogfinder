@@ -11,6 +11,7 @@ class Boss extends Model
 	
 	protected $fillable = ['bnet_id', 'parent_boss_id'];
 	protected $searchableColumns = ['name'];
+	protected $visible = ['id', 'name'];
 	
 	public function parentBoss() {
 		return $this->belongsTo('App\Boss', 'parent_boss_id');

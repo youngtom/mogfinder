@@ -20,6 +20,10 @@ class Zone extends Model
 		return $this->hasMany('App\Boss');
 	}
 	
+	public function encounter() {
+		return $this->hasMany('App\Boss')->whereNull('parent_boss_id');
+	}
+	
 	public function itemDisplays() {
 		return $this->belongsToMany('App\ItemDisplay');
 	}
