@@ -159,7 +159,7 @@
 	</div>
     <div class="row">
         <div class="col-md-10 col-md-offset-1 <?=(@count($itemDisplays) > 1) ? 'item-scroll-with-nav' : ''?>">
-	        <?php if (@count($itemDisplays) > 1) { ?>
+	        <?php if (false && @count($itemDisplays) > 1) { ?>
 	        @include('items.shared.display-filter')
 			<?php } ?>
 			
