@@ -374,6 +374,13 @@ class ItemsController extends Controller
 					    $mogslots = Mogslot::all();
 				    }
 				    
+				    if ($selectedClass) {
+						$classmask = pow(2, $selectedClass->id);
+						$mogslots = $mogslots->filter(function ($mogslot) use ($classmask) {
+							return ($mogslot->allowed_class_bitmask === null || (($classmask & $mogslot->allowed_class_bitmask) !== 0));
+						});
+				    }
+				    
 				    $displays = ItemDisplay::whereIn('id', $displayIDs)->whereIn('mogslot_id', $mogslots->lists('id')->toArray())->get();
 				    
 				    if ($selectedClass || $selectedRace) {
