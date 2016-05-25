@@ -83,7 +83,7 @@
 					<div class="col-sm-2">
 				        <label class="control-label" for="class">Source:</label>
 					</div>
-			        <div class="col-sm-4">
+			        <div class="col-sm-6">
 				        <select class="form-control" name="source" id="source">
 					        <option value="" data-keep="1">Any</option>
 					        <?php foreach ($allSources as $sourceType) { ?>
@@ -91,6 +91,7 @@
 					        <?php } ?>
 				        </select>
 			        </div>
+			        <?php /*
 			        <div class="col-sm-3">
 				    	<div id="only-this-source" class="checkbox <?=(old('source')) ? '' : 'hidden'?>">
 							<label>
@@ -98,6 +99,7 @@
 							</label>
 						</div>
 			        </div>
+			        */?>
 		        </div>
 		        <div class="form-group">
 			        <div class="col-sm-2">
