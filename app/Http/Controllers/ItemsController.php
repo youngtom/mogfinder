@@ -381,7 +381,7 @@ class ItemsController extends Controller
 					    $racemask = ($selectedFaction) ? $selectedFaction->race_bitmask : false;
 					    
 					    $displays = $displays->filter(function ($display) use ($classmask, $racemask) {
-						    return ((!$racemask || $display->restricted_races === null || ($display->restricted_races & $racemask) != 0) && (!$classMask || $display->restricted_classes === null || ($display->restricted_classes & $classmask) != 0));
+						    return ((!$racemask || $display->restricted_races === null || ($display->restricted_races & $racemask) != 0) && (!$classmask || $display->restricted_classes === null || ($display->restricted_classes & $classmask) != 0));
 						});
 				    }
 				    
