@@ -405,10 +405,12 @@ class ItemsController extends Controller
 				$searchError = 'Please select collected and/or not collected appearance checkbox.';
 			}
 		    
-		    $view = $this->showItemDisplays($displays, false, $itemIDs, 'items.item-finder')->with('headerText', 'Search Results: ' . $display->count() . ' appearances found.');
+		    $view = $this->showItemDisplays($displays, false, $itemIDs, 'items.item-finder')->with('headerText', 'Search Results: ' . $displays->count() . ' appearances found.');
 	    } else {
 		    $submitted = false;
 		    $view = view('items.item-finder');
+		    $selectedCat = false;
+		    $selectedZone = false;
 	    }
 	    
 	    return $view->with('allSources', $allSources)->with('allClasses', $classes)->with('allFactions', $factions)->with('mogslotCategories', $mogslotCategories)->with('mogslots', $mogslotsByCategory)->with('selectedCat', $selectedCat)->with('selectedZone', $selectedZone)->with('zonesByCategory', $zonesByCategory)->with('zoneCategories', $zoneCategories)->with('bossesByZone', $bossesByZone)->with('submitted', $submitted)->with('searchError', $searchError);
