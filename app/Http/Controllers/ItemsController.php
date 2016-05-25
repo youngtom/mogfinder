@@ -357,7 +357,7 @@ class ItemsController extends Controller
 				    $sourceItemIDs = array_unique(ItemSource::where('item_source_type_id', '=', $selectedSourceType->id)->whereIn('item_id', $itemIDs)->get(['item_id'])->lists('item_id')->toArray());
 				    
 				    if ($request->input('only_selected_source')) {
-					    $otherSourceItemIDs = array_unique(ItemSource::where('item_source_type_id', '<>', $selectedSourceType->id)->whereIn('item_id', $itemIDs)->get(['item_id'])->lists('item_id')->toArray());
+					    $otherSourceItemIDs = array_unique(ItemSource::where('item_source_type_id', '<>', $selectedSourceType->id)->whereIn('item_id', $sourceItemIDs)->get(['item_id'])->lists('item_id')->toArray());
 					    $sourceItemIDs = array_diff($itemIDs, $otherSourceItemIDs);
 				    }
 				    $itemIDs = array_intersect($itemIDs, $sourceItemIDs);
