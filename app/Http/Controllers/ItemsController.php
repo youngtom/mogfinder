@@ -415,7 +415,7 @@ class ItemsController extends Controller
 		    $view = view('items.item-finder');
 	    }
 	    
-	    return $view->with('allSources', $allSources)->with('allClasses', $classes)->with('allFactions', $factions)->with('mogslotCategories', $mogslotCategories)->with('mogslots', $mogslotsByCategory)->with('selectedCat', false)->with('selectedZone', false)->with('zonesByCategory', $zonesByCategory)->with('zoneCategories', $zoneCategories)->with('bossesByZone', $bossesByZone)->with('submitted', $submitted)->with('searchError', $searchError);
+	    return $view->with('allSources', $allSources)->with('allClasses', $classes)->with('allFactions', $factions)->with('mogslotCategories', $mogslotCategories)->with('mogslots', $mogslotsByCategory)->with('selectedCat', $selectedCat)->with('selectedZone', $selectedZone)->with('zonesByCategory', $zonesByCategory)->with('zoneCategories', $zoneCategories)->with('bossesByZone', $bossesByZone)->with('submitted', $submitted)->with('searchError', $searchError);
     }
     
     public function searchHints($query) {
