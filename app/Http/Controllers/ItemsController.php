@@ -386,7 +386,7 @@ class ItemsController extends Controller
 				    }
 				    
 				    if ($showCollected != $showUncollected) {
-					    $userItems = $user->userItems()->whereIn('item_display_id', $displays->lists('id')->toArray())->get();
+					    $userItems = Auth::user()->userItems()->whereIn('item_display_id', $displays->lists('id')->toArray())->get();
 					    $userDisplayIDs = array_unique($userItems->lists('item_display_id')->toArray());
 					    
 					    $displays = $displays->filter(function ($display) use ($showCollected, $userDisplayIDs) {
