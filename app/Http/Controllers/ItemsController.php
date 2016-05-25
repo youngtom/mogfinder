@@ -405,7 +405,7 @@ class ItemsController extends Controller
 				$searchError = 'Please select collected and/or not collected appearance checkbox.';
 			}
 		    
-		    $view = $this->showItemDisplays($displays, false, $itemIDs, 'items.item-finder');
+		    $view = $this->showItemDisplays($displays, false, $itemIDs, 'items.item-finder')->with('headerText', 'Search Results');
 	    } else {
 		    $submitted = false;
 		    $view = view('items.item-finder');
