@@ -354,18 +354,13 @@ class ItemsController extends Controller
 			    }
 			    
 			    if ($selectedSourceType && count($itemIDs)) {
-				    echo count($itemIDs) . '<br>';
-				    $sourceItemIDs = array_unique(ItemSource::where('item_source_type_id', '=', $selectedSourceType->id)->get(['item_id'])->lists('item_id')->toArray());
-				    echo count($sourceItemIDs) . '<br>';
+				    $sourceItemIDs = array_unique(ItemSource::where('item_source_type_id', '=', $selectedSourceType->id)->whereIn('item_id', $itemIDs)->get(['item_id'])->lists('item_id')->toArray());
 				    
 				    if ($request->input('only_selected_source')) {
 					    $otherSourceItemIDs = array_unique(ItemSource::where('item_source_type_id', '<>', $selectedSourceType->id)->whereIn('item_id', $sourceItemIDs)->get(['item_id'])->lists('item_id')->toArray());
 					    $sourceItemIDs = array_diff($sourceItemIDs, $otherSourceItemIDs);
 				    }
-				    echo count($sourceItemIDs) . '<br>';
 				    $itemIDs = array_intersect($itemIDs, $sourceItemIDs);
-				    echo count($itemIDs) . '<br>';
-				    die;
 			    }
 			    
 			    if (count($itemIDs)) {
