@@ -329,16 +329,16 @@ class ItemsController extends Controller
 		    $showCollected = ($request->input('show_collected')) ? true : false;
 		    $showUncollected = ($request->input('show_uncollected')) ? true : false;
 		    
-		    if ($showCollected || $showUncollected) {
-			    $selectedCat = ($request->input('cat')) ? MogslotCategory::find($request->input('cat')) : false;
-			    $selectedSlot = ($request->input('slot')) ? Mogslot::find($request->input('slot')) : false;
-			    
-			    $selectedZone = ($request->input('zone')) ? Zone::find($request->input('zone')) : false;
-			    $selectedBoss = ($request->input('boss')) ? Boss::find($request->input('boss')) : false;
-			    $selectedSourceType = ($request->input('source')) ? ItemSourceType::where('url_token', '=', $request->input('source'))->first() : false;
-			    $selectedFaction = ($request->input('faction') && $request->input('faction') <= 2) ? Faction::find($request->input('faction')) : false;
-			    $selectedClass = ($request->input('class')) ? CharClass::find($request->input('class')) : false;
-			    
+		    $selectedCat = ($request->input('cat')) ? MogslotCategory::find($request->input('cat')) : false;
+		    $selectedSlot = ($request->input('slot')) ? Mogslot::find($request->input('slot')) : false;
+		    
+		    $selectedZone = ($request->input('zone')) ? Zone::find($request->input('zone')) : false;
+		    $selectedBoss = ($request->input('boss')) ? Boss::find($request->input('boss')) : false;
+		    $selectedSourceType = ($request->input('source')) ? ItemSourceType::where('url_token', '=', $request->input('source'))->first() : false;
+		    $selectedFaction = ($request->input('faction') && $request->input('faction') <= 2) ? Faction::find($request->input('faction')) : false;
+		    $selectedClass = ($request->input('class')) ? CharClass::find($request->input('class')) : false;
+		    
+		    if (($showCollected || $showUncollected) && ($selectedCat || $selectedSlot || $selectedBoss || $selectedSourceType || $selectedFaction || $selectedClass)) {
 			    if ($request->input('item_name')) {
 				    $items = $this->searchItems($request->input('item_name'), true, false, false);
 			    } else {
@@ -429,7 +429,11 @@ class ItemsController extends Controller
 				    $searchError = 'No appearances found. Please try again.';
 			    }
 			} else {
-				$searchError = 'Please select collected and/or not collected appearance checkbox.';
+				if (!($showCollected || $showUncollected)) {
+					$searchError = 'Please select collected and/or not collected appearance checkbox.';
+				} else {
+					$searchError = 'Please add at least one filter to your search.';
+				}
 			}
 	    }
 	    
