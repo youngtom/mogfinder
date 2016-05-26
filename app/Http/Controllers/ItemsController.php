@@ -412,6 +412,10 @@ class ItemsController extends Controller
 				    }
 				    
 				    $displays = $displays->paginate(500);
+				    
+				    if ($request->input('test')) {
+					    echo $displays->total(); die;
+				    }
 					
 					if ($displays->count()) {
 						if ($displays->total() > $displays->count()) {
