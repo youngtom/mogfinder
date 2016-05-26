@@ -27,6 +27,7 @@ use DB;
 class TestController extends Controller
 {
 	public function index() {
+		echo $d->count(); die;
 		$characters = Character::all();
 		foreach ($characters as $character) {
 			$character->url_token = $character->getToken();

@@ -377,29 +377,36 @@ class ItemsController extends Controller
 						});
 				    }
 				    
-				    $displays = ItemDisplay::whereIn('id', $displayIDs)->whereIn('mogslot_id', $mogslots->lists('id')->toArray())->get();
-				    
-				    if ($selectedClass || $selectedRace) {
-					    $classmask = ($selectedClass) ? pow(2, $selectedClass->id) : false;
-					    $racemask = ($selectedFaction) ? $selectedFaction->race_bitmask : false;
-					    
-					    $displays = $displays->filter(function ($display) use ($classmask, $racemask) {
-						    return ((!$racemask || $display->restricted_races === null || ($display->restricted_races & $racemask) != 0) && (!$classmask || $display->restricted_classes === null || ($display->restricted_classes & $classmask) != 0));
-						});
-				    }
-				    
 				    if ($showCollected != $showUncollected) {
 					    $userItems = Auth::user()->userItems()->whereIn('item_display_id', $displays->lists('id')->toArray())->get();
 					    $userDisplayIDs = array_unique($userItems->lists('item_display_id')->toArray());
 					    
-					    $displays = $displays->filter(function ($display) use ($showCollected, $userDisplayIDs) {
-						    if ($showCollected) {
-							    return in_array($display->id, $userDisplayIDs);
-						    } else {
-							    return !in_array($display->id, $userDisplayIDs);
-						    }
+					    if ($showCollected) {
+						    $displayIDs = array_intersect($displayIDs, $userDisplayIDs);
+					    } else {
+						    $displayIDs = array_diff($displayIDs, $userDisplayIDs);
+					    }
+				    }
+				    
+				    $displays = ItemDisplay::whereIn('id', $displayIDs)->whereIn('mogslot_id', $mogslots->lists('id')->toArray())->get();
+				    
+				    if ($selectedClass) {
+					    $classmask = pow(2, $selectedClass->id);
+					    $displays = $displays->where(function ($query) use ($classmask) {
+						    $query->whereNull('restricted_classes');
+						    $query->orWhere('restricted_classes', '&', $classmask);
 					    });
 				    }
+				    
+				    if ($selectedFaction) {
+					    $racemask = $selectedFaction->race_bitmask;
+					    $displays = $displays->where(function ($query) use ($racemask) {
+						    $query->whereNull('restricted_races');
+						    $query->orWhere('restricted_races', '&', $racemask);
+					    });
+				    }
+				    
+				    $displays = $displays->get();
 			    }
 			} else {
 				$searchError = 'Please select collected and/or not collected appearance checkbox.';
