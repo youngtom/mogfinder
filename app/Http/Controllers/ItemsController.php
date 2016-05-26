@@ -411,7 +411,7 @@ class ItemsController extends Controller
 					    });
 				    }
 				    
-				    $displays = $displays->paginate(1000);
+				    $displays = $displays->paginate(500);
 					
 					if ($displays->count()) {
 						if ($displays->total() > $displays->count()) {
