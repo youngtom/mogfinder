@@ -19,6 +19,9 @@
 </script>
 
 <div class="container-fluid">
+	<div class="page-header">
+		<h1>Appearance Finder</h1>
+	</div>
 	<div class="row">
 		<div class="col-md-7 col-md-offset-3">
 			<form class="form-horizontal" id="appearance-finder-form" method="get">
@@ -164,8 +167,11 @@
 			<?php } ?>
 			
 	        <?php if (@$headerText) { ?>
-	        <div class="display-title">
-		        <h2><?=$headerText?></h2>
+	        <div class="display-title clearfix">
+		        <h2 class="pull-left"><?=$headerText?></h2>
+		        <div class="pull-right">
+			        {!! $itemDisplays->appends($request->all())->render() !!}
+		        </div>
 	        </div>
 	        <?php } ?>
 			

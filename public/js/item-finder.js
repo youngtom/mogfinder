@@ -1,4 +1,13 @@
 $(document).ready(function () {
+	$('.form-control').on('change', function () {
+		if ($(this).val()) {
+			$(this).addClass('has-input');
+		} else {
+			$(this).removeClass('has-input');
+		}
+	});
+	$('.form-control').trigger('change');
+	
 	$('select#source').on('change', function () {
 		if ($('option:selected', $(this)).val()) {
 			$('#only-this-source').removeClass('hidden');
@@ -13,8 +22,6 @@ $(document).ready(function () {
 		
 		toggleBossSelect(zoneID, false);
 	});
-	
-	
 });
 
 function toggleBossSelect(zoneID, currentSelectedBoss) {	

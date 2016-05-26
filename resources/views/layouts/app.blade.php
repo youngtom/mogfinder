@@ -11,7 +11,7 @@
 
     <title>MogCollector<?=(@$pageTitle) ? ' | ' . $pageTitle : ''?></title>
 
-    <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/sb-admin.css') }}" rel="stylesheet">
     <link href="{{ asset('css/main.css') }}" rel="stylesheet">
     @yield('css')
@@ -80,6 +80,9 @@
                             </li>
                             <li>
                                 <a href="{{ url('/wardrobe/auctions') }}">Auction Search</a>
+                            </li>
+                            <li>
+                                <a href="{{ url('/wardrobe/appearance-finder') }}">Appearance Finder</a>
                             </li>
                             <li>
                                 <a href="{{ url('/wardrobe/duplicates') }}">Duplicates</a>

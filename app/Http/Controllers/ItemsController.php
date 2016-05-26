@@ -302,6 +302,11 @@ class ItemsController extends Controller
     }
     
     public function itemFinder(Request $request) {
+	    $view = false;
+	    $selectedCat = false;
+	    $selectedZone = false;
+	    $submitted = false;
+	    
 	    $classes = CharClass::orderBy('name', 'ASC')->get();
 	    $factions = Faction::whereNotNull('race_bitmask')->get();
 	    $mogslotCategories = MogslotCategory::all();
@@ -325,8 +330,6 @@ class ItemsController extends Controller
 		    $showUncollected = ($request->input('show_uncollected')) ? true : false;
 		    
 		    if ($showCollected || $showUncollected) {
-			    $_start = microtime(true);
-			    $_times = [];
 			    $selectedCat = ($request->input('cat')) ? MogslotCategory::find($request->input('cat')) : false;
 			    $selectedSlot = ($request->input('slot')) ? Mogslot::find($request->input('slot')) : false;
 			    
@@ -335,14 +338,12 @@ class ItemsController extends Controller
 			    $selectedSourceType = ($request->input('source')) ? ItemSourceType::where('url_token', '=', $request->input('source'))->first() : false;
 			    $selectedFaction = ($request->input('faction') && $request->input('faction') <= 2) ? Faction::find($request->input('faction')) : false;
 			    $selectedClass = ($request->input('class')) ? CharClass::find($request->input('class')) : false;
-			    $_times['var_setup'] = microtime(true);
 			    
 			    if ($request->input('item_name')) {
 				    $items = $this->searchItems($request->input('item_name'), true, false, false);
 			    } else {
 				    $items = Item::where('transmoggable', '=', 1)->get();
 			    }
-			    $_times['item_search'] = microtime(true);
 			    
 			    $itemIDs = $items->lists('id')->toArray();
 			    
@@ -351,23 +352,17 @@ class ItemsController extends Controller
 				    $itemIDs = array_intersect($itemIDs, $bossItemIDs);
 			    }
 			    
-			    $_times['boss'] = microtime(true);
-			    
 			    if ($selectedZone && count($itemIDs)) {
 				    $zoneSourceTypeIDs = ItemSourceType::where('zone_relevant', '=', 1)->get()->lists('id')->toArray();
 					$zoneItemIDs = array_unique(ItemSource::where('zone_id', '=', $selectedZone->id)->whereIn('item_source_type_id', $zoneSourceTypeIDs)->whereIn('item_id', $itemIDs)->get(['item_id'])->lists('item_id')->toArray());
 					$itemIDs = array_intersect($itemIDs, $zoneItemIDs);
 			    }
 			    
-			    $_times['zone'] = microtime(true);
-			    
 			    if ($selectedSourceType && count($itemIDs)) {
 				    $sourceItemIDs = array_unique(ItemSource::where('item_source_type_id', '=', $selectedSourceType->id)->whereIn('item_id', $itemIDs)->get(['item_id'])->lists('item_id')->toArray());
 				    
 				    $itemIDs = array_intersect($itemIDs, $sourceItemIDs);
 			    }
-			    
-			    $_times['source'] = microtime(true);
 			    
 			    if (count($itemIDs)) {
 				    $displayIDs = Item::whereIn('id', $itemIDs)->get(['item_display_id'])->lists('item_display_id')->toArray();
@@ -387,8 +382,6 @@ class ItemsController extends Controller
 						});
 				    }
 				    
-				    $_times['mogslot_setup'] = microtime(true);
-				    
 				    if ($showCollected != $showUncollected) {
 					    $userItems = Auth::user()->userItems()->whereIn('item_display_id', $displays->lists('id')->toArray())->get();
 					    $userDisplayIDs = array_unique($userItems->lists('item_display_id')->toArray());
@@ -399,8 +392,6 @@ class ItemsController extends Controller
 						    $displayIDs = array_diff($displayIDs, $userDisplayIDs);
 					    }
 				    }
-				    
-				    $_times['collected_uncollected'] = microtime(true);
 				    
 				    $displays = ItemDisplay::whereIn('id', $displayIDs)->whereIn('mogslot_id', $mogslots->lists('id')->toArray());
 				    
@@ -420,34 +411,33 @@ class ItemsController extends Controller
 					    });
 				    }
 				    
-				    $displays = $displays->get();
-				    
-				    $_times['displays_get'] = microtime(true);
-				    $_total = 0;
-				    
-				    if ($request->input('profile')) {
-					    foreach ($_times as $_label => $_time) {
-						    echo $_label . ': ' . ($_time - $_start) . '<br>';
-						    $_total += ($_time - $_start);
-						    $_start = $_time;
-					    }
-					    echo 'Total: ' . $_total;
-					    die;
+				    $displays = $displays->paginate(1000);
+					
+					if ($displays->count()) {
+						if ($displays->total() > $displays->count()) {
+							$_start = (($displays->currentPage() - 1) * $displays->perPage()) + 1;
+							$_end = $_start + $displays->perPage() - 1;
+							$headerAppend = ' Showing ' . $_start . ' &ndash; ' . $_end;
+						} else {
+							$headerAppend = '';
+						}
+					    $view = view('items.item-finder')->with('itemDisplays', $displays)->with('userDisplayIDs', $userDisplayIDs)->with('userItemIDs', $userItems->lists('id')->toArray())->with('priorityItemIDs', $itemIDs)->with('headerText', 'Search Results: ' . $displays->total() . ' appearances found.' . $headerAppend)->with('mogslot', $selectedSlot);
 					}
+			    }
+			    
+			    if (!$displays->count()) {
+				    $searchError = 'No appearances found. Please try again.';
 			    }
 			} else {
 				$searchError = 'Please select collected and/or not collected appearance checkbox.';
 			}
-		    
-		    $view = $this->showItemDisplays($displays, false, $itemIDs, 'items.item-finder')->with('headerText', 'Search Results: ' . $displays->count() . ' appearances found.');
-	    } else {
-		    $submitted = false;
-		    $view = view('items.item-finder');
-		    $selectedCat = false;
-		    $selectedZone = false;
 	    }
 	    
-	    return $view->with('allSources', $allSources)->with('allClasses', $classes)->with('allFactions', $factions)->with('mogslotCategories', $mogslotCategories)->with('mogslots', $mogslotsByCategory)->with('selectedCat', $selectedCat)->with('selectedZone', $selectedZone)->with('zonesByCategory', $zonesByCategory)->with('zoneCategories', $zoneCategories)->with('bossesByZone', $bossesByZone)->with('submitted', $submitted)->with('searchError', $searchError);
+	    if (!$view) {
+		    $view = view('items.item-finder');
+	    }
+	    
+	    return $view->with('allSources', $allSources)->with('allClasses', $classes)->with('allFactions', $factions)->with('mogslotCategories', $mogslotCategories)->with('mogslots', $mogslotsByCategory)->with('selectedCat', $selectedCat)->with('selectedZone', $selectedZone)->with('zonesByCategory', $zonesByCategory)->with('zoneCategories', $zoneCategories)->with('bossesByZone', $bossesByZone)->with('submitted', $submitted)->with('searchError', $searchError)->with('request', $request)->with('pageTitle', 'Appearance Finder');
     }
     
     public function searchHints($query) {

@@ -7,3 +7,6 @@
 }
 
 #appearance-finder-form label { padding-right: 10px; width: 100%; }
+
+.form-control.has-input { background: #555; }
+.form-control:focus { background: #444; }
