@@ -338,7 +338,7 @@ class ItemsController extends Controller
 		    $selectedFaction = ($request->input('faction') && $request->input('faction') <= 2) ? Faction::find($request->input('faction')) : false;
 		    $selectedClass = ($request->input('class')) ? CharClass::find($request->input('class')) : false;
 		    
-		    if (($showCollected || $showUncollected) && ($selectedCat || $selectedSlot || $selectedBoss || $selectedSourceType || $selectedFaction || $selectedClass)) {
+		    if (($showCollected || $showUncollected) && ($selectedCat || $selectedSlot || $selectedBoss || $selectedSourceType || $selectedClass)) {
 			    if ($request->input('item_name')) {
 				    $items = $this->searchItems($request->input('item_name'), true, false, false);
 			    } else {
@@ -432,7 +432,7 @@ class ItemsController extends Controller
 				if (!($showCollected || $showUncollected)) {
 					$searchError = 'Please select collected and/or not collected appearance checkbox.';
 				} else {
-					$searchError = 'Please add at least one filter to your search.';
+					$searchError = 'Please narrow your search by adding at least 1 more filter.';
 				}
 			}
 	    }
