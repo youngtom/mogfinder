@@ -79,10 +79,10 @@
                                 <a href="{{ url('/wardrobe/zones') }}">Zone Overview</a>
                             </li>
                             <li>
-                                <a href="{{ url('/wardrobe/auctions') }}">Auction Search</a>
+                                <a href="{{ url('/wardrobe/appearance-finder') }}">Appearance Finder</a>
                             </li>
                             <li>
-                                <a href="{{ url('/wardrobe/appearance-finder') }}">Appearance Finder</a>
+                                <a href="{{ url('/wardrobe/auctions') }}">Auction Search</a>
                             </li>
                             <li>
                                 <a href="{{ url('/wardrobe/duplicates') }}">Duplicates</a>
