@@ -388,7 +388,7 @@ class ItemsController extends Controller
 					    }
 				    }
 				    
-				    $displays = ItemDisplay::whereIn('id', $displayIDs)->whereIn('mogslot_id', $mogslots->lists('id')->toArray())->get();
+				    $displays = ItemDisplay::whereIn('id', $displayIDs)->whereIn('mogslot_id', $mogslots->lists('id')->toArray());
 				    
 				    if ($selectedClass) {
 					    $classmask = pow(2, $selectedClass->id);
