@@ -382,9 +382,8 @@ class ItemsController extends Controller
 						});
 				    }
 				    
-				    if ($showCollected != $showUncollected) {
-					    $userItems = Auth::user()->userItems()->whereIn('item_display_id', $displays->lists('id')->toArray())->get();
-					    $userDisplayIDs = array_unique($userItems->lists('item_display_id')->toArray());
+				    if ($showCollected != $showUncollected) {					    
+					    $userDisplayIDs = array_unique(Auth::user()->userItems->lists('item_display_id')->toArray());
 					    
 					    if ($showCollected) {
 						    $displayIDs = array_intersect($displayIDs, $userDisplayIDs);
