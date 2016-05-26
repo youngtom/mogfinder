@@ -425,7 +425,7 @@ class ItemsController extends Controller
 							$headerAppend = '';
 						}
 						
-						$userItemIDs = Auth::user()->userItems()->whereIn('item_display_id', $displays->lists('id')->toArray())->get()->->toArray();
+						$userItemIDs = Auth::user()->userItems()->whereIn('item_display_id', $displays->lists('id')->toArray())->get()->toArray();
 						
 					    $view = view('items.item-finder')->with('itemDisplays', $displays)->with('userDisplayIDs', $userDisplayIDs)->with('userItemIDs', $userItemIDs)->with('priorityItemIDs', $itemIDs)->with('headerText', 'Search Results: ' . $displays->total() . ' appearances found.' . $headerAppend)->with('mogslot', $selectedSlot);
 					}
