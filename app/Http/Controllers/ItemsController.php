@@ -424,7 +424,10 @@ class ItemsController extends Controller
 						} else {
 							$headerAppend = '';
 						}
-					    $view = view('items.item-finder')->with('itemDisplays', $displays)->with('userDisplayIDs', $userDisplayIDs)->with('userItemIDs', $userItems->lists('id')->toArray())->with('priorityItemIDs', $itemIDs)->with('headerText', 'Search Results: ' . $displays->total() . ' appearances found.' . $headerAppend)->with('mogslot', $selectedSlot);
+						
+						$userItemIDs = Auth::user()->userItems()->whereIn('item_display_id', $displays->lists('id')->toArray())->get()->->toArray();
+						
+					    $view = view('items.item-finder')->with('itemDisplays', $displays)->with('userDisplayIDs', $userDisplayIDs)->with('userItemIDs', $userItemIDs)->with('priorityItemIDs', $itemIDs)->with('headerText', 'Search Results: ' . $displays->total() . ' appearances found.' . $headerAppend)->with('mogslot', $selectedSlot);
 					}
 			    }
 			    
