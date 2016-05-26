@@ -78,9 +78,11 @@
                             <li>
                                 <a href="{{ url('/wardrobe/zones') }}">Zone Overview</a>
                             </li>
+                            <?php /*
                             <li>
                                 <a href="{{ url('/wardrobe/appearance-finder') }}">Appearance Finder</a>
                             </li>
+                            */ ?>
                             <li>
                                 <a href="{{ url('/wardrobe/auctions') }}">Auction Search</a>
                             </li>
