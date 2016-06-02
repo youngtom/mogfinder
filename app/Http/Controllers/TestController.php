@@ -449,7 +449,7 @@ class TestController extends Controller
     }
     
     public function unavailableDisplays($format = false) {
-	    $displays = ItemDisplay::where('legacy', '=', 1)->get();
+	    $displays = ItemDisplay::where('legacy', '=', 1)->orderBy('bnet_display_id', 'ASC')->get();
 	    
 	    $simple = ['displayInfoId,itemID'];
 	    foreach ($displays as $display) {
