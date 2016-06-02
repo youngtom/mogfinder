@@ -27,17 +27,7 @@ use DB;
 class TestController extends Controller
 {
 	public function index() {
-		echo $d->count(); die;
-		$characters = Character::all();
-		foreach ($characters as $character) {
-			$character->url_token = $character->getToken();
-			$character->save();
-			
-			echo $character->name . ': ' . $character->url_token . '<br>';
-		}
 		die;
-		$legacyItemIDs = ItemSource::where('item_source_type_id', '=', 17)->get(['item_id'])->lists('item_id')->toArray();
-		$sourcedItemIDs = ItemSource::where('item_source_type_id', '<>', 17)->whereIn('item_id', $legacyItemIDs)->get(['item_id'])->lists('item_id')->toArray();
 		
 		$legacyItemIDs = array_diff($legacyItemIDs, $sourcedItemIDs);
 		
@@ -453,6 +443,34 @@ class TestController extends Controller
 				    $out[] = '<a href="http://www.wowhead.com/' . $source->getWowheadMarkup($source->item) . '">' . $source->getSourceText() . '</a>: <a href="http://www.wowhead.com/item=' . $source->item->bnet_id . '" class="q' . $source->item->quality . '" rel="' . $source->item->getWowheadMarkup() . '">[' . $source->item->name . ']</a> - ' . $source->item->id;
 				}
 			}
+	    }
+	    
+	    return view('test')->with('out', $out)->with('newline', "<br>");
+    }
+    
+    public function unavailableDisplays($format = false) {
+	    $displays = ItemDisplay::where('legacy', '=', 1)->get();
+	    
+	    $simple = ['displayInfoId,itemID'];
+	    foreach ($displays as $display) {
+		    $out[] = '<strong>DisplayInfoId: ' . $display->bnet_display_id . '</strong>';
+		    
+		    foreach ($display->items as $item) {
+			    $out[] = 'Item: ' . $item->bnet_id . ': <a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
+			    $simple[] = $display->bnet_display_id . ',' . $item->bnet_id;
+		    }
+		    
+		    $out[] = '';
+	    }
+	    
+	    if ($format == 'csv') {
+		    mkdir(storage_path() . '/tmp/');
+		    $file = storage_path() . '/tmp/legacy.csv';
+		    $fp = fopen($file, 'w');
+		    fwrite($fp, implode("\n", $simple));
+		    fclose($fp);
+		    
+		    return response()->download($file, 'legacy.csv');
 	    }
 	    
 	    return view('test')->with('out', $out)->with('newline', "<br>");

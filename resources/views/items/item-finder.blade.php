@@ -39,7 +39,7 @@
 					</div>
 			        <div class="col-sm-3">
 				        <select class="form-control" name="faction" id="faction">
-					        <option value="" data-keep="1">Faction</option>
+					        <option value="" data-keep="1">Any Faction</option>
 					        <?php foreach ($allFactions as $faction) { ?>
 								<option value="<?=$faction->id?>" <?=(old('faction') == $faction->id) ? 'selected="selected"' : ''?>><?=$faction->name?></option>
 					        <?php } ?>
@@ -47,7 +47,7 @@
 			        </div>
 			        <div class="col-sm-3">
 				        <select class="form-control" name="class" id="class">
-					        <option value="" data-keep="1">Class</option>
+					        <option value="" data-keep="1">Any Class</option>
 					        <?php foreach ($allClasses as $class) { ?>
 								<option value="<?=$class->id?>" data-classmask="<?=pow(2, $class->id)?>" <?=(old('class') == $class->id) ? 'selected="selected"' : ''?>><?=$class->name?></option>
 					        <?php } ?>

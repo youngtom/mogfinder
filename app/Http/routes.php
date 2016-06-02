@@ -56,6 +56,7 @@ Route::group(['middleware' => 'web'], function () {
 	Route::get('/test/check-deleted-sources/{id}', 'TestController@checkDeletedSources');
 	Route::get('/test/list-sources/{id}', 'TestController@listSources');
 	Route::get('/test/list-sourceless-items', 'TestController@listSourcelessItems');
+	Route::get('/test/unavailable-displays/{format?}', 'TestController@unavailableDisplays');
 	
 	//Feedback routes
 	Route::get('/feedback', ['as' => 'feedback', 'uses' => 'ContactController@index']);
