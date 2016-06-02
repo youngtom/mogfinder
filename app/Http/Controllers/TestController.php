@@ -456,7 +456,7 @@ class TestController extends Controller
 		    $out[] = '<strong>DisplayInfoId: ' . $display->bnet_display_id . '</strong>';
 		    
 		    foreach ($display->items as $item) {
-			    $out[] = 'Item: ' . $item->bnet_id . ': <a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="item-link q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
+			    $out[] = 'Item ' . $item->bnet_id . ': <a href="http://www.wowhead.com/item=' . $item->bnet_id . '" class="item-link q' . $item->quality . '" rel="' . $item->getWowheadMarkup() . '">[' . $item->name . ']</a>';
 			    $simple[] = $display->bnet_display_id . ',' . $item->bnet_id;
 		    }
 		    
