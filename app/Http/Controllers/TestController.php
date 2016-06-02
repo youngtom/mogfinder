@@ -467,7 +467,7 @@ class TestController extends Controller
 		    @mkdir(storage_path() . '/tmp/');
 		    $file = storage_path() . '/tmp/legacy.csv';
 		    $fp = fopen($file, 'w');
-		    fwrite($fp, implode("\n\r", $simple));
+		    fwrite($fp, implode("\r\n", $simple));
 		    fclose($fp);
 		    
 		    return response()->download($file, 'legacy.csv');
