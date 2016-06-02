@@ -464,7 +464,7 @@ class TestController extends Controller
 	    }
 	    
 	    if ($format == 'csv') {
-		    mkdir(storage_path() . '/tmp/');
+		    @mkdir(storage_path() . '/tmp/');
 		    $file = storage_path() . '/tmp/legacy.csv';
 		    $fp = fopen($file, 'w');
 		    fwrite($fp, implode("\n", $simple));
