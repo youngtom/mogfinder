@@ -152,28 +152,33 @@ class Item extends Model
 	    $item->sell_price = $data['sellPrice'];
 	    
 	    //save type, subtype, and inventory type
-	    $type = ItemType::where('bnet_id', '=', $data['itemClass'])->first();
 	    
-	    if (!$type) {
-		    $type = new ItemType;
-		    $type->bnet_id = $data['itemClass'];
-		    $type->save();
+	    if (!$item->item_type_id)) {
+		    $type = ItemType::where('bnet_id', '=', $data['itemClass'])->first();
+		    
+		    if (!$type) {
+			    $type = new ItemType;
+			    $type->bnet_id = $data['itemClass'];
+			    $type->save();
+		    }
+		    
+		    $item->item_type_id = $type->id;
+		}
+	    
+	    if (!$item->item_subtype_id) {
+		    $subtype = ItemSubtype::where('bnet_id', '=', $data['itemSubClass'])->where('item_type_id', '=', $type->id)->first();
+		    
+		    if (!$subtype) {
+			    $subtype = new ItemSubtype;
+			    $subtype->bnet_id = $data['itemSubClass'];
+			    $subtype->item_type_id = $type->id;
+			    $subtype->save();
+		    }
+		    
+		    $item->item_subtype_id = $subtype->id;
 	    }
 	    
-	    $item->item_type_id = $type->id;
-	    
-	    $subtype = ItemSubtype::where('bnet_id', '=', $data['itemSubClass'])->where('item_type_id', '=', $type->id)->first();
-	    
-	    if (!$subtype) {
-		    $subtype = new ItemSubtype;
-		    $subtype->bnet_id = $data['itemSubClass'];
-		    $subtype->item_type_id = $type->id;
-		    $subtype->save();
-	    }
-	    
-	    $item->item_subtype_id = $subtype->id;
-	    
-	    if ($data['inventoryType']) {
+	    if (!$item->inventory_type_id && $data['inventoryType']) {
 		    $invType = InventoryType::where('id', '=', $data['inventoryType'])->first();
 		    
 		    if (!$invType) {
@@ -195,6 +200,13 @@ class Item extends Model
 				$display->item_subtype_id = $item->item_subtype_id;
 				$display->inventory_type_id = $invTypeID;
 				//$display->transmoggable = $item->transmoggable;
+				
+				$mogslot = Mogslot::where('inventory_type_id', '=', $display->inventory_type_id)->where('item_subtype_id', '=', $display->item_subtype_id)->first();
+				
+				if ($mogslot) {
+					$display->mogslot_id = $mogslot->id;
+				}
+				
 				$display->save();
 			}
 			
@@ -215,6 +227,7 @@ class Item extends Model
 	    
 	    $item->save();
 	    
+	    /*
 	    if ($data['itemSource'] && $data['itemSource']['sourceId'] && $data['itemSource']['sourceType']) {
 		    $sourceType = ItemSourceType::where('label', '=', $data['itemSource']['sourceType'])->first();
 		    
@@ -235,6 +248,7 @@ class Item extends Model
 			    $source->save();
 		    }
 	    }
+	    */
 	    
 	    return $item;
     }
