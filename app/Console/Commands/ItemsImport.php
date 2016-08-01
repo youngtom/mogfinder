@@ -41,7 +41,7 @@ class ItemsImport extends Command
     public function handle()
     {
 	    
-	    if ($id = $this->argument('num')) {
+	    if ($id = $this->argument('id')) {
 		    $itemID = $maxID = $id;
 	    } else {
 			$lastIDVar = StoredVariable::where('var', '=', 'latest_imported_item')->first();
