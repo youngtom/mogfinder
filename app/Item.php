@@ -153,7 +153,7 @@ class Item extends Model
 	    
 	    //save type, subtype, and inventory type
 	    
-	    if (!$item->item_type_id)) {
+	    if (!$item->item_type_id) {
 		    $type = ItemType::where('bnet_id', '=', $data['itemClass'])->first();
 		    
 		    if (!$type) {
