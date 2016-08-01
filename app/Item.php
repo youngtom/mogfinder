@@ -223,7 +223,7 @@ class Item extends Model
 	    $item->reputation_level = (@$data['minReputation']) ?: null;
 	    $item->required_level = $data['requiredLevel'];
 	    $item->allowable_classes = (@$data['allowableClasses'] && is_array($data['allowableClasses'])) ? self::getBitmaskFromIDArray($data['allowableClasses']) : null;
-	    $item->allowable_races = (@$data['allowableRaces'] && is_array($data['allowableRaces'])) ? self::getBitmaskFromIDArray($data['allowableClasses']) : null;
+	    $item->allowable_races = (@$data['allowableRaces'] && is_array($data['allowableRaces'])) ? self::getBitmaskFromIDArray($data['allowableRaces']) : null;
 	    
 	    $item->save();
 	    
