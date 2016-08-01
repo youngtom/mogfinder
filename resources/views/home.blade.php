@@ -7,7 +7,7 @@
 		    <div class="panel panel-default">
 			    <div class="panel-body">
 			        <div class="page-header">
-						<h3>Welcome <small>What is this?</small></h3>
+						<h3>Welcome <small>What is this? Test</small></h3>
 					</div>
 					<p>MogCollector is a tool built to assist in collecting gear for the transmog/wardrobe system being introduced in Legion. Currently, this site can be used to determine which appearances you've unlocked, and to help find those you have not yet unlocked. There's also a duplicate item finder that can help free up some much-needed bag space. With time, I hope to implement more features that will further assist completionists like myself.</p>
 				    <div class="page-header">
