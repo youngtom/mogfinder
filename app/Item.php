@@ -190,7 +190,7 @@ class Item extends Model
 		    $item->inventory_type_id = $invType->id;
 		}
 		
-		if ($data['displayInfoId']) {
+		if (!$item->item_display_id && $data['displayInfoId']) {
 			$invTypeID = ($invType->parent_inventory_type_id) ?: $item->inventory_type_id;
 			$display = ItemDisplay::where('bnet_display_id', '=', $data['displayInfoId'])->where('item_subtype_id', '=', $item->item_subtype_id)->where('inventory_type_id', '=', $invTypeID)->first();
 			
