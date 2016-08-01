@@ -66,10 +66,12 @@ class ItemsImport extends Command
 					}
 				}
 			}
-	
-			$lastIDVar->val = $itemID;
-			$lastIDVar->save();
-			$itemID++;
+			
+			if ($lastIDVar) {
+				$lastIDVar->val = $itemID;
+				$lastIDVar->save();
+				$itemID++;
+			}
 		}
 		$this->info(count($items) . ' items imported.');
     }
