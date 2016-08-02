@@ -31,7 +31,7 @@ class TestController extends Controller
 		
 		foreach ($items as $item) {
 			$bonus = ($item->bonus) ? '1:' . $item->bonus : '';
-			echo '[' . $item->id . '] = {"|cffa335ee|Hitem:' . $item->bnet_id . ':0:0:0:0:0:0:0:0:0:0:0:' . $bonus . '|h[' . $item->name . ']|h|r"},' . "\n";
+			echo '[' . $item->id . '] = {"|cffa335ee|Hitem:' . $item->bnet_id . ':0:0:0:0:0:0:0:0:0:0:0:' . $bonus . '|h[' . addslashes($item->name) . ']|h|r"},' . "\n";
 		}
 	}
 	
