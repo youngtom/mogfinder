@@ -96,17 +96,17 @@ class Item extends Model
 		    return false;
 	    }
 	    
-	    $contextLabel = (stristr($context->label, 'trade-skill')) ? 'trade-skill' : $context->label;
-	    
-	    $data = self::$apiClient->getItemData($this->bnet_id, $contextLabel);
-	    
-	    if ($data && @$data['bonusLists']) {
-		    $this->bonus = implode(',', $data['bonusLists']);
-		    $this->save();
-		    return true;
-	    } else {
-		    return false;
-	    }
+	    if (!stristr($context->label, 'trade-skill')) {	    
+		    $data = self::$apiClient->getItemData($this->bnet_id, $contextLabel);
+		    
+		    if ($data && @$data['bonusLists']) {
+			    $this->bonus = implode(',', $data['bonusLists']);
+			    $this->save();
+			    return true;
+		    } else {
+			    return false;
+		    }
+		}
 	}
 	
     public static function importBnetData($itemID) {
