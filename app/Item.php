@@ -92,6 +92,10 @@ class Item extends Model
 	    
 	    $context = ItemContext::find($this->item_context_id);
 	    
+	    if (!$context) {
+		    return false;
+	    }
+	    
 	    $contextLabel = (stristr($context->label, 'trade-skill')) ? 'trade-skill' : $context->label;
 	    
 	    $data = self::$apiClient->getItemData($this->bnet_id, $contextLabel);
