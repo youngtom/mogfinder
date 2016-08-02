@@ -97,7 +97,7 @@ class Item extends Model
 	    }
 	    
 	    if (!stristr($context->label, 'trade-skill')) {	    
-		    $data = self::$apiClient->getItemData($this->bnet_id, $contextLabel);
+		    $data = self::$apiClient->getItemData($this->bnet_id, $context->label);
 		    
 		    if ($data && @$data['bonusLists']) {
 			    $this->bonus = implode(',', $data['bonusLists']);
