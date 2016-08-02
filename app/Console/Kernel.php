@@ -57,7 +57,8 @@ class Kernel extends ConsoleKernel
         Commands\ImportLegacyQuestSources::class,
         Commands\ImportCharacterQuests::class,
         Commands\ImportLegacyQuestDataExternal::class,
-        Commands\ImportLocalizedRealmData::class
+        Commands\ImportLocalizedRealmData::class,
+        Commands\UpdateItemBonuses::class
     ];
 
     /**

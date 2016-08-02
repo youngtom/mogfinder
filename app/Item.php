@@ -81,6 +81,30 @@ class Item extends Model
 	    return $data;
 	}
 	
+	public function updateBnetBonusData() {
+		if (self::$apiClient === null) {
+			self::$apiClient = new \App\BnetWowApi(Config::get('settings.bnet_api_key'), Config::get('settings.bnet_api_locale'));
+	    }
+	    
+	    if ($this->item_context_id) {
+		    return false;
+	    }
+	    
+	    $context = ItemContext::find($this->item_context_id);
+	    
+	    $contextLabel = (stristr($context->label, 'trade-skill')) ? 'trade-skill' : $context->label;
+	    
+	    $data = self::$apiClient->getItemData($this->bnet_id, $contextLabel);
+	    
+	    if ($data && @$data['bonusLists']) {
+		    $item->bonus = implode(',', $data['bonusLists']);
+		    $item->save();
+		    return $item->bonus;
+	    } else {
+		    return false;
+	    }
+	}
+	
     public static function importBnetData($itemID) {
 	    if (self::$apiClient === null) {
 			self::$apiClient = new \App\BnetWowApi(Config::get('settings.bnet_api_key'), Config::get('settings.bnet_api_locale'));
