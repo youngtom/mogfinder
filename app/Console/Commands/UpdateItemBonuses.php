@@ -45,7 +45,7 @@ class UpdateItemBonuses extends Command
 	    foreach ($items as $item) {
 		    $oldBonus = $item->bonus;
 		    if ($newBonus = $item->updateBnetBonusData()) {
-			    $this->line('Item (' . $item->bnet_id . ') bonus changed from ' . $oldBonus . ' to ' . $newBonus)
+			    $this->line('Item (' . $item->bnet_id . ') bonus changed from ' . $oldBonus . ' to ' . $newBonus);
 		    }
 		    
 		    $bar->advance();
