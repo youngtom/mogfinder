@@ -63,6 +63,7 @@ class ImportItemAppearanceData extends Command
 						if ($item->bnet_id > 133586) {
 							$item->transmoggable = $xmoggable;
 						} else {
+							\Log::info('Xmog mismatch - ' . $xmoggable . ': ' . $item->name . ' (' . $item->bnet_id . ')');
 							$this->line('Xmog mismatch - ' . $xmoggable . ': ' . $item->name . ' (' . $item->bnet_id . ')');
 						}
 					}
