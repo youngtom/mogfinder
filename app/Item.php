@@ -101,9 +101,9 @@ class Item extends Model
 	    $data = self::$apiClient->getItemData($this->bnet_id, $contextLabel);
 	    
 	    if ($data && @$data['bonusLists']) {
-		    $item->bonus = implode(',', $data['bonusLists']);
-		    $item->save();
-		    return $item->bonus;
+		    $this->bonus = implode(',', $data['bonusLists']);
+		    $this->save();
+		    return true;
 	    } else {
 		    return false;
 	    }
