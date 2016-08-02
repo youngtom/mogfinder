@@ -86,7 +86,7 @@ class Item extends Model
 			self::$apiClient = new \App\BnetWowApi(Config::get('settings.bnet_api_key'), Config::get('settings.bnet_api_locale'));
 	    }
 	    
-	    if ($this->item_context_id) {
+	    if (!$this->item_context_id) {
 		    return false;
 	    }
 	    
