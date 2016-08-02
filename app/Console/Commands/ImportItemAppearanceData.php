@@ -60,7 +60,11 @@ class ImportItemAppearanceData extends Command
 					$item->appearance_id = ($appearanceID) ?: $item->appearance_id;
 					
 					if ($item->transmoggable != $xmoggable) {
-						$this->line('Xmog mismatch - ' . $xmoggable . ': ' . $item->name . ' (' . $item->bnet_id . ')');
+						if ($item->bnet_id > 133586) {
+							$item->transmoggable = $xmoggable;
+						} else {
+							$this->line('Xmog mismatch - ' . $xmoggable . ': ' . $item->name . ' (' . $item->bnet_id . ')');
+						}
 					}
 					
 					$item->save();
