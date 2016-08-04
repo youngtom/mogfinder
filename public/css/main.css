@@ -82,6 +82,7 @@ a.rogue { color: #FFF569 !important; }
 a.shaman { color: #0070DE !important; }
 a.warlock { color: #9482C9 !important; }
 a.warrior { color: #C79C6E !important; }
+a.demon-hunter { color: #A330C9 !important; }
 
 .btn[data-class="death-knight"] { background-color: rgba(196, 30, 59, 100); }
 .btn[data-class="druid"] { background-color: rgba(255, 125, 10, 100); }
@@ -94,6 +95,7 @@ a.warrior { color: #C79C6E !important; }
 .btn[data-class="shaman"] { background-color: rgba(0, 112, 222, 100); }
 .btn[data-class="warlock"] { background-color: rgba(148, 130, 201, 100); }
 .btn[data-class="warrior"] { background-color: rgba(199, 156, 110, 100); }
+.btn[data-class="demon-hunter"] { background-color: rgba(163, 48, 201, 100); }
 
 .btn[data-faction="alliance"] { background-color: #114587; }
 .btn[data-faction="horde"] { background-color: #650c0e; }
