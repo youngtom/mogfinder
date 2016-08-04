@@ -90,6 +90,7 @@ class UserController extends Controller
 					$userFile->progress_current = 0;
 					$userFile->save();
 					
+					\Log::info('Queuing ImportUserData for user: ' . $user->id . ' - userFile: ' . $userFile->id);
 					$job = (new ImportUserData($user->id, $userFile->id))->onQueue('high');
 				    $this->dispatch($job);
 					
