@@ -65,134 +65,67 @@ class User extends Authenticatable
 				}
 				
 				if ($character) {
-					$character->updateCharacterFromDataArray($charData['charInfo']);
-				    
-				    $scanTime = (@$charData['scanTime']) ? $charData['scanTime'] : 0;
-					
-					if ($scanTime > $character->last_scanned) {
-						if ($character->realm_id && $character->class_id && $character->race_id) {
-							// Queue item import
-							$job = (new ImportCharacterItems($character->id, $dataFile->id))->onQueue('med');
-							$this->dispatch($job);
-							
-							$character->last_scanned = $scanTime;
-							$character->latest_chardata = json_encode($charData);
-						} else {
-							$count = 0;
-							
-							if (@$charData['equipped']) {
-								$count += count($charData['equipped']);
-							}
-							
-							if (@$charData['items']) {
-								foreach ($charData['items'] as $itemArr) {
-									$count += count($itemArr);
-								}
-							}
-							
-							DB::table('user_datafiles')->where('id', '=', $dataFile->id)->increment('progress_current', $count);
-						}
-					}
-					
-					$character->save();
+					$character->updateCharacterFromDataArray($charData['charInfo']);					
 				}
 			}
 	    }
 	    
-	    if (@$dataFile->import_data['heirlooms'] && is_array($dataFile->import_data['heirlooms']) && count($dataFile->import_data['heirlooms'])) {
-		    $heirloomLocation = ItemLocation::where('label', '=', 'heirlooms')->first();
-		    
-		    foreach ($dataFile->import_data['heirlooms'] as $itemID => $transmoggable) {
-		        $item = Item::where('bnet_id', '=', $itemID)->first();
+	    if (@$dataFile->import_data['appearances'] && is_array($dataFile->import_data['appearances']) && count($dataFile->import_data['appearances'])) {
+		    foreach ($dataFile->import_data['appearances'] as $appKey => $itemArr) {
+		        $appearanceID = str_replace('app', '', $appKey);
+		        $appearanceIDs = [$appearanceID, null];
 		        
-		        if ($item && $item->isTransmoggable()) {
-			        $userItem = UserItem::where('user_id', '=', $this->id)->where('item_location_id', '=', $heirloomLocation->id)->where('item_id', '=', $item->id)->first();
-			        
-			        if (!$userItem) {
-				        $userItem = new UserItem;
-				        $userItem->user_id = $this->id;
-				        $userItem->item_id = $item->id;
-				        $userItem->item_display_id = $item->item_display_id;
-				        $userItem->item_location_id = $heirloomLocation->id;
-				        $userItem->bound = 2;
-				        $userItem->save();
-					}
-			    }
-			    
-			    DB::table('user_datafiles')->where('id', '=', $dataFile->id)->increment('progress_current');
-	        }
-	    }
-	    
-	    if (@$dataFile->import_data['guilds'] && is_array($dataFile->import_data['guilds']) && count($dataFile->import_data['guilds'])) {
-		    $guildIDs = [];
-		    $guildBankLocation = ItemLocation::where('import_tag', '=', 'guildbank')->first();
-		    
-		    foreach ($dataFile->import_data['guilds'] as $guildID => $guildData) {
-			    $guildItemIDs = [];
-			    
-			    if (@$guildData['guildInfo'] && @$guildData['guildInfo']['faction'] && @$guildData['guildInfo']['realm'] && @$guildData['guildInfo']['region']) {
-				    $realmName = $guildData['guildInfo']['realm'];
-				    $guildRealm = Realm::where(function ($query) use ($realmName) {
-				        $query->where('name', '=', $realmName);
-				        $query->orWhere('localized_name', '=', $realmName);
-			        })->where('region', '=', ucwords($guildData['guildInfo']['region']))->first();
-				    $guildFaction = Faction::where('name', '=', $guildData['guildInfo']['faction'])->first();
-				    $characters = $this->characters()->where('realm_id', '=', $guildRealm->id)->where('faction_id', '=', $guildFaction->id)->get();
+		        foreach ($itemArr as $itemStr => $_one) {
+			        if (stristr($itemStr, '|')) {
+				        list($itemID, $bonusStr) = explode('|', $itemStr);
+				        $bonuses = explode(':', $bonusStr);
+				    } else {
+					    $itemID = $itemStr;
+					    $bonuses = [];
+				    }
 				    
-				    if ($guildRealm && $guildFaction && count($characters)) {
-					    $guildIDs[] = $guildID;
-					    
-					    if (@$guildData['items'] && count($guildData['items'])) {
-						    foreach ($guildData['items'] as $tabID => $itemArr) {
-							    foreach ($itemArr as $itemStr) {
-								    list($bound, $xmoggable, $itemLink) = explode('--', $itemStr);
+				    $items = Item::where('bnet_id', '=', $itemID)->where('appearance_id', '=', $appearanceID)->get();
 				    
-								    $userItem = UserItem::where('user_id', '=', $this->id)->where('item_location_id', '=', $guildBankLocation->id)->where('location_label', '=', $guildID)->where('item_link', $itemLink)->first();
+				    if (!$items->count()) {
+						$items = Item::where('bnet_id', '=', $itemID)->whereNull('appearance_id')->get();
+				    }
+				    
+				    if ($items->count()) {
+					    $displayIDs = array_unique($items->lists('item_display_id')->toArray());
 					    
-								    if (!$userItem) {
-									    $item = Item::findItemFromLink($itemLink);
-									    
-									    if ($item && $item->isTransmoggable()) {
-									        $found = false;
-									        $characters->each(function ($character) use ($item, &$found) {
-										        if ($character->canUseItem($item)) {
-													$found = $character;
-													return false;
-												}
-									        });
-									        
-									        if ($found) {
-										        $userItem = new UserItem;
-										        $userItem->user_id = $this->id;
-										        $userItem->item_id = $item->id;
-										        $userItem->item_display_id = $item->item_display_id;
-										        $userItem->item_location_id = $guildBankLocation->id;
-										        $userItem->location_label = $guildID;
-										        $userItem->item_link = $itemLink;
-										        $userItem->bound = $bound;
-										        $userItem->save();
-									        }
-								        }
-									}
-														    
-								    if ($userItem) {
-									    $guildItemIDs[] = $userItem->id;
-								    }
-								    
-									DB::table('user_datafiles')->where('id', '=', $dataFile->id)->increment('progress_current');
+					    if (count($displayIDs) == 1) {
+						    $item = $items[0];
+					    } else {
+						    $item = false;
+						    foreach ($items as $_item) {
+							    if (in_array($_item->bonus, $bonuses) || !$bonuses && $_item->bonus == null) {
+								    $item = $_item;
+								    break;
 							    }
 						    }
-						}
-					    
-					    $deleteItems = UserItem::where('user_id', '=', $this->id)->where('item_location_id', '=', $guildBankLocation->id)->where('location_label', '=', $guildID)->whereNotIn('id', $guildItemIDs)->get();
-					    
-					    foreach($deleteItems as $item) {
-							$item->delete();
-						}
+					    }
+				    } else {
+					    $item = false;
 				    }
-			    }
-			}
-		}
+				    
+				    if ($item) {
+					    $userItem = UserItem::where('user_id', '=', $this->id)->where('item_id', '=', $item->id)->first();
+			        
+				        if (!$userItem) {
+					        $userItem = new UserItem;
+					        $userItem->user_id = $this->id;
+					        $userItem->item_id = $item->id;
+					        $userItem->item_display_id = $item->item_display_id;
+					        $userItem->save();
+						}
+				    } else {
+					    \Log::error('Item not found (' . $appKey . ') - ' . $itemStr);
+				    }
+				    
+				    DB::table('user_datafiles')->where('id', '=', $dataFile->id)->increment('progress_current');
+		        }
+	        }
+	    }
     }
     
     public function getOtherCharacters(Character $character, $mailable) {

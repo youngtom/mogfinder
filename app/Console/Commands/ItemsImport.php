@@ -14,7 +14,7 @@ class ItemsImport extends Command
      *
      * @var string
      */
-    protected $signature = 'items:import {num=100}';
+    protected $signature = 'items:import {id?}';
 
     /**
      * The console command description.
@@ -40,11 +40,16 @@ class ItemsImport extends Command
      */
     public function handle()
     {
-        $lastIDVar = StoredVariable::where('var', '=', 'latest_imported_item')->first();
-		$lastID = $lastIDVar->val;
-		$maxID = min(Config::get('settings.bnet_max_item_id'), $lastID + $this->argument('num'));
-		
-		$itemID = $lastID + 1;
+	    
+	    if ($id = $this->argument('id')) {
+		    $itemID = $maxID = $id;
+	    } else {
+			$lastIDVar = StoredVariable::where('var', '=', 'latest_imported_item')->first();
+			$lastID = $lastIDVar->val;
+			$maxID = Config::get('settings.bnet_max_item_id');
+			
+			$itemID = $lastID + 1;   
+	    }
 		
 		$items = [];
 		
@@ -61,10 +66,12 @@ class ItemsImport extends Command
 					}
 				}
 			}
-	
-			$lastIDVar->val = $itemID;
-			$lastIDVar->save();
-			$itemID++;
+			
+			if ($lastIDVar) {
+				$lastIDVar->val = $itemID;
+				$lastIDVar->save();
+				$itemID++;
+			}
 		}
 		$this->info(count($items) . ' items imported.');
     }

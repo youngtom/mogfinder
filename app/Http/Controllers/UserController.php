@@ -58,11 +58,14 @@ class UserController extends Controller
 			if ($parser && $data && @$data['MCCSaved']) {
 				$fileMD5 = md5_file($fullPath . $filename);
 				$userFile = UserDatafile::where('md5', '=', $fileMD5)->where('user_id', '=', $user->id)->first();
+				$ver = explode('.', $data['MCCSaved']['ver']);
 				
 				if ($userFile) {
 					Storage::delete($path . $filename);
 					
 					return Response::json(['success' => false, 'errormsg' => 'This file has already been processed.']);
+				} elseif ($ver[0] < 3) {
+					return Response::json(['success' => false, 'errormsg' => 'This file is from an outdated version of the mod. Please download the latest version.']);
 				} else {
 					$file = new FileUpload;
 					$file->filename = $filename;
