@@ -79,10 +79,33 @@ class User extends Authenticatable
 			        if (stristr($itemStr, '|')) {
 				        list($itemID, $bonusStr) = explode('|', $itemStr);
 				        $bonuses = explode(':', $bonusStr);
-				        $item = Item::where('bnet_id', '=', $itemID)->whereIn('appearance_id', $appearanceIDs)->whereIn('bonus', $bonuses)->first();
 				    } else {
 					    $itemID = $itemStr;
-					    $item = Item::where('bnet_id', '=', $itemID)->whereIn('appearance_id', $appearanceIDs)->where('bonus', '=', null)->first();
+					    $bonuses = [];
+				    }
+				    
+				    $items = Item::where('bnet_id', '=', $itemID)->where('appearance_id', '=', $appearanceID)->get();
+				    
+				    if (!$items->count()) {
+						$items = Item::where('bnet_id', '=', $itemID)->whereNull('appearance_id')->get();
+				    }
+				    
+				    if ($items->count()) {
+					    $displayIDs = $items->lists('item_display_id')->toArray();
+					    
+					    if (count($displayIDs) == 1) {
+						    $item = $items[0];
+					    } else {
+						    $item = false;
+						    foreach ($items as $_item) {
+							    if (in_array($_item->bonus, $bonuses) || !$bonuses && $_item->bonus == null) {
+								    $item = $_item;
+								    break;
+							    }
+						    }
+					    }
+				    } else {
+					    $item = false;
 				    }
 				    
 				    if ($item) {
@@ -93,7 +116,6 @@ class User extends Authenticatable
 					        $userItem->user_id = $this->id;
 					        $userItem->item_id = $item->id;
 					        $userItem->item_display_id = $item->item_display_id;
-					        $userItem->bound = 2;
 					        $userItem->save();
 						}
 				    } else {
