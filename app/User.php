@@ -81,7 +81,7 @@ class User extends Authenticatable
 				        $bonuses = explode(':', $bonusStr);
 				        $item = Item::where('bnet_id', '=', $itemID)->whereIn('appearance_id', $appearanceIDs)->whereIn('bonus', $bonuses)->first();
 				    } else {
-					    $itemId = $itemStr;
+					    $itemID = $itemStr;
 					    $item = Item::where('bnet_id', '=', $itemID)->whereIn('appearance_id', $appearanceIDs)->where('bonus', '=', null)->first();
 				    }
 				    
