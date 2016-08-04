@@ -91,7 +91,7 @@ class User extends Authenticatable
 				    }
 				    
 				    if ($items->count()) {
-					    $displayIDs = $items->lists('item_display_id')->toArray();
+					    $displayIDs = array_unique($items->lists('item_display_id')->toArray());
 					    
 					    if (count($displayIDs) == 1) {
 						    $item = $items[0];
