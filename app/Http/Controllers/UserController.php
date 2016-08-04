@@ -64,8 +64,8 @@ class UserController extends Controller
 					Storage::delete($path . $filename);
 					
 					return Response::json(['success' => false, 'errormsg' => 'This file has already been processed.']);
-				} elseif ($ver <= 3) {
-					return Response::json(['success' => false, 'errormsg' => 'This is from an outdated version of the mod. Please <a href="' . url('/download') . "'>download</a> the latest version."]);
+				} elseif ($ver[0] <= 3) {
+					return Response::json(['success' => false, 'errormsg' => 'This file is from an outdated version of the mod. Please <a href="' . url('/download') . "'>download</a> the latest version."]);
 				} else {
 					$file = new FileUpload;
 					$file->filename = $filename;
@@ -90,8 +90,9 @@ class UserController extends Controller
 					$userFile->progress_current = 0;
 					$userFile->save();
 					
-					$job = (new ImportUserData($user->id, $userFile->id))->onQueue('high');
-				    $this->dispatch($job);
+					$user->importUserData($userFile->id);
+					//$job = (new ImportUserData($user->id, $userFile->id))->onQueue('high');
+				    //$this->dispatch($job);
 					
 					return Response::json(['success' => true, 'token' => $userFile->token, 'total' => $itemCount, 'reportURL' => url('upload-data/report/' . $userFile->token), 'msg' => 'This process may take a few minutes. You may leave this page at any time (progress will continue in the background)']);
 				}
