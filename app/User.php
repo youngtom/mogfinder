@@ -75,8 +75,7 @@ class User extends Authenticatable
 		        $appearanceID = str_replace('app', '', $appKey);
 		        $appearanceIDs = [$appearanceID, null];
 		        
-		        foreach ($itemArr as $itemArr) {
-			        $itemStr = key($itemArr);
+		        foreach ($itemArr as $itemStr => $_one) {
 			        if (stristr($itemStr, '|')) {
 				        list($itemID, $bonusStr) = explode('|', $itemStr);
 				        $bonuses = explode(':', $bonusStr);
