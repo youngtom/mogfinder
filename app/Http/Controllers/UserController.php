@@ -65,7 +65,7 @@ class UserController extends Controller
 					
 					return Response::json(['success' => false, 'errormsg' => 'This file has already been processed.']);
 				} elseif ($ver[0] < 3) {
-					return Response::json(['success' => false, 'errormsg' => 'This file is from an outdated version of the mod. Please download the latest version."]);
+					return Response::json(['success' => false, 'errormsg' => 'This file is from an outdated version of the mod. Please download the latest version.']);
 				} else {
 					$file = new FileUpload;
 					$file->filename = $filename;
