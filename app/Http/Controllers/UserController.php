@@ -56,7 +56,6 @@ class UserController extends Controller
 			$data = ($parser) ? $parser->parse() : false;
 			
 			if ($parser && $data && @$data['MCCSaved']) {
-				var_dump($data['MCCSaved']); die;
 				$fileMD5 = md5_file($fullPath . $filename);
 				$userFile = UserDatafile::where('md5', '=', $fileMD5)->where('user_id', '=', $user->id)->first();
 				$ver = explode('.', $data['MCCSaved']['ver']);
