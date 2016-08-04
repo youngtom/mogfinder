@@ -60,54 +60,9 @@ class UserDatafile extends Model
 	public function getItemCount() {
 		$count = 0;
 		
-		if (isset($this->import_data['heirlooms']) && is_array($this->import_data['heirlooms'])) {
-			$count += count($this->import_data['heirlooms']);	
-		}
-		
-		if (!is_array($this->import_data['chars'])) {
-			\Log::error('Missing char data in user_id: ' . $this->user_id . ' fileid: ' . $this->file_id);
-			return 0;
-		}
-		
-		foreach ($this->import_data['chars'] as $charTag => $charData) {
-		    $character = Character::where('wow_guid', '=', $charTag)->where('user_id', '=', Auth::user()->id)->first();
-		    
-		    if ($character || count($charData['charInfo'])) {
-			    $lastScanned = ($character) ? $character->last_scanned : 0;
-			    
-			    $scanTime = (@$charData['scanTime']) ? $charData['scanTime'] : 0;
-				
-				if ($scanTime > $lastScanned) {
-					if (@$charData['equipped']) {
-						$count += count($charData['equipped']);
-					}
-					
-					if (@$charData['items']) {
-						foreach ($charData['items'] as $itemArr) {
-							$count += count($itemArr);
-						}
-					}
-				}
-			}
-		}
-		
-		if (@$this->import_data['guilds'] && is_array($this->import_data['guilds']) && count($this->import_data['guilds'])) {
-		    foreach ($this->import_data['guilds'] as $guildID => $guildData) {
-			    if (@$guildData['guildInfo'] && @$guildData['guildInfo']['faction'] && @$guildData['guildInfo']['realm'] && @$guildData['guildInfo']['region'] && @$guildData['items']) {
-				    $realmName = $guildData['guildInfo']['realm'];
-				    $guildRealm = Realm::where(function ($query) use ($realmName) {
-				        $query->where('name', '=', $realmName);
-				        $query->orWhere('localized_name', '=', $realmName);
-			        })->where('region', '=', ucwords($guildData['guildInfo']['region']))->first();
-				    $guildFaction = Faction::where('name', '=', $guildData['guildInfo']['faction'])->first();
-				    $characters = Character::where('user_id', '=', $this->user_id)->where('realm_id', '=', $guildRealm->id)->where('faction_id', '=', $guildFaction->id)->get();
-				    
-				    if ($guildRealm && $guildFaction && count($characters)) {
-					    foreach ($guildData['items'] as $tabID => $itemArr) {
-						    $count += count($itemArr);
-					    }
-				    }
-			    }
+		if (isset($this->import_data['appearances']) && is_array($this->import_data['appearances'])) {
+			foreach ($this->import_data['appearances'] as $appArr) {
+				$count += count($appArr);
 			}
 		}
 		

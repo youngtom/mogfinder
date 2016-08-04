@@ -162,40 +162,6 @@ class ItemsController extends Controller
 	    return view('items.set-icons')->with('mogslot', $mogslot)->with('itemDisplays', $displays);
     }
     
-    public function duplicates($selectedCharacterURL = false) {
-	    $user = Auth::user();
-        
-        if ($selectedCharacterURL) {
-	        $selectedCharacter = Character::where('user_id', '=', $user->id)->where('url_token', '=', $selectedCharacterURL)->first();
-	        
-	        if (!$selectedCharacter) {
-		        return redirect('items/duplicates');
-	        }
-        } else {
-	        $selectedCharacter = null;
-        }
-        
-        $dupeItems = $user->getDuplicateItems(true, $selectedCharacter);
-        
-        if ($selectedCharacter) {
-	        $characters = Character::where('user_id', '=', $user->id)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');
-        } else {
-	        $charIDs = [];
-	        
-	        foreach ($dupeItems as $dupeItemArr) {
-		        foreach ($dupeItemArr as $item) {
-			        if ($item->character_id && !in_array($item->character_id, $charIDs)) {
-				        $charIDs[] = $item->character_id;
-			        }
-		        }
-	        }
-	        
-	        $characters = Character::whereIn('id', $charIDs)->orderBy('realm_id', 'ASC')->orderBy('name', 'ASC')->get()->groupBy('realm_id');
-        }
-                
-        return view('items.duplicates')->with('duplicates', $dupeItems)->with('characters', $characters)->with('selectedCharacter', $selectedCharacter)->with('pageTitle', 'Duplicate Items');
-    }
-    
     public function showItem($bnetID) {
 	    $items = Item::where('bnet_id', '=', $bnetID)->get();
 	    

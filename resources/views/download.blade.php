@@ -6,8 +6,8 @@
 	    <div class="row">
 		    <div class="jumbotron">
 			    <h1>ItemCollector v<?=$currentModVersion?></h1>
-			    <p>This addon is used to scan items obtained on your account. To use it, just log in to each character you wish to scan, open your bank and void storage (and open the heirloom tab on one character).</p>
-			    <p>Type /mcc to show a summary of what has been scanned.</p>
+			    <p>This addon is used to scan appearances obtained on your account. To use it, just log in to each character you wish to scan. Scanning will take place automatically on login, but you may also type /mcc to manually trigger a scan.</p>
+			    <p>Type /mcc clear to reset all scanned data (for all characters).</p>
 			    <p>To scan the currently open guild bank tab, type /mcc gb (/mcc gbclear will clear all of your current guild's bank data).</p>
 			    <p>
 				    <a class="btn btn-primary btn-lg" href="{{ asset('/files/ItemCollector.zip') }}" role="button">Download v<?=$currentModVersion?></a>
@@ -18,6 +18,9 @@
 		<div class="row">
 			<dl class="dl-horizontal">
 				<dd><h2>Addon Change History</h2></dd>
+				<dt>3.0.0</dt>
+				<dd>Complete rewrite for 7.0 & Legion</dd>
+				<dd>Addon no longer scans inventories and relies entirely on the new wardrobe system.</dd>
 				<dt>2.1.0</dt>
 				<dd>Added guild bank scanning. "/mcc gb" to scan the current tab of the guild bank. "/mcc gbclear" to clear current guild data.</dd>
 				<dd>Added completed quest scanning</dd>
