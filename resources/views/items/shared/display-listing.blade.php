@@ -71,7 +71,10 @@
             <i class="fa fa-btn fa-minus collapse-icon" title="collapse"></i> &nbsp; Appearance <?=$display->id?> <?=(!$mogslot) ? '(' . $display->mogslot->singular_label . ')' : ''?>
             <span class="display-item-info">
                 -
+                <?php if ($displayPrimaryItem) { ?>
                 <span class="display-item-link"><a href="http://www.wowhead.com/item=<?=$displayPrimaryItem->bnet_id?>" target="_blank" rel="<?=$displayPrimaryItem->getWowheadMarkup()?>" class="item-link q<?=$displayPrimaryItem->quality?>">[<?=$displayPrimaryItem->name?>]</a></span>
+				<?php } ?>
+				
                 <?php if (count($displayItems) > 1) { ?>
                 <small class="num-addl-items">(and <?=count($displayItems) - 1?> other<?=(count($displayItems) > 2) ? 's' : ''?>)</small>
                 <?php } ?>
