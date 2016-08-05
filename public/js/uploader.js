@@ -1,6 +1,6 @@
+var newAppearances = 0;
+
 $(function () {
-	var newAppearances = 0;
-	
     $('#luaupload').fileupload({
         dataType: 'json',
         acceptFileTypes: /(\.|\/)(lua)$/i,
