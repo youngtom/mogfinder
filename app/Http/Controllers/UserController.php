@@ -88,6 +88,7 @@ class UserController extends Controller
 					
 					$userFile->progress_total = $itemCount;
 					$userFile->progress_current = 0;
+					$userFile->progress_new = 0;
 					$userFile->save();
 					
 					\Log::info('Queuing ImportUserData for user: ' . $user->id . ' - userFile: ' . $userFile->id);

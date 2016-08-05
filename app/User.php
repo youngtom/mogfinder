@@ -116,13 +116,15 @@ class User extends Authenticatable
 					        $userItem->item_id = $item->id;
 					        $userItem->item_display_id = $item->item_display_id;
 					        $userItem->save();
+					        
+					        DB::table('user_datafiles')->where('id', '=', $dataFile->id)->increment('progress_new');
 						}
 				    } else {
 					    \Log::error('Item not found (' . $appKey . ') - ' . $itemStr);
 				    }
-				    
-				    DB::table('user_datafiles')->where('id', '=', $dataFile->id)->increment('progress_current');
 		        }
+		        
+		        DB::table('user_datafiles')->where('id', '=', $dataFile->id)->increment('progress_current');
 	        }
 	    }
     }

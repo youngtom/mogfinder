@@ -1,4 +1,6 @@
-$(function () {	
+$(function () {
+	var newAppearances = 0;
+	
     $('#luaupload').fileupload({
         dataType: 'json',
         acceptFileTypes: /(\.|\/)(lua)$/i,
@@ -11,6 +13,7 @@ $(function () {
 	        $('.fa-btn', $button).removeClass('fa-upload').addClass('fa-circle-o-notch').addClass('fa-spin');
 	        $('span', $button).html('&nbsp;Uploading...');
 	        $('.status.error').hide();
+	        newAppearances = 0;
         },
         done: function (e, data) {
 	        var $button = $(this).parent();
@@ -24,6 +27,7 @@ $(function () {
 	            $('#status-msg').show().html(data.result.msg);
 	            
 	            $('#upload-progress .progress-label').html('<span>0</span>%');
+	            newAppearances = parseInt(data.result.new);
 	            updateProgressbar(0, parseInt(data.result.total));
 	            
 	            if (data.result.reportURL) {
@@ -82,7 +86,7 @@ function updateProgressbar(current, total, $button) {
 				$button.removeClass('btn-warning').addClass('btn-success');
 		        $('span', $button).html('&nbsp;Complete');
 		        $('.fa-btn', $button).addClass('fa-check').removeClass('fa-circle-o-notch').removeClass('fa-spin');
-		        $('#status-msg').html('Import completed - ' + $bar.attr('aria-valuemax') + ' items processed.');
+		        $('#status-msg').html('Import completed - ' + $bar.attr('aria-valuemax') + ' appearances processed. ' + newAppearance + ' new appearances added.');
 			}
 		}
 	}

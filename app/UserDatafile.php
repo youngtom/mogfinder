@@ -33,7 +33,8 @@ class UserDatafile extends Model
 	public function getResponseDataArray() {
 		$data = [
 			'current' => $this->progress_current,
-			'total' => $this->progress_total
+			'total' => $this->progress_total,
+			'new' => $this->progress_new
 		];
 		
 		if ($this->response) {
@@ -61,9 +62,7 @@ class UserDatafile extends Model
 		$count = 0;
 		
 		if (isset($this->import_data['appearances']) && is_array($this->import_data['appearances'])) {
-			foreach ($this->import_data['appearances'] as $appArr) {
-				$count += count($appArr);
-			}
+			$count = count($this->import_data['appearances']);
 		}
 		
 		return $count;
